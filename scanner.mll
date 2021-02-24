@@ -15,6 +15,7 @@ rule token = parse
 | '}'      { RBRACE }
 | '['      { LSQUARE }
 | ']'      { RSQUARE }
+| '|'      { STICK }
 | ':'      { COLON }
 | ','      { COMMA }
 | '+'      { PLUS }
@@ -66,11 +67,9 @@ rule token = parse
 | "main"   { MAIN }
 | digits as lxm { LITERAL(int_of_string lxm) }
 | digits '.'  digit* ( ['e' 'E'] ['+' '-']? digits )? as lxm { FLIT(lxm) }
-| ['a'-'z' 'A'-'Z']['a'-'z' 'A'-'Z' '0'-'9' '_']*     as lxm { ID(lxm) }
-(*
-| ['a'-'z']+                                          as var { VAR(var) } 
-| ['A'-'Z']+                                          as actionID { ACTIONID(actionId) }
-*)
+(*| ['a'-'z' 'A'-'Z']['a'-'z' 'A'-'Z' '0'-'9' '_']*     as lxm { ID(lxm) } *)
+| ['a'-'z']+                                          as lxm { ID(lxm) } 
+| ['A'-'Z']+                                          as actionID { ACTIONID(actionID) }
 | eof { EOF }
 | _ as char { raise (Failure("illegal character " ^ Char.escaped char)) }
 
