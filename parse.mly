@@ -79,22 +79,24 @@ prim_typ:
 
 // Mara
 clas:
-     OBJECT         {  }
+     OBJECT         { Object }
 
 template_class:
      STICK typ STICK { }
 
 param:
-      typ ID     {}
+      typ ID     { }
 
 params_list:
       param       {}
+    | LPAREN param COMMA RPAREN {}
 
 arg:
       ID expr    {}
 
 args_list:
       arg       {}
+    | LPAREN arg COMMA RPAREN {}
 // end of Mara
 
 stmt:
