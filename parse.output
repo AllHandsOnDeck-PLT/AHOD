@@ -1,0 +1,71 @@
+   0  $accept : %entry% $end
+
+   1  program : decls EOF
+
+   2  decls : decls main_decl
+
+   3  main_decl :
+
+   4  %entry% : '\001' program
+
+state 0
+	$accept : . %entry% $end  (0)
+
+	'\001'  shift 1
+	.  error
+
+	%entry%  goto 2
+
+
+state 1
+	%entry% : '\001' . program  (4)
+
+
+	program  goto 3
+	decls  goto 4
+
+
+state 2
+	$accept : %entry% . $end  (0)
+
+	$end  accept
+
+
+state 3
+	%entry% : '\001' program .  (4)
+
+	.  reduce 4
+
+
+4: shift/reduce conflict (shift 5, reduce 3) on EOF
+state 4
+	program : decls . EOF  (1)
+	decls : decls . main_decl  (2)
+	main_decl : .  (3)
+
+	EOF  shift 5
+
+	main_decl  goto 6
+
+
+state 5
+	program : decls EOF .  (1)
+
+	.  reduce 1
+
+
+state 6
+	decls : decls main_decl .  (2)
+
+	.  reduce 2
+
+
+Rules never reduced:
+	main_decl :  (3)
+
+
+State 4 contains 1 shift/reduce conflict.
+
+
+61 terminals, 5 nonterminals
+5 grammar rules, 7 states
