@@ -108,7 +108,7 @@ params_list:
 
 
 arg:
-      ID expr    {}
+      expr    {}
 
 args_opt:
      /*nothing */                  {  }
