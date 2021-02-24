@@ -16,6 +16,17 @@ open Ast
 %start program
 %type <Ast.program> program
 
+%nonassoc NOT
+%right ASSIGN
+%left OR
+%left AND
+%left EQ NEQ
+%left LT GT LEQ GEQ 
+%left PLUS MINUS
+%left MOD 
+%left FLOOR 
+%left TIMES DIVIDE
+%left POWER
 
 %%
 
@@ -43,7 +54,6 @@ action_decl:
 helper_decl:
       ID LPAREN params_list RPAREN COLON expr       {}
     | ID LPAREN params_list RPAREN COLON stmt_block {}   
-// end of Christi
 
 // Tiff
 attr_decl:
@@ -87,17 +97,25 @@ args_list:
       arg       {}
 // end of Mara
 
-
+// guys I don't think the stmt in front will work because what if we don't want an additional stmt? 
+// am in the process of modifying so that we can have stmt_list instead
 stmt:
-      RETURN expr     {}
-    | stmt ID ASSIGN expr      {}
-    | stmt if_stmt          {}
-    | stmt for_stmt         {}
-    | stmt while_stmt       {}
+    expr                      {} 
+    | RETURN expr             {} 
+    //| LBRACE stmt_list RBRACE {}
+    | if_stmt            {}
+    | for_stmt           {}
+    | while_stmt         {}
+
+/*
+stmt_list: 
+    /* nothing     { }
+    | stmt_list stmt { }
+*/ 
 
 // Jang 
 if_stmt:
-    //  IF                 {}
+    //  IF               {} //maybe need to account for associativity here %left stuff
     | IF expr elif_stmt  {}
     | IF expr else_stmt  {}
 
@@ -115,30 +133,45 @@ while_stmt:
 // end of Jang
 
 expr:
-     LITERAL           {}
-    |  ID              {                 }
-    | expr PLUS        {    }
+    | expr PLUS   expr {} //binop 
+    | expr MINUS  expr {}
+    | expr TIMES  expr {}
+    | expr DIVIDE expr {}
+    | expr EQ     expr {}
+    | expr NEQ    expr {}
+    | expr LT     expr {}
+    | expr LEQ    expr {}
+    | expr GT     expr {}
+    | expr GEQ    expr {}
+    | expr AND    expr {}
+    | expr OR     expr {}
+    | expr MOD    expr {}
+    | expr POWER  expr {}
+    | expr FLOOR  expr {} //end of binop 
+    | ID ASSIGN expr   {}
+    | NOT expr         {}
+    | LPAREN expr RPAREN {}
     | call_action      {}
-    /*| expr MINUS  expr {    }
-    | expr TIMES  expr {    }
-    | expr DIVIDE expr {    }
-    | expr EQ     expr { Binop($1, Equal, $3)   }
-    | expr NEQ    expr { Binop($1, Neq,   $3)   }
-    | expr LT     expr { Binop($1, Less,  $3)   }
-    | expr LEQ    expr { Binop($1, Leq,   $3)   }
-    | expr GT     expr { Binop($1, Greater, $3) }
-    | expr GEQ    expr { Binop($1, Geq,   $3)   }
-    | expr AND    expr { Binop($1, And,   $3)   }
-    | expr OR     expr { Binop($1, Or,    $3)   }
+    | call_class       {}
+    // | call_helper      {} 
+    | LITERAL          {} //digits 
+    | FLIT             {} 
+    | BLIT             {} 
+    | ID               {}
+    | NONE             {}
+/*
     | MINUS expr %prec NOT { Unop(Neg, $2)      }
-    | NOT expr         { Unop(Not, $2)          }
-    | ID ASSIGN expr   { Assign($1, $3)         }
+     Assign($1, $3)         }
     | ID LPAREN args_opt RPAREN { Call($1, $3)  }
-    | LPAREN expr RPAREN { $2                   }
-    | expr MOD    expr {Binop($1, Mod,    $3)   }
-    | expr POWER  expr {Binop($1, Power,    $3) }
-    | expr FLOOR  expr {Binop($1, Floor,    $3) }
     | DO ID args_opt   { Call($2, $3)           }*/
 
 call_action:
     ID DO ACTIONID    {}
+
+call_class: 
+      ID LPAREN args_list RPAREN {} 
+
+/* not included because it causes ambiguity with call_class 
+call_helper: 
+      ID LPAREN args_list RPAREN {} 
+*/ 
