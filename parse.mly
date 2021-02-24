@@ -39,14 +39,14 @@ decls:
     | decls class_decl  {}
     | decls action_decl {}
     | decls helper_decl {}
-    | decls attr_decl   {}
+//     | decls attr_decl   {} <- produces a reduce/shift error with helper_decl, moved to class_block 
 
 main_decl:
       MAIN COLON stmt_block {} 
 
 class_decl:
       LET clas BE typ WITH COLON class_block                                                       {} //WITH COLON class_block: opt
-    | LET clas LPAREN params_list RPAREN BE typ LPAREN args_list RPAREN WITH COLON class_block     {} //params_list, args_list: opt
+    | LET clas LPAREN params_opt RPAREN BE typ LPAREN args_opt RPAREN WITH COLON class_block     {} //params_list, args_list: opt
 
 action_decl:
       WHEN typ ID DO ACTIONID LPAREN params_list RPAREN COLON stmt_block                           {} //typ ID: opt
@@ -57,15 +57,26 @@ helper_decl:
 
 // Tiff
 attr_decl:
-      CONST typ COLON {}
+      const_opt typ_opt ID COLON expr {}
+    | const_opt typ_opt ID COLON stmt_block {}   
+
 
 stmt_block:
       LBRACE stmt_block stmt RBRACE {}
 
 class_block:
-      LPAREN RPAREN {}
+      LPAREN attr_decl RPAREN {}
+
 // end of Tiff
 
+//Optional
+const_opt: //may make sense to move this to a different section of grammar?  
+     /* nothing */      {}
+    | CONST   {}
+
+typ_opt:
+     /* nothing */      {}
+    | typ   {}
 
 typ:
       typ prim_typ {}
@@ -87,18 +98,24 @@ template_class:
 param:
       typ ID     { }
 
+params_opt:
+     /*nothing */                  {  }
+    | params_list          {}
+
 params_list:
-      /*nothing */                  {}
-    |  param                        {}
+      param                        {}
     | params_list COMMA  param      {}
 
 
 arg:
       ID expr    {}
 
+args_opt:
+     /*nothing */                  {  }
+    | args_list          {}
+
 args_list:
-     /*nothing */                  {}
-    |  arg                         {}
+     arg                         {}
     | args_list COMMA  arg         {}
 
 // end of Mara
