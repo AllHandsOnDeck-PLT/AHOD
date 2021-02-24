@@ -28,21 +28,21 @@ decls:
     | decls class_decl  {}
     | decls action_decl {}
     | decls helper_decl {}
-    | decls attr_decl {}
+    | decls attr_decl   {}
 
-// Christi
 main_decl:
       MAIN COLON stmt_block {} 
 
 class_decl:
-      LET BE class_block {}
-    | params_list args_list      {}
+      LET clas BE typ WITH COLON class_block                                                       {} //WITH COLON class_block: opt
+    | LET clas LPAREN params_list RPAREN BE typ LPAREN args_list RPAREN WITH COLON class_block     {} //params_list, args_list: opt
 
 action_decl:
-      WHEN DO {}
+      WHEN typ ID DO ACTIONID LPAREN params_list RPAREN COLON stmt_block                           {} //typ ID: opt
 
 helper_decl:
-      ID COLON {}
+      ID LPAREN params_list RPAREN COLON expr       {}
+    | ID LPAREN params_list RPAREN COLON stmt_block {}   
 // end of Christi
 
 // Tiff

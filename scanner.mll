@@ -1,7 +1,5 @@
 (* Ocamllex scanner for AHOD *)
-(* associativity only useful for multiple expressions*)
 { open Parse }
-
 
 let digit = ['0' - '9']
 let digits = digit+
