@@ -30,6 +30,7 @@ decls:
     | decls helper_decl {}
     | decls attr_decl {}
 
+// Christi
 main_decl:
       MAIN COLON stmt_block {} 
 
@@ -42,7 +43,9 @@ action_decl:
 
 helper_decl:
       ID COLON {}
+// end of Christi
 
+// Tiff
 attr_decl:
       CONST typ COLON {}
 
@@ -51,6 +54,8 @@ stmt_block:
 
 class_block:
       LPAREN RPAREN {}
+// end of Tiff
+
 
 typ:
       typ prim_typ {}
@@ -62,6 +67,7 @@ prim_typ:
     | FLOAT         { Float }
     | BOOL          { Bool  }
 
+// Mara
 clas:
      OBJECT         {  }
 
@@ -79,6 +85,8 @@ arg:
 
 args_list:
       arg       {}
+// end of Mara
+
 
 stmt:
       RETURN expr     {}
@@ -87,6 +95,7 @@ stmt:
     | stmt for_stmt         {}
     | stmt while_stmt       {}
 
+// Jang 
 if_stmt:
     //  IF                 {}
     | IF expr elif_stmt  {}
@@ -103,6 +112,7 @@ for_stmt:
 
 while_stmt:
       WHILE expr    {}
+// end of Jang
 
 expr:
      LITERAL           {}
