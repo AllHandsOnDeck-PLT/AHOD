@@ -60,7 +60,7 @@ attr_decl:
       CONST typ COLON {}
 
 stmt_block:
-      LBRACE stmt RBRACE {}
+      LBRACE stmt_block stmt RBRACE {}
 
 class_block:
       LPAREN RPAREN {}
@@ -97,21 +97,12 @@ args_list:
       arg       {}
 // end of Mara
 
-// guys I don't think the stmt in front will work because what if we don't want an additional stmt? 
-// am in the process of modifying so that we can have stmt_list instead
 stmt:
     expr                      {} 
     | RETURN expr             {} 
-    //| LBRACE stmt_list RBRACE {}
-    | if_stmt            {}
-    | for_stmt           {}
-    | while_stmt         {}
-
-/*
-stmt_list: 
-    /* nothing     { }
-    | stmt_list stmt { }
-*/ 
+    | if_stmt                 {}
+    | for_stmt                {}
+    | while_stmt              {}
 
 // Jang 
 if_stmt:
