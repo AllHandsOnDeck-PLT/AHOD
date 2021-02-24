@@ -37,4 +37,4 @@ type func_decl = {
     body : stmt list;
   }
 
-type program = int(*bind list * func_decl list*)
+type program = unit(*bind list * func_decl list*)

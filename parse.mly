@@ -23,31 +23,32 @@ program:
     decls EOF { $1 }
 
 decls:
-    | decls main_decl   { }
-    | decls class_decl  { }
+     /* nothing */      {}
+    | decls main_decl   {}
+    | decls class_decl  {}
     | decls action_decl {}
     | decls helper_decl {}
     | decls attr_decl {}
 
-
 main_decl:
-     /* nothing */      {   []   }
+    MAIN COLON stmt_block {} 
 
 class_decl:
-     /* nothing */      {   []    }
+    LET BE class_block {}
+
 
 action_decl:
-     /* nothing */      {   []    }
+    WHEN DO {}
 
 helper_decl:
-     /* nothing */      {   []    }
+    ID COLON {}
 
 attr_decl:
-     /* nothing */      {   []    }
+    CONST COLON {}
 
 stmt_block:
-     /* nothing */      {   []    }
+    LBRACE RBRACE {}
 
 class_block:
-     /* nothing */      {   []    }
+    LPAREN RPAREN {}
 

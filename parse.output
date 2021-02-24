@@ -2,11 +2,28 @@
 
    1  program : decls EOF
 
-   2  decls : decls main_decl
+   2  decls :
+   3        | decls main_decl
+   4        | decls class_decl
+   5        | decls action_decl
+   6        | decls helper_decl
+   7        | decls attr_decl
 
-   3  main_decl :
+   8  main_decl : MAIN COLON
 
-   4  %entry% : '\001' program
+   9  class_decl : LET BE
+
+  10  action_decl : WHEN DO
+
+  11  helper_decl : ID COLON
+
+  12  attr_decl : CONST COLON
+
+  13  stmt_block : LBRACE RBRACE
+
+  14  class_block : LPAREN RPAREN
+
+  15  %entry% : '\001' program
 
 state 0
 	$accept : . %entry% $end  (0)
@@ -18,8 +35,10 @@ state 0
 
 
 state 1
-	%entry% : '\001' . program  (4)
+	%entry% : '\001' . program  (15)
+	decls : .  (2)
 
+	.  reduce 2
 
 	program  goto 3
 	decls  goto 4
@@ -32,40 +51,139 @@ state 2
 
 
 state 3
-	%entry% : '\001' program .  (4)
+	%entry% : '\001' program .  (15)
 
-	.  reduce 4
+	.  reduce 15
 
 
-4: shift/reduce conflict (shift 5, reduce 3) on EOF
 state 4
 	program : decls . EOF  (1)
-	decls : decls . main_decl  (2)
-	main_decl : .  (3)
+	decls : decls . main_decl  (3)
+	decls : decls . class_decl  (4)
+	decls : decls . action_decl  (5)
+	decls : decls . helper_decl  (6)
+	decls : decls . attr_decl  (7)
 
-	EOF  shift 5
+	WHEN  shift 5
+	LET  shift 6
+	MAIN  shift 7
+	ID  shift 8
+	CONST  shift 9
+	EOF  shift 10
+	.  error
 
-	main_decl  goto 6
+	main_decl  goto 11
+	class_decl  goto 12
+	action_decl  goto 13
+	helper_decl  goto 14
+	attr_decl  goto 15
 
 
 state 5
+	action_decl : WHEN . DO  (10)
+
+	DO  shift 16
+	.  error
+
+
+state 6
+	class_decl : LET . BE  (9)
+
+	BE  shift 17
+	.  error
+
+
+state 7
+	main_decl : MAIN . COLON  (8)
+
+	COLON  shift 18
+	.  error
+
+
+state 8
+	helper_decl : ID . COLON  (11)
+
+	COLON  shift 19
+	.  error
+
+
+state 9
+	attr_decl : CONST . COLON  (12)
+
+	COLON  shift 20
+	.  error
+
+
+state 10
 	program : decls EOF .  (1)
 
 	.  reduce 1
 
 
-state 6
-	decls : decls main_decl .  (2)
+state 11
+	decls : decls main_decl .  (3)
 
-	.  reduce 2
+	.  reduce 3
+
+
+state 12
+	decls : decls class_decl .  (4)
+
+	.  reduce 4
+
+
+state 13
+	decls : decls action_decl .  (5)
+
+	.  reduce 5
+
+
+state 14
+	decls : decls helper_decl .  (6)
+
+	.  reduce 6
+
+
+state 15
+	decls : decls attr_decl .  (7)
+
+	.  reduce 7
+
+
+state 16
+	action_decl : WHEN DO .  (10)
+
+	.  reduce 10
+
+
+state 17
+	class_decl : LET BE .  (9)
+
+	.  reduce 9
+
+
+state 18
+	main_decl : MAIN COLON .  (8)
+
+	.  reduce 8
+
+
+state 19
+	helper_decl : ID COLON .  (11)
+
+	.  reduce 11
+
+
+state 20
+	attr_decl : CONST COLON .  (12)
+
+	.  reduce 12
 
 
 Rules never reduced:
-	main_decl :  (3)
+	stmt_block : LBRACE RBRACE  (13)
+	class_block : LPAREN RPAREN  (14)
 
 
-State 4 contains 1 shift/reduce conflict.
-
-
-61 terminals, 5 nonterminals
-5 grammar rules, 7 states
+61 terminals, 11 nonterminals
+16 grammar rules, 21 states
