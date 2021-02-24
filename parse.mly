@@ -39,7 +39,6 @@ decls:
     | decls class_decl  {}
     | decls action_decl {}
     | decls helper_decl {}
-//     | decls attr_decl   {} <- produces a reduce/shift error with helper_decl, moved to class_block 
 
 main_decl:
       MAIN COLON stmt_block {} 
@@ -51,21 +50,29 @@ class_decl:
 action_decl:
       WHEN typ ID DO ACTIONID LPAREN params_list RPAREN COLON stmt_block                           {} //typ ID: opt
 
-helper_decl:
+ helper_decl:
       ID LPAREN params_list RPAREN COLON expr       {}
-    | ID LPAREN params_list RPAREN COLON stmt_block {}   
+    | ID LPAREN params_list RPAREN COLON stmt_block {}    
+
+helper_decl_list:
+    /* nothing */      {}
+    | helper_decl_list helper_decl {}  
 
 // Tiff
 attr_decl:
       const_opt typ_opt ID COLON expr {}
     | const_opt typ_opt ID COLON stmt_block {}   
 
+attr_decl_list:
+ //   /* nothing */      {}
+    | attr_decl_list attr_decl {}   
 
 stmt_block:
-      LBRACE stmt_block stmt RBRACE {}
+//      /* nothing */      {} //shift/reduce conflict with ln 59 and 61, related to ID 
+     | LBRACE stmt_block stmt RBRACE {}
 
 class_block:
-      LPAREN attr_decl RPAREN {}
+      | LBRACE helper_decl_list attr_decl_list RBRACE {} //order results in shift/reduce error if ln 68 is uncommented    
 
 // end of Tiff
 
