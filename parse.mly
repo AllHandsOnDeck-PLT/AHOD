@@ -141,16 +141,17 @@ if_stmt:
     | IF expr else_stmt  {}
 
 elif_stmt:
-      ELIF      {}
+      ELIF expr COLON stmt_block elif_stmt     {}
+    | ELIF expr COLON stmt_block else_stmt     {}
 
 else_stmt:
-      ELSE      {}
+      ELSE COLON stmt_block     {}
 
 for_stmt:
-      FOR ID    {}
+      FOR ID IN expr COLON stmt_block   {}
 
 while_stmt:
-      WHILE expr    {}
+      WHILE expr COLON stmt_block else_stmt   {}
 // end of Jang
 
 expr:
