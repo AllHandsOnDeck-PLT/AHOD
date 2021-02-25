@@ -45,7 +45,7 @@ main_decl:
 
 class_decl:
       LET clas BE typ WITH COLON class_block                                                       {} //WITH COLON class_block: opt
-    | LET clas LPAREN params_opt RPAREN BE typ LPAREN args_opt RPAREN WITH COLON class_block     {} //params_list, args_list: opt
+    | LET clas LPAREN params_opt RPAREN BE typ LPAREN args_opt RPAREN WITH COLON class_block     {} 
 
 action_decl:
       WHEN typ ID DO ACTIONID LPAREN params_list RPAREN COLON stmt_block                           {} //typ ID: opt
@@ -58,26 +58,22 @@ helper_decl_list:
     /* nothing */      {}
     | helper_decl_list helper_decl {}  
 
-// Tiff
 attr_decl:
       const_opt typ_opt ID COLON expr {}
     | const_opt typ_opt ID COLON stmt_block {}   
 
 attr_decl_list:
- //   /* nothing */      {}
+//    /* nothing */      {}
     | attr_decl_list attr_decl {}   
 
 stmt_block:
-//      /* nothing */      {} //shift/reduce conflict with ln 59 and 61, related to ID 
+//      /* nothing */      {} //shift/reduce conflict with ln 54 and 64, related to ID 
      | LBRACE stmt_block stmt RBRACE {}
 
 class_block:
-      | LBRACE helper_decl_list attr_decl_list RBRACE {} //order results in shift/reduce error if ln 68 is uncommented    
+      | LBRACE helper_decl_list attr_decl_list RBRACE {} //order results in shift/reduce error if ln 67 is uncommented    
 
-// end of Tiff
-
-//Optional
-const_opt: //may make sense to move this to a different section of grammar?  
+const_opt: 
      /* nothing */      {}
     | CONST   {}
 
@@ -95,7 +91,6 @@ prim_typ:
     | FLOAT         { Float }
     | BOOL          { Bool  }
 
-// Mara
 clas:
      OBJECT         { }
 
@@ -113,7 +108,6 @@ params_list:
       param                        {}
     | params_list COMMA  param      {}
 
-
 arg:
       expr    {}
 
@@ -125,8 +119,6 @@ args_list:
      arg                         {}
     | args_list COMMA  arg         {}
 
-// end of Mara
-
 stmt:
     expr                      {} 
     | RETURN expr             {} 
@@ -134,7 +126,6 @@ stmt:
     | for_stmt                {}
     | while_stmt              {}
 
-// Jang 
 if_stmt:
     //  IF               {} //maybe need to account for associativity here %left stuff
     | IF expr elif_stmt  {}
@@ -152,7 +143,6 @@ for_stmt:
 
 while_stmt:
       WHILE expr COLON stmt_block else_stmt   {}
-// end of Jang
 
 expr:
     | expr PLUS   expr {} //binop 
@@ -175,7 +165,7 @@ expr:
     | LPAREN expr RPAREN {}
     | call_action      {}
     | call_class       {}
-    // | call_helper      {} 
+    | call_helper      {} 
     | LITERAL          {} //digits 
     | FLIT             {} 
     | BLIT             {} 
@@ -189,11 +179,10 @@ expr:
 
 call_action:
     ID DO ACTIONID    {}
+    | ID DO ACTIONID LPAREN args_opt RPAREN   {}
 
 call_class: 
-      ID LPAREN args_list RPAREN {} 
+      clas LPAREN args_opt RPAREN {} 
 
-/* not included because it causes ambiguity with call_class 
 call_helper: 
-      ID LPAREN args_list RPAREN {} 
-*/ 
+      ID LPAREN args_opt RPAREN {} 
