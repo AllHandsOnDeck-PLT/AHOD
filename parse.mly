@@ -31,11 +31,10 @@ open Ast
 %%
 
 program:
-    decls EOF { $1 }
+      main_decl decls EOF { $1 }
 
 decls:
      /* nothing */      {}
-    | decls main_decl   {}
     | decls class_decl  {}
     | decls action_decl {}
     | decls helper_decl {}
@@ -44,34 +43,39 @@ main_decl:
       MAIN COLON stmt_block {} 
 
 class_decl:
-      LET clas BE typ WITH COLON class_block                                                       {} //WITH COLON class_block: opt
+      LET clas BE typ WITH COLON class_block        {} //WITH COLON class_block: opt
+    | LET clas BE typ                               {}
     | LET clas LPAREN params_opt RPAREN BE typ LPAREN args_opt RPAREN WITH COLON class_block     {} 
 
 action_decl:
       WHEN typ ID DO ACTIONID LPAREN params_list RPAREN COLON stmt_block                           {} //typ ID: opt
+    | WHEN DO ACTIONID LPAREN params_list RPAREN COLON stmt_block                                  {}
+    //| WHEN typ ID DO ACTIONID params_list COLON stmt_block                           {}
+    //| WHEN DO ACTIONID params_list COLON stmt_block                                  {}
 
- helper_decl:
-      ID LPAREN params_list RPAREN COLON expr       {}
-    | ID LPAREN params_list RPAREN COLON stmt_block {}    
+helper_decl:
+      ID LPAREN params_list RPAREN COLON stmt_block {}
 
 helper_decl_list:
-    /* nothing */      {}
-    | helper_decl_list helper_decl {}  
+      helper_decl_list helper_decl {}  
 
 attr_decl:
-      const_opt typ_opt ID COLON expr {}
-    | const_opt typ_opt ID COLON stmt_block {}   
+      const_opt typ_opt ID COLON stmt_block {}
+    // | const_opt typ_opt ID COLON expr {}  distinction between stmt_block and expr within functions?
+    // Can expressions be standalone rn?
 
 attr_decl_list:
-//    /* nothing */      {}
-    | attr_decl_list attr_decl {}   
+      attr_decl_list attr_decl {}   
 
 stmt_block:
-//      /* nothing */      {} //shift/reduce conflict with ln 54 and 64, related to ID 
-     | LBRACE stmt_block stmt RBRACE {}
+      /* nothing */      {} //shift/reduce conflict with ln 54 and 64, related to ID 
+    | LBRACE stmt_block stmt RBRACE {}
 
 class_block:
-      | LBRACE helper_decl_list attr_decl_list RBRACE {} //order results in shift/reduce error if ln 67 is uncommented    
+      LBRACE helper_decl_list RBRACE {}    
+    | LBRACE attr_decl_list RBRACE {}
+    | LBRACE helper_decl_list attr_decl_list RBRACE {} //order results in shift/reduce error if ln 67 is uncommented    
+
 
 const_opt: 
      /* nothing */      {}
@@ -87,7 +91,7 @@ typ:
     | typ template_class {}
     
 prim_typ:
-     INT            { Int }
+      INT            { Int }
     | FLOAT         { Float }
     | BOOL          { Bool  }
 
@@ -116,31 +120,36 @@ args_opt:
     | args_list          {}
 
 args_list:
-     arg                         {}
-    | args_list COMMA  arg         {}
+     arg                          {}
+    | args_list COMMA arg         {}
 
 stmt:
-    expr                      {} 
+      expr                    {} 
     | RETURN expr             {} 
     | if_stmt                 {}
     | for_stmt                {}
     | while_stmt              {}
 
+// Jang 
 if_stmt:
     //  IF               {} //maybe need to account for associativity here %left stuff
     | IF expr elif_stmt  {}
     | IF expr else_stmt  {}
 
+// Jang 
 elif_stmt:
       ELIF expr COLON stmt_block elif_stmt     {}
     | ELIF expr COLON stmt_block else_stmt     {}
 
+// Jang
 else_stmt:
       ELSE COLON stmt_block     {}
 
+// Christi
 for_stmt:
       FOR ID IN expr COLON stmt_block   {}
 
+// Christi
 while_stmt:
       WHILE expr COLON stmt_block else_stmt   {}
 
@@ -178,7 +187,7 @@ expr:
     | DO ID args_opt   { Call($2, $3)           }*/
 
 call_action:
-    ID DO ACTIONID    {}
+      ID DO ACTIONID    {}
     | ID DO ACTIONID LPAREN args_opt RPAREN   {}
 
 call_class: 

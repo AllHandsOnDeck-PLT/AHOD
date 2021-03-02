@@ -37,4 +37,28 @@ type func_decl = {
     body : stmt list;
   }
 
+(*
+We needa figure out how this works lmao
+--------------------
+Jang:
+- if
+- elif
+- else
+- typ
+
+Christi:
+- Data structure
+- For
+- while
+
+Tiff:
+- decl
+- class + param + arg
+
+Mara:
+- expr
+- call_*
+- stmt
+
+*)
 type program = unit(*bind list * func_decl list*)
