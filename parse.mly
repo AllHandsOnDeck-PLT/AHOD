@@ -4,7 +4,7 @@
 open Ast
 %}
 
-%token LPAREN RPAREN LBRACE RBRACE LSQUARE RSQUARE LBRACK RBRACK COLON COMMA PLUS MINUS TIMES DIVIDE ASSIGN MOD POWER FLOOR DOTDOT NEWLINE
+%token LPAREN RPAREN LBRACE RBRACE LSQUARE RSQUARE LBRACK RBRACK COLON COMMA PLUS MINUS TIMES DIVIDE ASSIGN MOD POWER FLOOR DOTDOT DOTDOTDOT NEWLINE
 %token NOT EQ NEQ LT LEQ GT GEQ AND OR IN
 %token RETURN IF ELIF ELSE FOR WHILE INT BOOL FLOAT NONE STRING ACTOR OBJECT STACK SERIES COLLECTION RANGE WHEN DO LET BE WITH NEW MAIN /* think about TIMES */
 %token <int> LITERAL
@@ -179,9 +179,13 @@ expr:
     | Series_literal   {} 
     | ID               {} 
     | NONE             {}
+//    | dotted_range     {}
 //    | comprehension    {} 
 //    | slice {}
 //    | index {}
+
+//not (expr for id in expr)
+//(not expr) for id in expr
 
 call_action:
       ID DO ACTIONID    {}
@@ -203,6 +207,10 @@ list_args_opt:
 items:
       /* nothing */      {}
       | items COMMA expr  {}
+
+//dotted_range:
+//      | expr DOTDOT expr  {}
+//      | expr DOTDOTDOT expr {}
 
 //comprehension:
 //    expr FOR ID IN expr {}
