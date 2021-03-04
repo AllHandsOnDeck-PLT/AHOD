@@ -13,7 +13,8 @@ rule token = parse
 | '}'      { RBRACE }
 | '['      { LSQUARE }
 | ']'      { RSQUARE }
-| '|'      { STICK }
+| '<'      { LBRACK }
+| '>'      { RBRACK }
 | ':'      { COLON }
 | ','      { COMMA }
 | '+'      { PLUS }
@@ -52,23 +53,18 @@ rule token = parse
 | "return" { RETURN }
 | "int"    { INT }
 | "bool"   { BOOL }
-| "String" { STRING }
+| "string" { STRING }
 | "float"  { FLOAT }
-| "Actor"  { ACTOR }
-| "Object" { OBJECT }
-| "Collection" { COLLECTION }
-| "Series" { SERIES }
-| "Stack"  { STACK }
-| "none"   { NONE }
-| "true"   { BLIT(true)  }
-| "false"  { BLIT(false) }
+| "None"   { NONE }
+| "True"   { BLIT(true)  }
+| "False"  { BLIT(false) }
 | "main"   { MAIN }
 | digits as lxm { LITERAL(int_of_string lxm) }
-| digits '.'  digit* ( ['e' 'E'] ['+' '-']? digits )? as lxm { FLIT(lxm) }
+| ['-']? (digits '.'  digit* ( ['e' 'E'] ['+' '-']? digits )?) as lxm { FLIT(lxm) }
 (*| ['a'-'z' 'A'-'Z']['a'-'z' 'A'-'Z' '0'-'9' '_']*     as lxm { ID(lxm) } *)
 | ['a'-'z']['a'-'z' '0'-'9' '_']*                     as lxm { ID(lxm) } 
 | ['A'-'Z']['A'-'Z' '0'-'9' '_']*                     as actionID { ACTIONID(actionID) }
-(*| ['a'-'z' 'A'-'Z']['a'-'z' 'A'-'Z' '0'-'9']*                     as classID { CLASSID(classID) } *)
+| ['A'-'Z']['a'-'z' 'A'-'Z' '0'-'9']*                     as classID { CLASSID(classID) } 
 | eof { EOF }
 | _ as char { raise (Failure("illegal character " ^ Char.escaped char)) }
 

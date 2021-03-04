@@ -4,12 +4,12 @@
 open Ast
 %}
 
-%token LPAREN RPAREN LBRACE RBRACE LSQUARE RSQUARE STICK COLON COMMA PLUS MINUS TIMES DIVIDE ASSIGN MOD POWER FLOOR DOTDOT NEWLINE
+%token LPAREN RPAREN LBRACE RBRACE LSQUARE RSQUARE LBRACK RBRACK COLON COMMA PLUS MINUS TIMES DIVIDE ASSIGN MOD POWER FLOOR DOTDOT NEWLINE
 %token NOT EQ NEQ LT LEQ GT GEQ AND OR IN
 %token RETURN IF ELIF ELSE FOR WHILE INT BOOL FLOAT NONE STRING ACTOR OBJECT STACK SERIES COLLECTION RANGE WHEN DO LET BE WITH NEW MAIN /* think about TIMES */
 %token <int> LITERAL
 %token <bool> BLIT
-%token <string> ID ACTIONID FLIT
+%token <string> ID ACTIONID CLASSID FLIT
 %token CONST
 %token EOF
 
@@ -72,10 +72,13 @@ stmt_block:
     | LBRACE stmt_block stmt RBRACE {}
 
 class_block:
-      LBRACE helper_decl_list RBRACE {}    
-    | LBRACE attr_decl_list RBRACE {}
-    | LBRACE helper_decl_list attr_decl_list RBRACE {} //order results in shift/reduce error if ln 67 is uncommented    
+    LBRACE class_decl_list RBRACE {}
 
+class_decl_list:
+  | helper_decl_list {}
+  | attr_decl_list {}
+  | class_decl_list helper_decl_list {}
+  | class_decl_list attr_decl_list {}
 
 const_opt: 
      /* nothing */      {}
@@ -99,7 +102,7 @@ clas:
      OBJECT         { }
 
 template_class:
-     STICK typ STICK { }
+     LBRACK typ RBRACK { }
 
 param:
       typ ID     { }
@@ -129,27 +132,22 @@ stmt:
     | if_stmt                 {}
     | for_stmt                {}
     | while_stmt              {}
-
-// Jang 
+ 
 if_stmt:
     //  IF               {} //maybe need to account for associativity here %left stuff
     | IF expr elif_stmt  {}
     | IF expr else_stmt  {}
 
-// Jang 
 elif_stmt:
       ELIF expr COLON stmt_block elif_stmt     {}
     | ELIF expr COLON stmt_block else_stmt     {}
 
-// Jang
 else_stmt:
       ELSE COLON stmt_block     {}
 
-// Christi
 for_stmt:
       FOR ID IN expr COLON stmt_block   {}
 
-// Christi
 while_stmt:
       WHILE expr COLON stmt_block else_stmt   {}
 
@@ -175,16 +173,14 @@ expr:
     | call_action      {}
     | call_class       {}
     | call_helper      {} 
-    | LITERAL          {} //digits 
+    | LITERAL          {} //literals
     | FLIT             {} 
     | BLIT             {} 
-    | ID               {}
+    | ID               {} 
     | NONE             {}
-/*
-    | MINUS expr %prec NOT { Unop(Neg, $2)      }
-     Assign($1, $3)         }
-    | ID LPAREN args_opt RPAREN { Call($1, $3)  }
-    | DO ID args_opt   { Call($2, $3)           }*/
+//    | comprehension    {} 
+//    | slice {}
+//    | index {}
 
 call_action:
       ID DO ACTIONID    {}
@@ -195,3 +191,11 @@ call_class:
 
 call_helper: 
       ID LPAREN args_opt RPAREN {} 
+
+//comprehension:
+//    expr FOR ID IN expr {}
+
+//slice:
+//    | expr {}
+//    | expr_opt
+

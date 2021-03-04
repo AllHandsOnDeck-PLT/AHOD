@@ -23,7 +23,8 @@ parse.cmx : ast.cmi parse.cmi
 scanner.cmo : parse.cmi
 scanner.cmx : parse.cmx
 
-
+parse.output : parse.mly
+	ocamlyacc -v parse.mly
 ##############################
 
 #TARFILES = README Makefile \
@@ -35,4 +36,4 @@ scanner.cmx : parse.cmx
 .PHONY : clean
 clean :
 	rm -rf \
-	*.cmi *.cmo parse.ml parse.mli scanner.ml test
+	*.cmi *.cmo parse.ml parse.mli parse.output scanner.ml test 

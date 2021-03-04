@@ -9,6 +9,7 @@ type typ = Int | Bool | Float | None
 
 type bind = typ * string
 
+(*type Stack = typ*)
 
 type expr =
     Literal of int
