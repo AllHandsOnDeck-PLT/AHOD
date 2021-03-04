@@ -6,7 +6,7 @@ open Ast
 
 %token LPAREN RPAREN LBRACE RBRACE LSQUARE RSQUARE LBRACK RBRACK COLON COMMA PLUS MINUS TIMES DIVIDE ASSIGN MOD POWER FLOOR DOTDOT NEWLINE
 %token NOT EQ NEQ LT LEQ GT GEQ AND OR IN
-%token RETURN IF ELIF ELSE FOR WHILE INT BOOL FLOAT NONE STRING ACTOR OBJECT STACK SERIES COLLECTION RANGE WHEN DO LET BE WITH NEW MAIN /* think about TIMES */
+%token RETURN IF ELIF ELSE FOR WHILE INT BOOL FLOAT NONE STRING RANGE WHEN DO LET BE WITH NEW MAIN /* think about TIMES */
 %token <int> LITERAL
 %token <bool> BLIT
 %token <string> ID ACTIONID CLASSID FLIT
@@ -94,12 +94,12 @@ typ:
     | typ template_class {}
     
 prim_typ:
-      INT            { Int }
+      INT           { Int }
     | FLOAT         { Float }
     | BOOL          { Bool  }
 
 clas:
-     OBJECT         { }
+     CLASSID        { }
 
 template_class:
      LBRACK typ RBRACK { }
@@ -127,14 +127,13 @@ args_list:
     | args_list COMMA arg         {}
 
 stmt:
-      expr                    {} 
-    | RETURN expr             {} 
-    | if_stmt                 {}
-    | for_stmt                {}
-    | while_stmt              {}
+      expr                                           {} 
+    | RETURN expr                                    {} 
+    | if_stmt                                        {}
+    | FOR ID IN expr COLON stmt_block                {} //Christi 
+    | WHILE expr COLON stmt_block else_stmt          {} //Christi
  
 if_stmt:
-    //  IF               {} //maybe need to account for associativity here %left stuff
     | IF expr elif_stmt  {}
     | IF expr else_stmt  {}
 
@@ -145,39 +144,33 @@ elif_stmt:
 else_stmt:
       ELSE COLON stmt_block     {}
 
-for_stmt:
-      FOR ID IN expr COLON stmt_block   {}
-
-while_stmt:
-      WHILE expr COLON stmt_block else_stmt   {}
-
 expr:
-    | expr PLUS   expr {} //binop 
-    | expr MINUS  expr {}
-    | expr TIMES  expr {}
-    | expr DIVIDE expr {}
-    | expr EQ     expr {}
-    | expr NEQ    expr {}
-    | expr LT     expr {}
-    | expr LEQ    expr {}
-    | expr GT     expr {}
-    | expr GEQ    expr {}
-    | expr AND    expr {}
-    | expr OR     expr {}
-    | expr MOD    expr {}
-    | expr POWER  expr {}
-    | expr FLOOR  expr {} //end of binop 
-    | ID ASSIGN expr   {}
-    | NOT expr         {}
-    | LPAREN expr RPAREN {}
-    | call_action      {}
-    | call_class       {}
-    | call_helper      {} 
-    | LITERAL          {} //literals
-    | FLIT             {} 
-    | BLIT             {} 
-    | ID               {} 
-    | NONE             {}
+    | expr PLUS   expr { Binop($1, Add,     $3)} //binop 
+    | expr MINUS  expr { Binop($1, Sub,     $3)}
+    | expr TIMES  expr { Binop($1, Mult,    $3)}
+    | expr DIVIDE expr { Binop($1, Div,     $3)}
+    | expr EQ     expr { Binop($1, Equal,   $3)}
+    | expr NEQ    expr { Binop($1, Equal,   $3)}
+    | expr LT     expr { Binop($1, Less,    $3)}
+    | expr LEQ    expr { Binop($1, Leq,     $3)}
+    | expr GT     expr { Binop($1, Greater, $3)}
+    | expr GEQ    expr { Binop($1, Geq,     $3)}
+    | expr AND    expr { Binop($1, And,     $3)}
+    | expr OR     expr { Binop($1, Or,      $3)}
+    | expr MOD    expr { Binop($1, Mod,     $3)}
+    | expr POWER  expr { Binop($1, Power,   $3)}
+    | expr FLOOR  expr { Binop($1, Floor,   $3) } //end of binop */
+    | LITERAL          { Literal($1)} //literals
+    | FLIT             { Fliteral($1)} 
+    | BLIT             { BoolLit($1) } 
+    | ID               { Id($1)} 
+    | NONE             { Noexpr}
+    | ID ASSIGN expr   { Assign($1, $3)}
+    | NOT expr         { Unop(Not, $2)}
+    | LPAREN expr RPAREN { $2}
+    | call_action      { Noexpr} //lines 178-180: look at decls in microc? 
+    | call_class       { Noexpr}
+    | call_helper      { Noexpr} 
 //    | comprehension    {} 
 //    | slice {}
 //    | index {}

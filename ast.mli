@@ -41,6 +41,9 @@ type func_decl = {
 (*
 We needa figure out how this works lmao
 --------------------
+Extra questions: 
+ - series literal be changed to list literal so there's consistency (else there should also be stack literal)
+
 Jang:
 - if
 - elif
@@ -48,7 +51,7 @@ Jang:
 - typ
 
 Christi:
-- Data structure
+- Data structure (series, ) 
 - For
 - while
 
