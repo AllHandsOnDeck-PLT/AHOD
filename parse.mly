@@ -176,6 +176,7 @@ expr:
     | LITERAL          {} //literals
     | FLIT             {} 
     | BLIT             {} 
+    | Series_literal   {} 
     | ID               {} 
     | NONE             {}
 //    | comprehension    {} 
@@ -191,6 +192,17 @@ call_class:
 
 call_helper: 
       ID LPAREN args_opt RPAREN {} 
+
+Series_literal:
+      LBRACK list_args_opt RBRACK {}
+
+list_args_opt:
+      /* nothing */      {}
+      | expr items      {}
+
+items:
+      /* nothing */      {}
+      | items COMMA expr  {}
 
 //comprehension:
 //    expr FOR ID IN expr {}
