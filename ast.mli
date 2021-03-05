@@ -9,8 +9,6 @@ type typ = Int | Bool | Float | None
 
 type bind = typ * string
 
-(*type Stack = typ*)
-
 type expr =
     Literal of int
   | Seriesliteral of expr list
@@ -72,4 +70,8 @@ Mara:
 - stmt
 
 *)
+
+(*type program = bind list * func_decl list*)
+
+
 type program = unit(*bind list * func_decl list*)

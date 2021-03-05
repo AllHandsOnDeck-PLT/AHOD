@@ -16,13 +16,15 @@ open Ast
 %start program
 %type <Ast.program> program
 
-%nonassoc DOTDOT DOTDOTDOT
+
 %nonassoc FOR IN
 %right ASSIGN
 %left OR
 %left AND
 %left EQ NEQ
 %left LT GT LEQ GEQ 
+%nonassoc DOTDOT DOTDOTDOT
+%nonassoc COLON
 %left PLUS MINUS
 %left MOD 
 %left FLOOR 
@@ -32,8 +34,16 @@ open Ast
 
 %%
 
+//hi():
+//  return 5
+
+//hi(): 5
+
+//hi():5
+
 program:
       main_decl decls EOF { $1 }
+      //| main_decl decls EOF { $1, $2 }
 
 decls:
      /* nothing */      {}
@@ -45,21 +55,49 @@ main_decl:
       MAIN COLON stmt_block {} 
 
 class_decl:
-      LET clas BE typ WITH COLON class_block        {} //WITH COLON class_block: opt
-    | LET clas BE typ                               {}
-    | LET clas LPAREN params_opt RPAREN BE typ LPAREN args_opt RPAREN WITH COLON class_block     {} 
+    LET clas BE typ                               {}
+    | LET clas BE typ WITH COLON class_block        {} 
+    | LET clas LPAREN params_list_opt RPAREN BE typ LPAREN args_list_opt RPAREN     {} 
+    | LET clas LPAREN params_list_opt RPAREN BE typ LPAREN args_list_opt RPAREN WITH COLON class_block     {} 
 
 action_decl:
-      WHEN typ ID DO ACTIONID LPAREN params_list RPAREN COLON stmt_block                           {} //typ ID: opt
-    | WHEN DO ACTIONID LPAREN params_list RPAREN COLON stmt_block                                  {}
-    //| WHEN typ ID DO ACTIONID params_list COLON stmt_block                           {}
-    //| WHEN DO ACTIONID params_list COLON stmt_block                                  {}
+    WHEN DO ACTIONID COLON stmt_block             {}
+    | WHEN DO ACTIONID LPAREN params_list RPAREN COLON stmt_block          {}
+    | WHEN typ ID DO ACTIONID COLON stmt_block               {}
+    | WHEN typ ID DO ACTIONID LPAREN params_list RPAREN COLON stmt_block   {} 
 
 helper_decl:
       ID LPAREN params_list RPAREN COLON stmt_block {}
 
 helper_decl_list:
       helper_decl_list helper_decl {}  
+
+params_list_opt:
+     /*nothing */                  {  }
+    | params_list          {}
+
+params_list:
+      param                        {}
+    | params_list COMMA param      {}
+
+param:
+      typ ID {}
+//      typ_opt ID     { }
+
+args_list_opt:
+     /*nothing */                  {  }
+    | args_list          {}
+
+args_list:
+     arg                          {}
+    | args_list COMMA arg         {}
+
+arg:
+      expr    {}
+
+//typ_opt:
+//      /*nothing */        {}
+//      | typ               {}
 
 attr_decl:
       const_opt typ_opt ID COLON stmt_block {}
@@ -70,8 +108,11 @@ attr_decl_list:
       attr_decl_list attr_decl {}   
 
 stmt_block:
-      /* nothing */      {} //shift/reduce conflict with ln 54 and 64, related to ID 
-    | LBRACE stmt_block stmt RBRACE {}
+    LBRACE stmt_list RBRACE              {}
+
+stmt_list:
+    stmt              {}
+    | stmt_list stmt {}
 
 class_block:
     LBRACE class_decl_list RBRACE {}
@@ -106,31 +147,9 @@ clas:
 template_class:
      LBRACK typ RBRACK { }
 
-param:
-      typ ID     { }
-
-params_opt:
-     /*nothing */                  {  }
-    | params_list          {}
-
-params_list:
-      param                        {}
-    | params_list COMMA  param      {}
-
-arg:
-      expr    {}
-
-args_opt:
-     /*nothing */                  {  }
-    | args_list          {}
-
-args_list:
-     arg                          {}
-    | args_list COMMA arg         {}
-
 stmt:
-      expr                                           {} 
-    | RETURN expr                                    {} 
+      expr NEWLINE                                          {} 
+    | RETURN expr NEWLINE                                   {} 
     | if_stmt                                        {}
     | FOR ID IN expr COLON stmt_block                {} //Christi 
     | WHILE expr COLON stmt_block else_stmt          {} //Christi
@@ -176,7 +195,7 @@ expr:
     | call_class       { Noexpr}
     | call_helper      { Noexpr} 
     | comprehension    { $1 } 
-//    | slice {}
+//    | slice            { $1 }
 //    | index {}
 
 //not (expr for id in expr)
@@ -184,13 +203,13 @@ expr:
 
 call_action:
       ID DO ACTIONID    {}
-    | ID DO ACTIONID LPAREN args_opt RPAREN   {}
+    | ID DO ACTIONID LPAREN args_list_opt RPAREN   {}
 
 call_class: 
-      clas LPAREN args_opt RPAREN {} 
+      clas LPAREN args_list_opt RPAREN {} 
 
 call_helper: 
-      ID LPAREN args_opt RPAREN {} 
+      ID LPAREN args_list_opt RPAREN {} 
 
 Series_literal:
       LBRACK list_args_opt RBRACK { Seriesliteral($2)}
@@ -214,6 +233,12 @@ comprehension:
     expr FOR ID IN expr { Comprehension($1, $3, $5)}
 
 //slice:
-//    | expr {}
-//    | expr_opt
+//    //| expr {}
+//    | expr_opt COLON expr_opt {}
+//    | expr_opt COLON expr_opt COLON expr {}
+
+//expr_opt:
+//    /* nothing */      {}
+//    | expr             {}
+
 
