@@ -23,9 +23,8 @@ rule token = parse
 | '/'      { DIVIDE }
 | '%'      { MOD }
 | "**"     { POWER }
-(*
 | ".."     { DOTDOT }
-*)
+| "..."     { DOTDOTDOT }
 | '='      { ASSIGN }
 | "=="     { EQ }
 | "!="     { NEQ }

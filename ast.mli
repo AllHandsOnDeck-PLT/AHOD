@@ -44,6 +44,10 @@ We needa figure out how this works lmao
 Extra questions: 
  - series literal be changed to list literal so there's consistency (else there should also be stack literal)
 
+ To do for next week: 
+ - figure out how to call all of the parse file in program 
+ - there will be midpoint check-in on Tuesday! 
+
 Jang:
 - if
 - elif

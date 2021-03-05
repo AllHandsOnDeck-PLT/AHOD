@@ -4,7 +4,7 @@
 open Ast
 %}
 
-%token LPAREN RPAREN LBRACE RBRACE LSQUARE RSQUARE LBRACK RBRACK COLON COMMA PLUS MINUS TIMES DIVIDE ASSIGN MOD POWER FLOOR DOTDOT NEWLINE
+%token LPAREN RPAREN LBRACE RBRACE LSQUARE RSQUARE LBRACK RBRACK COLON COMMA PLUS MINUS TIMES DIVIDE ASSIGN MOD POWER FLOOR DOTDOT DOTDOTDOT NEWLINE
 %token NOT EQ NEQ LT LEQ GT GEQ AND OR IN
 %token RETURN IF ELIF ELSE FOR WHILE INT BOOL FLOAT NONE STRING RANGE WHEN DO LET BE WITH NEW MAIN /* think about TIMES */
 %token <int> LITERAL
@@ -175,6 +175,9 @@ expr:
 //    | slice {}
 //    | index {}
 
+//not (expr for id in expr)
+//(not expr) for id in expr
+
 call_action:
       ID DO ACTIONID    {}
     | ID DO ACTIONID LPAREN args_opt RPAREN   {}
@@ -184,6 +187,21 @@ call_class:
 
 call_helper: 
       ID LPAREN args_opt RPAREN {} 
+
+Series_literal:
+      LBRACK list_args_opt RBRACK {}
+
+list_args_opt:
+      /* nothing */      {}
+      | expr items      {}
+
+items:
+      /* nothing */      {}
+      | items COMMA expr  {}
+
+//dotted_range:
+//      | expr DOTDOT expr  {}
+//      | expr DOTDOTDOT expr {}
 
 //comprehension:
 //    expr FOR ID IN expr {}
