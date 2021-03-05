@@ -163,6 +163,7 @@ expr:
     | expr FLOOR  expr { Binop($1, Floor,   $3) } //end of binop */
     | LITERAL          { Literal($1)} //literals
     | Series_literal   { $1 }
+//    | dotted_range     { $1}
     | FLIT             { Fliteral($1)} 
     | BLIT             { BoolLit($1) } 
     | ID               { Id($1)} 
@@ -173,7 +174,7 @@ expr:
     | call_action      { Noexpr} //lines 178-180: look at decls in microc? 
     | call_class       { Noexpr}
     | call_helper      { Noexpr} 
-    | comprehension    {} 
+    | comprehension    { $1 } 
 //    | slice {}
 //    | index {}
 
@@ -206,7 +207,7 @@ items:
 //      | expr DOTDOTDOT expr {}
 
 comprehension:
-    expr FOR ID IN expr {}
+    expr FOR ID IN expr { Comprehension($1, $3, $5)}
 
 //slice:
 //    | expr {}

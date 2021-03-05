@@ -14,6 +14,7 @@ type bind = typ * string
 type expr =
     Literal of int
   | Seriesliteral of expr list
+  | Comprehension of expr * string * expr
   | Fliteral of string
   | BoolLit of bool
   | Id of string
