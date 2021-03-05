@@ -10,12 +10,12 @@ type typ = Int | Bool | Float | None
 type bind = typ * string
 
 type expr =
-    Literal of int
+  | Iliteral of int
   | Seriesliteral of expr list
   | Comprehension of expr * string * expr
   | Dottedrange of expr * expr * bool
   | Fliteral of string
-  | BoolLit of bool
+  | Boollit of bool
   | Id of string
   | Binop of expr * op * expr
   | Unop of uop * expr

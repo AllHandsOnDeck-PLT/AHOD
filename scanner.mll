@@ -5,8 +5,9 @@ let digit = ['0' - '9']
 let digits = digit+
 
 rule token = parse
-  [' ' '\t' '\r' '\n'] { token lexbuf } (* Whitespace *)
+  [' ' '\t' '\r' ] { token lexbuf } (* Whitespace *)
 | '#'     { comment lexbuf }           (* Comments *)
+| "\n"	   { NEWLINE }
 | '('      { LPAREN }
 | ')'      { RPAREN }
 | '{'      { LBRACE }
@@ -19,7 +20,7 @@ rule token = parse
 | ','      { COMMA }
 | '+'      { PLUS }
 | '-'      { MINUS }
-| '*'      { TIMES }
+| '*'      { MULT }
 | '/'      { DIVIDE }
 | '%'      { MOD }
 | "**"     { POWER }
@@ -47,6 +48,8 @@ rule token = parse
 | "let"    { LET }
 | "be"     { BE }
 | "with"   { WITH }
+| "times"  { TIMES }
+| "pass"   { PASS }
 | "const"  { CONST }
 | "return" { RETURN }
 | "int"    { INT }
@@ -57,9 +60,9 @@ rule token = parse
 | "True"   { BLIT(true)  }
 | "False"  { BLIT(false) }
 | "main"   { MAIN }
-| digits as lxm { LITERAL(int_of_string lxm) }
+| digits as lxm { ILIT(int_of_string lxm) }
 | ['-']? (digits '.'  digit* ( ['e' 'E'] ['+' '-']? digits )?) as lxm { FLIT(lxm) }
-(*| ['a'-'z' 'A'-'Z']['a'-'z' 'A'-'Z' '0'-'9' '_']*     as lxm { ID(lxm) } *)
+(*| [('"' _* '"') (''' _* ''')] as  lxm { SLIT(lxm) }*)
 | ['a'-'z']['a'-'z' '0'-'9' '_']*                     as lxm { ID(lxm) } 
 | ['A'-'Z']['A'-'Z' '0'-'9' '_']*                     as actionID { ACTIONID(actionID) }
 | ['A'-'Z']['a'-'z' 'A'-'Z' '0'-'9']*                     as classID { CLASSID(classID) } 
