@@ -16,7 +16,7 @@ open Ast
 %start program
 %type <Ast.program> program
 
-%nonassoc NOT
+%nonassoc FOR IN
 %right ASSIGN
 %left OR
 %left AND
@@ -27,6 +27,7 @@ open Ast
 %left FLOOR 
 %left TIMES DIVIDE
 %left POWER
+%right NOT
 
 %%
 
@@ -172,7 +173,7 @@ expr:
     | call_action      { Noexpr} //lines 178-180: look at decls in microc? 
     | call_class       { Noexpr}
     | call_helper      { Noexpr} 
-//    | comprehension    {} 
+    | comprehension    {} 
 //    | slice {}
 //    | index {}
 
@@ -204,8 +205,8 @@ items:
 //      | expr DOTDOT expr  {}
 //      | expr DOTDOTDOT expr {}
 
-//comprehension:
-//    expr FOR ID IN expr {}
+comprehension:
+    expr FOR ID IN expr {}
 
 //slice:
 //    | expr {}
