@@ -16,6 +16,7 @@ open Ast
 %start program
 %type <Ast.program> program
 
+%nonassoc DOTDOT DOTDOTDOT
 %nonassoc FOR IN
 %right ASSIGN
 %left OR
@@ -163,7 +164,7 @@ expr:
     | expr FLOOR  expr { Binop($1, Floor,   $3) } //end of binop */
     | LITERAL          { Literal($1)} //literals
     | Series_literal   { $1 }
-//    | dotted_range     { $1}
+    | dotted_range     { $1 }
     | FLIT             { Fliteral($1)} 
     | BLIT             { BoolLit($1) } 
     | ID               { Id($1)} 
@@ -202,9 +203,12 @@ items:
       expr      {[$1]}
       | items COMMA expr  {$3::$1}
 
-//dotted_range:
-//      | expr DOTDOT expr  {}
-//      | expr DOTDOTDOT expr {}
+dotted_range:
+      | expr DOTDOT expr  { Dottedrange($1, $3, true)} // true for inclusive of end value, false for exclusive
+      | expr DOTDOTDOT expr { Dottedrange($1, $3, false)}
+
+// 3*3..4*4
+// 3...9 for id in
 
 comprehension:
     expr FOR ID IN expr { Comprehension($1, $3, $5)}

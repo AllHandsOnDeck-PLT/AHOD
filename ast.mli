@@ -15,6 +15,7 @@ type expr =
     Literal of int
   | Seriesliteral of expr list
   | Comprehension of expr * string * expr
+  | Dottedrange of expr * expr * bool
   | Fliteral of string
   | BoolLit of bool
   | Id of string
