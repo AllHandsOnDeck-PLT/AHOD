@@ -6,7 +6,7 @@ open Ast
 
 %token LPAREN RPAREN LBRACE RBRACE LSQUARE RSQUARE LBRACK RBRACK COLON COMMA PLUS MINUS TIMES DIVIDE ASSIGN MOD POWER FLOOR DOTDOT DOTDOTDOT NEWLINE
 %token NOT EQ NEQ LT LEQ GT GEQ AND OR IN
-%token RETURN IF ELIF ELSE FOR WHILE INT BOOL FLOAT NONE STRING RANGE WHEN DO LET BE WITH NEW MAIN /* think about TIMES */
+%token RETURN IF ELIF ELSE FOR WHILE INT BOOL FLOAT NONE STRING RANGE WHEN DO LET BE WITH MAIN /* think about TIMES */
 %token <int> LITERAL
 %token <bool> BLIT
 %token <string> ID ACTIONID CLASSID FLIT
@@ -161,6 +161,7 @@ expr:
     | expr POWER  expr { Binop($1, Power,   $3)}
     | expr FLOOR  expr { Binop($1, Floor,   $3) } //end of binop */
     | LITERAL          { Literal($1)} //literals
+    | Series_literal   { $1 }
     | FLIT             { Fliteral($1)} 
     | BLIT             { BoolLit($1) } 
     | ID               { Id($1)} 
@@ -189,15 +190,15 @@ call_helper:
       ID LPAREN args_opt RPAREN {} 
 
 Series_literal:
-      LBRACK list_args_opt RBRACK {}
+      LBRACK list_args_opt RBRACK { Seriesliteral($2)}
 
 list_args_opt:
-      /* nothing */      {}
-      | expr items      {}
+      /* nothing */      {[]}
+      | items      {$1}
 
 items:
-      /* nothing */      {}
-      | items COMMA expr  {}
+      expr      {[$1]}
+      | items COMMA expr  {$3::$1}
 
 //dotted_range:
 //      | expr DOTDOT expr  {}

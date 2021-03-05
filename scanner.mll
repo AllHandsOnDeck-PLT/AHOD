@@ -48,7 +48,6 @@ rule token = parse
 | "be"     { BE }
 | "with"   { WITH }
 | "const"  { CONST }
-| "new"	   { NEW }
 | "return" { RETURN }
 | "int"    { INT }
 | "bool"   { BOOL }
