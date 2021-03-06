@@ -42,8 +42,7 @@ open Ast
 //hi():5
 
 program:
-      newline_list_opt main_decl newline_list_opt decls newline_list_opt EOF { $2 }
-      //| main_decl decls EOF { $1, $2 }
+      newline_list_opt main_decl decls EOF { $2 }
 
 newline_list_opt:
       /* nothing */      {}
@@ -55,6 +54,7 @@ newline_list:
 
 decls:
      /* nothing */      {}
+    | decls NEWLINE     {}
     | decls class_decl  {}
     | decls action_decl {}
     | decls helper_decl {}
@@ -75,8 +75,12 @@ action_decl:
     | WHEN typ ID DO ACTIONID LPAREN params_list RPAREN COLON stmt_block   {} 
 
 helper_decl:
-    ID LPAREN params_list_opt RPAREN COLON expr NEWLINE {}
-    | ID LPAREN params_list_opt RPAREN COLON stmt_block {}
+    //| ID LPAREN params_list_opt RPAREN COLON expr NEWLINE {}
+    //| ID LPAREN params_list_opt RPAREN COLON stmt_block {}
+    // ^ above is the actual grammar 
+    | LPAREN params_list_opt RPAREN COLON stmt_block {} 
+    // ^ taking out ID gets rid of 2 shift/reduce conflicts, 
+    // but there are still 2 reduce/reduce conflicts that I haven't been able to pinpoint the source of 
 
 params_list_opt:
      /*nothing */                  {  }
@@ -110,6 +114,7 @@ stmt_block:
 
 stmt_list:
     stmt              {}
+    | stmt_list NEWLINE {}
     | stmt_list stmt {}
 
 class_block:
@@ -141,12 +146,12 @@ prim_typ:
     // SLIT
 
 template_class:
-     LBRACK typ RBRACK { }
+     CLASSID LBRACK typ RBRACK { }
 
 stmt:
       expr NEWLINE                         {} 
     | PASS NEWLINE                         {}
-    | RETURN expr_opt NEWLINE                  {} 
+    | RETURN expr_opt NEWLINE              {} 
     | if_stmt                              {}
     | for_stmt                             {}
     | WHILE expr COLON stmt_block          {} 
