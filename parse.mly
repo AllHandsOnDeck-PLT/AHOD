@@ -75,12 +75,8 @@ action_decl:
     | WHEN typ ID DO ACTIONID LPAREN params_list RPAREN COLON stmt_block   {} 
 
 helper_decl:
-    //| ID LPAREN params_list_opt RPAREN COLON expr NEWLINE {}
-    //| ID LPAREN params_list_opt RPAREN COLON stmt_block {}
-    // ^ above is the actual grammar 
-    | LPAREN params_list_opt RPAREN COLON stmt_block {} 
-    // ^ taking out ID gets rid of 2 shift/reduce conflicts, 
-    // but there are still 2 reduce/reduce conflicts that I haven't been able to pinpoint the source of 
+    | ID LPAREN params_list_opt RPAREN COLON expr NEWLINE {}
+    | ID LPAREN params_list_opt RPAREN COLON stmt_block {}
 
 params_list_opt:
      /*nothing */                  {  }
@@ -102,8 +98,8 @@ args_list:
     | args_list COMMA arg         {}
 
 arg:
-    expr    {}
-    | ID ASSIGN expr    {}
+    non_assign_expr    {}
+    | ID ASSIGN non_assign_expr    {}
 
 attr_decl:
     const_opt typ_opt ID COLON stmt_block {}
@@ -176,6 +172,10 @@ else_block:
       ELSE COLON stmt_block     {}
 
 expr:
+    non_assign_expr    { $1 }
+    | ID ASSIGN expr   { Assign($1, $3)}
+
+non_assign_expr: // distinction between non_assign_expr and expr due to reduce/reduce ambiguity with arg ID ASSIGN expr and assignment
     | ID               { Id($1)} 
     | NONE             { Noexpr}
     | ILIT          { Iliteral($1)} 
@@ -202,7 +202,6 @@ expr:
     | expr GT     expr { Binop($1, Greater, $3)}
     | expr GEQ    expr { Binop($1, Geq,     $3)}
 
-    | ID ASSIGN expr   { Assign($1, $3)}
     // augassign
 
     | call_class       { Noexpr}
