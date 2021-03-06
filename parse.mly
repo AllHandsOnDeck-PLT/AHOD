@@ -6,11 +6,10 @@ open Ast
 
 %token LPAREN RPAREN LBRACE RBRACE LSQUARE RSQUARE LBRACK RBRACK COLON COMMA PLUS MINUS MULT DIVIDE ASSIGN MOD POWER FLOOR DOTDOT DOTDOTDOT NEWLINE
 %token NOT EQ NEQ LT LEQ GT GEQ AND OR IN
-%token RETURN IF ELIF ELSE FOR WHILE INT BOOL FLOAT NONE STRING RANGE WHEN DO LET BE WITH PASS MAIN TIMES 
+%token RETURN IF ELIF ELSE FOR WHILE INT BOOL FLOAT NONE STRING RANGE WHEN DO LET BE WITH PASS MAIN TIMES CONST
 %token <int> ILIT
 %token <bool> BLIT
 %token <string> ID ACTIONID CLASSID FLIT
-%token CONST
 %token EOF
 
 %start program
@@ -23,6 +22,7 @@ open Ast
 %left AND
 %left EQ NEQ
 %left LT GT LEQ GEQ 
+%nonassoc DO
 %nonassoc DOTDOT DOTDOTDOT
 %nonassoc COLON
 %left PLUS MINUS
@@ -33,6 +33,11 @@ open Ast
 %right NOT
 
 %%
+
+// x or (y do something)
+// x or y do something
+//(x=y) do something
+//x=(y do something)
 
 //hi():
 //  return 5
@@ -102,8 +107,16 @@ arg:
     | ID ASSIGN non_assign_expr    {}
 
 attr_decl:
-    const_opt typ_opt ID COLON stmt_block {}
-    | const_opt typ_opt ID COLON expr NEWLINE {}  
+    //const_opt typ_opt ID COLON stmt_block {}
+    //| const_opt typ_opt ID COLON expr NEWLINE {}  
+    | ID COLON stmt_block {}
+    | typ ID COLON stmt_block {}
+    | CONST ID COLON stmt_block {}
+    | CONST typ ID COLON stmt_block {}
+    | ID COLON expr NEWLINE {}
+    | typ ID COLON expr NEWLINE {}
+    | CONST ID COLON expr NEWLINE {}
+    | CONST typ ID COLON expr NEWLINE {}
 
 stmt_block:
     NEWLINE LBRACE stmt_list RBRACE              {}
@@ -122,9 +135,9 @@ class_decl_list:
   | class_decl_list helper_decl {}
   | class_decl_list attr_decl {}
 
-const_opt: 
-     /* nothing */      {}
-    | CONST   {}
+//const_opt: 
+//     /* nothing */      {}
+//    | CONST   {}
 
 typ_opt:
      /* nothing */      {}
@@ -224,9 +237,10 @@ call_helper:
       ID LPAREN args_list_opt RPAREN      {} 
 
 call_action:
-    | ID DO ACTIONID    {}
-    | ID DO ACTIONID LPAREN args_list_opt RPAREN   {}
-    // reduce/reduce conflicts from using expr_opt instead of ID
+    | DO ACTIONID    {}
+    | expr DO ACTIONID    {}
+    | DO ACTIONID LPAREN args_list_opt RPAREN   {}
+    | expr DO ACTIONID LPAREN args_list_opt RPAREN   {}
 
 Series_literal:
       LBRACK list_args_opt RBRACK { Seriesliteral($2)}
