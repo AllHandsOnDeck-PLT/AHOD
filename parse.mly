@@ -224,7 +224,7 @@ non_assign_expr: // distinction between non_assign_expr and expr due to reduce/r
     | dotted_range     { $1 }
     | comprehension    { $1 } 
     //    | index {}
-    //    | slice            { $1 }
+    | slice            { $1 }
 
 
 //not (expr for id in expr)
@@ -263,10 +263,23 @@ dotted_range:
 comprehension:
     expr FOR ID IN expr { Comprehension($1, $3, $5)}
 
-//slice:
-//    | expr {}
-//    | expr_opt COLON expr_opt {}
-//    | expr_opt COLON expr_opt COLON expr {}
+slice:
+    | expr_colon_opt            { Slice(fst $1) }
+    | expr_colon_opt COLON expr { }
+
+    //[x:y:z] z is the step
+
+    //| expr_opt COLON expr_opt     {}
+    //| expr_opt COLON expr_opt COLON expr     {}
+    // ^ the grammar, but expr_opt gave 32 shift/reduce and 38 reduce/reduce conflicts,
+    // so I made a expr_colon_opt and wrote out all the cases instead
+    // and somehow that got rid of most of the conflicts (with 1 shift/reduce conflict remaining)
+
+expr_colon_opt:
+    | COLON expr { (0, $2, false)}
+    | expr COLON { ($1, 0, true)} // 0 is an unused variable, true means unbounded end, in order to reference the end of a list, design problem
+    | COLON { (0, 0, true) }
+    | expr COLON expr { ($1, $3, false)}
 
 expr_opt:
     /* nothing */      {}
