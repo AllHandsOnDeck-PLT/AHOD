@@ -15,7 +15,6 @@ open Ast
 %start program
 %type <Ast.program> program
 
-
 %nonassoc FOR IN
 %right ASSIGN
 %left OR
@@ -103,8 +102,13 @@ args_list:
     | args_list COMMA arg         {}
 
 arg:
-    non_assign_expr    {}
-    | ID ASSIGN non_assign_expr    {}
+    non_slice_expr     {}
+    | slice            {}
+    | ID ASSIGN non_slice_expr    {}
+    | ID ASSIGN slice    {}
+
+    //non_assign_expr    {}
+    //| ID ASSIGN non_assign_expr    {}
 
 attr_decl:
     //const_opt typ_opt ID COLON stmt_block {}
@@ -134,10 +138,6 @@ class_decl_list:
   | attr_decl {}
   | class_decl_list helper_decl {}
   | class_decl_list attr_decl {}
-
-//const_opt: 
-//     /* nothing */      {}
-//    | CONST   {}
 
 typ_opt:
      /* nothing */      {}
@@ -185,10 +185,11 @@ else_block:
       ELSE COLON stmt_block     {}
 
 expr:
-    non_assign_expr    { $1 }
-    | ID ASSIGN expr   { Assign($1, $3)}
+    non_slice_expr     { $1 }
+    | slice            { $1 }
+    | ID ASSIGN expr   { Assign($1, $3)} // distinction between non_assign_expr and expr due to reduce/reduce ambiguity with arg ID ASSIGN expr and assignment
 
-non_assign_expr: // distinction between non_assign_expr and expr due to reduce/reduce ambiguity with arg ID ASSIGN expr and assignment
+non_slice_expr:
     | ID               { Id($1)} 
     | NONE             { Noexpr}
     | ILIT          { Iliteral($1)} 
@@ -223,9 +224,7 @@ non_assign_expr: // distinction between non_assign_expr and expr due to reduce/r
 
     | dotted_range     { $1 }
     | comprehension    { $1 } 
-    //    | index {}
-    | slice            { $1 }
-
+//    | expr index       {$1, $2}
 
 //not (expr for id in expr)
 //(not expr) for id in expr
@@ -263,10 +262,15 @@ dotted_range:
 comprehension:
     expr FOR ID IN expr { Comprehension($1, $3, $5)}
 
-slice:
-    | expr_colon_opt            { Slice(fst $1) }
-    | expr_colon_opt COLON expr { }
+//index:
+//    LSQUARE expr RSQUARE       {}            //x+y[3]  
 
+slice:
+    | expr_colon_opt            {}
+    | expr_colon_opt COLON non_slice_expr {}
+
+    //[1:2]: 269&286 or 270&284 
+    //[1:2:3]: shift 270, reduce 269
     //[x:y:z] z is the step
 
     //| expr_opt COLON expr_opt     {}
@@ -276,13 +280,14 @@ slice:
     // and somehow that got rid of most of the conflicts (with 1 shift/reduce conflict remaining)
 
 expr_colon_opt:
-    | COLON expr { (0, $2, false)}
-    | expr COLON { ($1, 0, true)} // 0 is an unused variable, true means unbounded end, in order to reference the end of a list, design problem
+    | COLON non_slice_expr { (0, $2, false)}
+    | non_slice_expr COLON { ($1, 0, true)} // 0 is an unused variable, true means unbounded end, in order to reference the end of a list, design problem
     | COLON { (0, 0, true) }
-    | expr COLON expr { ($1, $3, false)}
+    | non_slice_expr COLON non_slice_expr { ($1, $3, false)}
 
 expr_opt:
     /* nothing */      {}
     | expr             {}
+
 
 

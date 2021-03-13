@@ -13,6 +13,7 @@ type expr =
   | Iliteral of int
   | Seriesliteral of expr list
   | Comprehension of expr * string * expr
+  (*| Slice of *)
   | Dottedrange of expr * expr * bool
   | Fliteral of string
   | Boollit of bool
