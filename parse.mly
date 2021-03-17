@@ -159,16 +159,19 @@ template_class:
 
 stmt:
       expr NEWLINE                         {} 
-    | PASS NEWLINE                         {}
+    // expr NEWLINE                         { Expr($1)} 
+    // | PASS NEWLINE                         {}
     | RETURN expr_opt NEWLINE              {} 
+    // | RETURN expr_opt NEWLINE              { Return($2)}
     | if_stmt                              {}
-    | for_stmt                             {}
-    | WHILE expr COLON stmt_block          {} 
- 
-for_stmt:
     | FOR ID IN expr COLON stmt_block      {} 
     | FOR expr TIMES COLON stmt_block      {}
+    /* | FOR ID IN expr COLON stmt_block   { ForId($2, $4, $6)} 
+    | FOR expr TIMES COLON stmt_block      { ForTimes($2, $5)} */
+    | WHILE expr COLON stmt_block          {} 
+    // | WHILE expr COLON stmt_block          { While($2, $4)} 
 
+ 
 if_stmt:
     | IF expr COLON stmt_block elif_stmt  {}
     | IF expr COLON stmt_block else_block_opt  {}

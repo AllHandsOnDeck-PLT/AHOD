@@ -28,7 +28,8 @@ type stmt =
   | Expr of expr
   | Return of expr
   | If of expr * stmt * stmt
-  | For of expr * expr * expr * stmt
+  | ForId of expr * expr * stmt (* not 100% sure if first expr is correct because it's ID*)
+  | ForTimes of expr * stmt
   | While of expr * stmt
 
 type func_decl = {
