@@ -24,13 +24,15 @@ type expr =
   | Noexpr
 
 type stmt =
-    Block of stmt list
+    ()
+  | Block of stmt list
   | Expr of expr
   | Return of expr
-  | If of expr * stmt * stmt
-  | ForId of expr * expr * stmt (* not 100% sure if first expr is correct because it's ID*)
-  | ForTimes of expr * stmt
+  (* | If of expr * stmt * stmt *)
+  | ForId of expr * stmt (* not 100% sure if first expr is correct because it's ID*)
+  (* | ForTimes of expr * stmt *)
   | While of expr * stmt
+  | Noexpr
 
 type func_decl = {
     typ : typ;
