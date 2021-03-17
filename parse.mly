@@ -12,8 +12,8 @@ open Ast
 %token <string> ID ACTIONID CLASSID FLIT
 %token EOF
 
-%start stmt
-%type <Ast.stmt> stmt
+%start program
+%type <Ast.program> program
 
 
 %nonassoc FOR IN
@@ -161,8 +161,8 @@ stmt:
      expr NEWLINE                          { Expr($1)} 
     // | PASS NEWLINE                         {}
     | RETURN expr_opt NEWLINE              { Return($2)}
-    // | if_stmt                              {}
-    // | FOR ID IN expr COLON stmt_block      { ForId($4, $6)} 
+    | if_stmt                              {}
+    /* | FOR ID IN expr COLON stmt_block      { ForId($4, $6)}  */
     // | FOR expr TIMES COLON stmt_block      { ForTimes($2, $5)}
     /* | WHILE expr COLON stmt_block          { While($2, $4)}  */
 
