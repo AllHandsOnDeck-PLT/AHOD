@@ -12,7 +12,7 @@ type bind = typ * string
 type expr =
   | Iliteral of int
   | Seriesliteral of expr list
-  | Comprehension of expr * string * expr
+  (* | Comprehension of expr * string * expr *)
   | Dottedrange of expr * expr * bool
   | Fliteral of string
   | Boollit of bool

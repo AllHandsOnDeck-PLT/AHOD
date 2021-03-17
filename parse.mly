@@ -92,19 +92,19 @@ params_list:
     | params_list COMMA param      {}
 
 param:
-      typ_opt ID     { }
+      typ ID     { }
 
 args_list_opt:
      /*nothing */                  {  }
     | args_list          {}
 
 args_list:
-     arg                          {}
+      arg                         {}
     | args_list COMMA arg         {}
 
 arg:
-    non_assign_expr    {}
-    | ID ASSIGN non_assign_expr    {}
+      non_assign_expr              {}
+    // ID ASSIGN non_assign_expr    {}
 
 attr_decl:
     //const_opt typ_opt ID COLON stmt_block {}
@@ -139,9 +139,9 @@ class_decl_list:
 //     /* nothing */      {}
 //    | CONST   {}
 
-typ_opt:
-     /* nothing */      {}
-    | typ   {}
+//typ_opt:
+//     /* nothing */      {}
+//    | typ   {}
 
 typ:
     | prim_typ {}
@@ -225,7 +225,8 @@ non_assign_expr: // distinction between non_assign_expr and expr due to reduce/r
     | call_action      { Noexpr} //lines 178-180: look at decls in microc? 
 
     | dotted_range     { $1 }
-    | comprehension    { $1 } 
+
+    //    | comprehension    { $1 } 
     //    | index {}
     //    | slice            { $1 }
 
@@ -263,8 +264,8 @@ dotted_range:
 // 3*3..4*4
 // 3...9 for id in
 
-comprehension:
-    expr FOR ID IN expr { Comprehension($1, $3, $5)}
+//comprehension:
+//    expr FOR ID IN expr { Comprehension($1, $3, $5)}
 
 //slice:
 //    | expr {}
