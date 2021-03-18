@@ -47,7 +47,7 @@ open Ast
 //hi():5
 
 program:
-      newline_list_opt main_decl decls EOF { $2 }
+      newline_list_opt main_decl decls EOF { $2 } /* $2 might need to be changed  */ 
 
 newline_list_opt:
       /* nothing */      {}
@@ -84,26 +84,26 @@ helper_decl:
     | ID LPAREN params_list_opt RPAREN COLON stmt_block {}
 
 params_list_opt:
-     /*nothing */                  {  }
-    | params_list          {}
+     /*nothing */                  {[]}
+    | params_list          {$1}
 
 params_list:
-      param                        {}
-    | params_list COMMA param      {}
+      param                        {[]}
+    | params_list COMMA param      {$3 :: $1 }
 
 param:
       typ ID     { }
 
 args_list_opt:
-     /*nothing */                  {  }
-    | args_list          {}
+     /*nothing */                  { []}
+    | args_list          {$1}
 
 args_list:
-      arg                         {}
-    | args_list COMMA arg         {}
+      arg                         {$1}
+    | args_list COMMA arg         {$3 :: $1}
 
 arg:
-      non_assign_expr              {}
+      non_assign_expr              {$1} //ensure that non_assign_expr is defined in the AST 
     // ID ASSIGN non_assign_expr    {}
 
 attr_decl:
@@ -119,13 +119,12 @@ attr_decl:
     | CONST typ ID COLON expr NEWLINE {}
 
 stmt_block: //called in for, while
-    NEWLINE LBRACE stmt_list RBRACE              { Block(List.rev $3)}
+    NEWLINE LBRACE stmt_list RBRACE              {}
 
 stmt_list: //called by stmt_block
-    /* nothing */  { [] }
-   // stmt              {$1}
-   // | stmt_list NEWLINE { $1 }
-    | stmt_list stmt { $2 :: $1 }
+    stmt              {}
+    | stmt_list NEWLINE {}
+    | stmt_list stmt {}
 
 class_block:
     NEWLINE LBRACE class_decl_list RBRACE {}
@@ -159,35 +158,29 @@ template_class:
      CLASSID LBRACK typ RBRACK { }
 
 stmt:
-    | stmt_block                            { $1 }
-    | expr NEWLINE                          { Expr($1)} 
+     expr NEWLINE                          { Expr($1)} 
     // | PASS NEWLINE                         {}
     | RETURN expr_opt NEWLINE              { Return($2)}
-    | if_stmt                              { $1 }
+    | if_stmt                              {}
     /* | FOR ID IN expr COLON stmt_block      { ForId($4, $6)}  */
     // | FOR expr TIMES COLON stmt_block      { ForTimes($2, $5)}
     /* | WHILE expr COLON stmt_block          { While($2, $4)}  */
 
  
-// IF expr COLON stmt_block (ELIF expr COLON stmt_block)* (ELSE COLON stmt_block)?
-// IF = expr * stmt * stmt
-
 if_stmt:
-    //| IF expr COLON stmt_block ELSE stmt_block
-
-    | IF expr COLON stmt_block elif_stmt  { If($2, $4, $5) }
-    | IF expr COLON stmt_block else_block_opt  { If($2, $4, $5) }
+    | IF expr COLON stmt_block elif_stmt  {}
+    | IF expr COLON stmt_block else_block_opt  {}
 
 elif_stmt:
-    | ELIF expr COLON stmt_block elif_stmt     { If($2, $4, $5) }
-    | ELIF expr COLON stmt_block else_block_opt     { If($2, $4, $5) }
+    | ELIF expr COLON stmt_block elif_stmt     {}
+    | ELIF expr COLON stmt_block else_block_opt     {}
 
 else_block_opt:
-      /* nothing */      { Block([]) }
-      | else_block       { $1 }
+      /* nothing */      {}
+      | else_block       {}
 
 else_block:
-      ELSE COLON stmt_block     { $3 }
+      ELSE COLON stmt_block     {}
 
 expr:
     non_assign_expr    { $1 }
