@@ -85,21 +85,22 @@ helper_decl:
 
 params_list_opt:
      /*nothing */                  {[]}
-    | params_list          {$1}
+    | params_list          {List.rev $1 } //Should this just be $1 or List.rev $1 
 
 params_list:
-      param                        {[]}
-    | params_list COMMA param      {$3 :: $1 }
+     //param                        {$1} //if uncommented produces a has type 'a list but expression of type 'a was expected 
+    | params_list COMMA param      {$3 :: $1} //$3 :: $1 
 
 param:
-      typ ID     { }
+      typ ID     { [($1,$2)]}  
 
 args_list_opt:
-     /*nothing */                  { []}
-    | args_list          {$1}
+     /*nothing */              { []}
+    | args_list          {List.rev $1}
 
 args_list:
-      arg                         {$1}
+    // If add nothing causes reduce/reduce conflict
+    // arg                         {$1}
     | args_list COMMA arg         {$3 :: $1}
 
 arg:
