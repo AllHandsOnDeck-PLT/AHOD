@@ -119,12 +119,13 @@ attr_decl:
     | CONST typ ID COLON expr NEWLINE {}
 
 stmt_block: //called in for, while
-    NEWLINE LBRACE stmt_list RBRACE              {}
+    NEWLINE LBRACE stmt_list RBRACE              { Block(List.rev $3)}
 
 stmt_list: //called by stmt_block
-    stmt              {}
-    | stmt_list NEWLINE {}
-    | stmt_list stmt {}
+    /* nothing */  { [] }
+   // stmt              {$1}
+   // | stmt_list NEWLINE { $1 }
+    | stmt_list stmt { $2 :: $1 }
 
 class_block:
     NEWLINE LBRACE class_decl_list RBRACE {}
@@ -158,29 +159,35 @@ template_class:
      CLASSID LBRACK typ RBRACK { }
 
 stmt:
-     expr NEWLINE                          { Expr($1)} 
+    | stmt_block                            { $1 }
+    | expr NEWLINE                          { Expr($1)} 
     // | PASS NEWLINE                         {}
     | RETURN expr_opt NEWLINE              { Return($2)}
-    | if_stmt                              {}
+    | if_stmt                              { $1 }
     /* | FOR ID IN expr COLON stmt_block      { ForId($4, $6)}  */
     // | FOR expr TIMES COLON stmt_block      { ForTimes($2, $5)}
     /* | WHILE expr COLON stmt_block          { While($2, $4)}  */
 
  
+// IF expr COLON stmt_block (ELIF expr COLON stmt_block)* (ELSE COLON stmt_block)?
+// IF = expr * stmt * stmt
+
 if_stmt:
-    | IF expr COLON stmt_block elif_stmt  {}
-    | IF expr COLON stmt_block else_block_opt  {}
+    //| IF expr COLON stmt_block ELSE stmt_block
+
+    | IF expr COLON stmt_block elif_stmt  { If($2, $4, $5) }
+    | IF expr COLON stmt_block else_block_opt  { If($2, $4, $5) }
 
 elif_stmt:
-    | ELIF expr COLON stmt_block elif_stmt     {}
-    | ELIF expr COLON stmt_block else_block_opt     {}
+    | ELIF expr COLON stmt_block elif_stmt     { If($2, $4, $5) }
+    | ELIF expr COLON stmt_block else_block_opt     { If($2, $4, $5) }
 
 else_block_opt:
-      /* nothing */      {}
-      | else_block       {}
+      /* nothing */      { Block([]) }
+      | else_block       { $1 }
 
 else_block:
-      ELSE COLON stmt_block     {}
+      ELSE COLON stmt_block     { $3 }
 
 expr:
     non_assign_expr    { $1 }
