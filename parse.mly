@@ -84,28 +84,28 @@ helper_decl:
     | ID LPAREN params_list_opt RPAREN COLON stmt_block {}
 
 params_list_opt:
-     /*nothing */                  {}
-    | params_list                  {}
+     /*nothing */                  {[]}
+    | params_list                  {List.rev $1}
 
 params_list:
-      param                        {}
-    | params_list COMMA param      {}
+    //  param                        {$1} //need to get first element of list 
+    | params_list COMMA param      {$3::$1}
 
 param:
-      typ ID                       {}
+      typ ID                       {($1,$2)}
 
 
 args_list_opt:
-    /*nothing */                  {}
-    | args_list                   {}
+    /*nothing */                  { [] }
+    | args_list                   { List.rev $1 }
 
 args_list:
-      arg                          {}
-    | args_list COMMA arg          {}
+    //  arg                        { $1 } //need to get first element of list 
+    | args_list COMMA arg          { $3 :: $1}
 
 arg:
-      non_assign_expr               {}
-    | ID ASSIGN non_assign_expr     {}
+    non_assign_expr               { $1 }
+    // | ID ASSIGN non_assign_expr     {}
 
 
 attr_decl:
@@ -125,7 +125,7 @@ stmt_block: //called in for, while
 
 stmt_list: //called by stmt_block
     /* nothing */                            { [] }
-    // stmt                                  { $1 }
+    // stmt                                  { $1 } //need to get head of list
     // | stmt_list NEWLINE                   { $1 }
     | stmt_list stmt                         { $2 :: $1 }
 
@@ -166,9 +166,9 @@ stmt:
     // | PASS NEWLINE                       { }
     | RETURN expr_opt NEWLINE               { Return($2)}
     | if_stmt                               { $1 }
-    /* | FOR ID IN expr COLON stmt_block      { ForId($4, $6)}  */
+    | FOR ID IN expr COLON stmt_block       { ForId($4, $6)} 
     // | FOR expr TIMES COLON stmt_block      { ForTimes($2, $5)}
-    /* | WHILE expr COLON stmt_block          { While($2, $4)}  */
+    | WHILE expr COLON stmt_block          { While($2, $4)} 
 
  
 // IF expr COLON stmt_block (ELIF expr COLON stmt_block)* (ELSE COLON stmt_block)?
@@ -224,8 +224,8 @@ non_assign_expr: // distinction between non_assign_expr and expr due to reduce/r
 
     // augassign
 
-    | call_class       { Noexpr}
-    | call_helper      { Noexpr} 
+    | call_class       { $1 }
+    | call_helper      { $1 } 
     | call_action      { Noexpr} //lines 178-180: look at decls in microc? 
 
     | dotted_range     { $1 }
@@ -239,15 +239,15 @@ non_assign_expr: // distinction between non_assign_expr and expr due to reduce/r
 //(not expr) for id in expr
 
 call_class: 
-     CLASSID LPAREN args_list_opt RPAREN            {} //{ Call($1, $3) } 
+     CLASSID LPAREN args_list_opt RPAREN            { Call($1, $3) } 
 
 call_helper: 
-      ID LPAREN args_list_opt RPAREN                {} // { Call($1, $3) } 
+      ID LPAREN args_list_opt RPAREN                { Call($1, $3) }
 
 call_action:
     | DO ACTIONID                                    {} //{ $2 }
     | expr DO ACTIONID                               {} //{ ($1, $3) }
-    | DO ACTIONID LPAREN args_list_opt RPAREN       {}// { Call($2, $4)}
+    | DO ACTIONID LPAREN args_list_opt RPAREN        {} // { Call($2, $4)}
     | expr DO ACTIONID LPAREN args_list_opt RPAREN   {} //{ ($1, Call($3, $5))}
 
 Series_literal:
