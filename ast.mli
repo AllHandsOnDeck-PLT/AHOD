@@ -27,7 +27,9 @@ type stmt =
   | Block of stmt list
   | Expr of expr
   | Return of expr
-  | If of expr * stmt * stmt 
+  | If of expr * stmt * stmt
+  | Elif of expr * stmt * stmt
+  | Else of stmt
   | ForId of expr * stmt (* not 100% sure if first expr is correct because it's ID*)
   (* | ForTimes of expr * stmt *)
   | While of expr * stmt

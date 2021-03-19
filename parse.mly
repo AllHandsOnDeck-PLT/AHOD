@@ -201,8 +201,7 @@ non_assign_expr: // distinction between non_assign_expr and expr due to reduce/r
     | BLIT             { Boollit($1) } 
     | Series_literal   { $1 }
     | NOT expr         { Unop(Not, $2)}
-    | LPAREN expr RPAREN { $2}
-
+    | LPAREN expr RPAREN { $2 }
     | expr PLUS   expr { Binop($1, Add,     $3)} 
     | expr MINUS  expr { Binop($1, Sub,     $3)}
     | expr MULT  expr { Binop($1, Mult,    $3)}
