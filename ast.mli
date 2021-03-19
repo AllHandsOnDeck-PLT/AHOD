@@ -44,9 +44,16 @@ type attr_decl =
   | MultiAdecl of typ option * string * stmt
   | OneAdecl of typ option * string * expr 
 
-type action_decl = 
-  | Nahadecl of string * bind list * stmt
-  | Yesadecl of typ * string * string * bind list * stmt
+type action_decl = {
+  entitytyp : typ option;
+  entityid : string option;
+  aname : string;
+  aparams : bind list;
+  abody: stmt;
+}
+  (*| Nahadecl of string * bind list * stmt *)
+
+  (*| Adecl of typ option * string option * string * bind list * stmt *)
 
 (*type class_decl = 
   | Cdecl of string * bind list * typ * expr list * helper_decl list * attr_decl list 
@@ -54,9 +61,9 @@ type action_decl =
 
 type class_decl = {
   cname : string;
-  params : bind list;
-  typ : typ;
-  args : expr list;
+  cparams : bind list;
+  ctyp : typ;
+  cargs : expr list;
   helpers : helper_decl list;
   attributes : attr_decl list;
 }

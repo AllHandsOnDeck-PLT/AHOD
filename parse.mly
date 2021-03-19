@@ -76,42 +76,40 @@ main_decl:
 
 class_decl:
     LET CLASSID BE typ                               
-    { {
+    {{
       cname = $2;
-      params = []; 
-      typ = $4; 
-      args = []; 
+      cparams = []; 
+      ctyp = $4; 
+      cargs = []; 
       helpers = [];
       attributes = [] }}
 
     | LET CLASSID BE typ WITH COLON class_block        
     {{ 
       cname = $2;
-      params = [];
-      typ = $4;
-      args = [];
+      cparams = [];
+      ctyp = $4;
+      cargs = [];
       helpers = fst $7;
       attributes = snd $7 }}
 
     | LET CLASSID LPAREN params_list_opt RPAREN BE typ LPAREN args_list_opt RPAREN     
     {{
       cname = $2;
-      params = $4;
-      typ = $7;
-      args = $9;
+      cparams = $4;
+      ctyp = $7;
+      cargs = $9;
       helpers = [];
       attributes = [] }}
 
     | LET CLASSID LPAREN params_list_opt RPAREN BE typ LPAREN args_list_opt RPAREN WITH COLON class_block     
     {{
       cname = $2;
-      params = $4; 
-      typ = $7; 
-      args = $9;
+      cparams = $4; 
+      ctyp = $7; 
+      cargs = $9;
       helpers = fst $13;
-      attributes = snd $13
-       }}
-
+      attributes = snd $13 }}
 
 //class_decl:
 //    LET CLASSID BE typ                               { Cdecl($2, [], $4, [], [], []) }
@@ -120,10 +118,43 @@ class_decl:
 //    | LET CLASSID LPAREN params_list_opt RPAREN BE typ LPAREN args_list_opt RPAREN WITH COLON class_block     { Cdecl($2, $4, $7, $9, fst $13, snd $13) } 
 
 action_decl:
-    WHEN DO ACTIONID COLON stmt_block             { Nahadecl($3, [], $5) }
-    | WHEN DO ACTIONID LPAREN params_list RPAREN COLON stmt_block          { Nahadecl($3, $5, $8) }
-    | WHEN typ ID DO ACTIONID COLON stmt_block               { Yesadecl($2, $3, $5, [], $7) }
-    | WHEN typ ID DO ACTIONID LPAREN params_list RPAREN COLON stmt_block   { Yesadecl($2, $3, $5, $7, $10) } 
+    WHEN DO ACTIONID COLON stmt_block             
+    {{ 
+      entitytyp = None;
+      entityid = None;
+      aname = $3;
+      aparams = [];
+      abody = $5 }}
+
+    | WHEN DO ACTIONID LPAREN params_list RPAREN COLON stmt_block          
+    {{ 
+      entitytyp = None;
+      entityid = None;
+      aname = $3;
+      aparams = $5;
+      abody = $8 }}
+
+    | WHEN typ ID DO ACTIONID COLON stmt_block               
+    {{ 
+      entitytyp = Some $2;
+      entityid = Some $3;
+      aname = $5;
+      aparams = [];
+      abody = $7 }}
+
+    | WHEN typ ID DO ACTIONID LPAREN params_list RPAREN COLON stmt_block   
+    {{ 
+      entitytyp = Some $2;
+      entityid = Some $3;
+      aname = $5;
+      aparams = $7;
+      abody = $10 }}
+
+//action_decl:
+//    WHEN DO ACTIONID COLON stmt_block             { Adecl(None, None, $3, [], $5) }
+//    | WHEN DO ACTIONID LPAREN params_list RPAREN COLON stmt_block          { Adecl(None, None, $3, $5, $8) }
+//    | WHEN typ ID DO ACTIONID COLON stmt_block               { Adecl(Some $2, Some $3, $5, [], $7) }
+//    | WHEN typ ID DO ACTIONID LPAREN params_list RPAREN COLON stmt_block   { Adecl(Some $2, Some $3, $5, $7, $10) } 
 
 helper_decl:
     | ID LPAREN params_list_opt RPAREN COLON expr NEWLINE { OneHdecl($1, $3, $6) }
