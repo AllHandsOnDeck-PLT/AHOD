@@ -106,7 +106,7 @@ params_list_opt:
     | params_list                  {List.rev $1}
 
 params_list:
-    //  param                        {$1} //need to get first element of list 
+    param                        {[$1]} 
     | params_list COMMA param      {$3::$1}
 
 param:
@@ -118,7 +118,7 @@ args_list_opt:
     | args_list                   { List.rev $1 }
 
 args_list:
-    //  arg                        { $1 } //need to get first element of list 
+    arg                        { [$1] } 
     | args_list COMMA arg          { $3 :: $1}
 
 arg:
@@ -142,8 +142,7 @@ stmt_block: //called in for, while
     NEWLINE LBRACE stmt_list RBRACE              { Block(List.rev $3)}
 
 stmt_list: //called by stmt_block
-    /* nothing */                            { [] }
-    // stmt                                  { $1 } //need to get head of list
+    stmt                                  { [$1] }
     // | stmt_list NEWLINE                   { $1 }
     | stmt_list stmt                         { $2 :: $1 }
 
