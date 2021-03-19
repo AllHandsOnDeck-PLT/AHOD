@@ -2,6 +2,11 @@
 
 %{
 open Ast
+
+let fst (a,_,_) = a;;
+let snd (_,b,_) = b;;
+let trd (_,_,c) = c;;
+
 %}
 
 %token LPAREN RPAREN LBRACE RBRACE LSQUARE RSQUARE LBRACK RBRACK COLON COMMA PLUS MINUS MULT DIVIDE ASSIGN MOD POWER FLOOR DOTDOT DOTDOTDOT NEWLINE
@@ -47,8 +52,11 @@ open Ast
 //hi():5
 
 program:
+      
+      newline_list_opt main_decl decls EOF { Program($2, fst $3, snd $3, trd $3) }
+
       //newline_list_opt main_decl decls EOF { $2 }
-       newline_list_opt main_decl decls EOF { Program($2, fst $3, snd $3) }
+      //newline_list_opt main_decl decls EOF { Program($2, $3) }
 
 newline_list_opt:
       /* nothing */      {}
@@ -59,22 +67,20 @@ newline_list:
       | newline_list NEWLINE  {}
 
 decls:
-     /* nothing */      { ([], []) }
-    | decls action_decl { (($2::fst $1), snd $1) }
-    | decls helper_decl { (fst $1, ($2::snd $1)) }
+     /* nothing */      { ([], [], []) }
+    | decls class_decl  { (List.rev ($2::fst $1), snd $1, trd $1)}
+    | decls action_decl { (fst $1, List.rev ($2::snd $1), trd $1) }
+    | decls helper_decl { (fst $1, snd $1, List.rev ($2::trd $1)) }
     //| decls NEWLINE     {}
-    //| decls class_decl  {}
-    //| decls action_decl {}
-    //| decls helper_decl {}
 
 main_decl:
       MAIN COLON stmt_block { $3 } 
 
 class_decl:
-    LET CLASSID BE typ                               {}
-    | LET CLASSID BE typ WITH COLON class_block        {} 
-    | LET CLASSID LPAREN params_list_opt RPAREN BE typ LPAREN args_list_opt RPAREN     {} 
-    | LET CLASSID LPAREN params_list_opt RPAREN BE typ LPAREN args_list_opt RPAREN WITH COLON class_block     {} 
+    LET CLASSID BE typ                               { Cdecl($2, [], $4, [], [], []) }
+    | LET CLASSID BE typ WITH COLON class_block        { Cdecl($2, [], $4, [], [], []) } 
+    | LET CLASSID LPAREN params_list_opt RPAREN BE typ LPAREN args_list_opt RPAREN     { Cdecl($2, $4, $7, $9, [], []) } 
+    | LET CLASSID LPAREN params_list_opt RPAREN BE typ LPAREN args_list_opt RPAREN WITH COLON class_block     { Cdecl($2, $4, $7, $9, fst $13, snd $13) } 
 
 action_decl:
     WHEN DO ACTIONID COLON stmt_block             { Nahadecl($3, [], $5) }
@@ -84,9 +90,16 @@ action_decl:
 
 helper_decl:
     | ID LPAREN params_list_opt RPAREN COLON expr NEWLINE { OneHdecl($1, $3, $6) }
-    /* | ID LPAREN params_list_opt RPAREN COLON stmt { Hdecl($1, $3, $6) } */
     | ID LPAREN params_list_opt RPAREN COLON stmt_block { MultiHdecl($1,$3,$6)}
 
+class_block:
+    NEWLINE LBRACE class_decl_list RBRACE { $3 }
+
+class_decl_list:
+  | helper_decl                     { ([$1], [], []) }
+  | attr_decl                       { ([], [$1], []) }
+  | class_decl_list helper_decl     { (List.rev ($2::fst $1), snd $1, []) }
+  | class_decl_list attr_decl       { (fst $1, List.rev ($2::snd $1), []) }
 
 params_list_opt:
      /*nothing */                  {[]}
@@ -134,15 +147,6 @@ stmt_list: //called by stmt_block
     // | stmt_list NEWLINE                   { $1 }
     | stmt_list stmt                         { $2 :: $1 }
 
-class_block:
-    NEWLINE LBRACE class_decl_list RBRACE {}
-
-class_decl_list:
-  | helper_decl                     {}
-  | attr_decl                       {}
-  | class_decl_list helper_decl     {}
-  | class_decl_list attr_decl       {}
-
 //const_opt: 
 //     /* nothing */      {}
 //    | CONST   {}
@@ -164,12 +168,11 @@ template_class:
 
 stmt:
     | stmt_block                            { $1 }
-    | expr NEWLINE                          { Expr($1)} 
+    | expr NEWLINE                          { Expr $1} 
     // | PASS NEWLINE                       { }
-    | RETURN expr_opt NEWLINE               { Return($2)}
+    | RETURN expr_opt NEWLINE               { Return $2}
     | if_stmt                               { $1 }
-    | FOR ID IN expr COLON stmt_block       { ForId($4, $6)} 
-    // | FOR expr TIMES COLON stmt_block      { ForTimes($2, $5)}
+    | FOR ID IN expr COLON stmt_block       { For($2, $4, $6)} 
     | WHILE expr COLON stmt_block          { While($2, $4)} 
 
  

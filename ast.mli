@@ -28,8 +28,7 @@ type stmt =
   | Expr of expr
   | Return of expr
   | If of expr * stmt * stmt 
-  | ForId of expr * stmt (* not 100% sure if first expr is correct because it's ID*)
-  (* | ForTimes of expr * stmt *)
+  | For of string * expr * stmt 
   | While of expr * stmt
   | Noexpr
 
@@ -42,19 +41,26 @@ type attr_decl =
   | TypAdecl of typ * string * stmt
   | ExprAdecl of string * expr 
   | TypExprAdecl of typ * string * expr
+
 type action_decl = 
   | Nahadecl of string * bind list * stmt
   | Yesadecl of typ * string * string * bind list * stmt
 
-type func_decl = {
-    typ : typ;
-    fname : string;
-    formals : bind list;
-    locals : bind list;
-    body : stmt list;
-  }
+type class_decl = 
+  | Cdecl of string * bind list * typ * expr list * helper_decl list * attr_decl list 
 
-(*type program = bind list * func_decl list*)
-type program = Program of stmt * action_decl list * helper_decl list
 
-(*type program = unit*)
+(* can we have 2 cases of records *)
+
+(*type decl = helper_decl | attr_decl | action_decl | class_decl*)
+
+type program = Program of stmt * class_decl list * action_decl list * helper_decl list
+(*type program = Program of stmt * class_decl list * action_decl list*)
+
+
+(* before when wrote it all out Program of stmt * action_decl list * helper_decl list * class_decl list *)
+(* ^ how to enable any order of the lists *)
+(* in microc, explain bind list in program = bind list * func_decl list (seemed that program got decl, both vdecl and fdecl from parse), why the distinction between bind_list and func_decl list in ast *)
+
+(*type program = Program of stmt * decl list*)
+
