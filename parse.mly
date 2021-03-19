@@ -65,7 +65,7 @@ decls:
     | decls helper_decl {}
 
 main_decl:
-      MAIN COLON stmt_block {} 
+      MAIN COLON stmt_block {$3} 
 
 class_decl:
     LET CLASSID BE typ                               {}
@@ -131,10 +131,10 @@ class_block:
     NEWLINE LBRACE class_decl_list RBRACE {}
 
 class_decl_list:
-  | helper_decl {}
-  | attr_decl {}
-  | class_decl_list helper_decl {}
-  | class_decl_list attr_decl {}
+  | helper_decl {$1}
+  | attr_decl {$1}
+  | class_decl_list helper_decl {} //$2 :: $1 variant expression is expected to have type Ast.stmt
+  | class_decl_list attr_decl {} //$2 :: $1 variant expression is expected to have type Ast.stmt
 
 //const_opt: 
 //     /* nothing */      {}
