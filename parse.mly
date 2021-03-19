@@ -3,8 +3,8 @@
 %{
 open Ast
 
-let fst (a,_,_) = a;;
-let snd (_,b,_) = b;;
+let frst (a,_,_) = a;;
+let scnd (_,b,_) = b;;
 let trd (_,_,c) = c;;
 
 %}
@@ -53,7 +53,7 @@ let trd (_,_,c) = c;;
 
 program:
       
-      newline_list_opt main_decl decls EOF { Program($2, fst $3, snd $3, trd $3) }
+      newline_list_opt main_decl decls EOF { Program($2, frst $3, scnd $3, trd $3) }
 
 newline_list_opt:
       /* nothing */      {}
@@ -65,9 +65,9 @@ newline_list:
 
 decls:
      /* nothing */      { ([], [], []) }
-    | decls class_decl  { (List.rev ($2::fst $1), snd $1, trd $1)}
-    | decls action_decl { (fst $1, List.rev ($2::snd $1), trd $1) }
-    | decls helper_decl { (fst $1, snd $1, List.rev ($2::trd $1)) }
+    | decls class_decl  { (List.rev ($2::frst $1), scnd $1, trd $1)}
+    | decls action_decl { (frst $1, List.rev ($2::scnd $1), trd $1) }
+    | decls helper_decl { (frst $1, scnd $1, List.rev ($2::trd $1)) }
     //| decls NEWLINE     {}
 
 main_decl:
@@ -133,10 +133,10 @@ class_block:
     NEWLINE LBRACE class_decl_list RBRACE { $3 }
 
 class_decl_list:
-  | helper_decl                     { ([$1], [], []) }
-  | attr_decl                       { ([], [$1], []) }
-  | class_decl_list helper_decl     { (List.rev ($2::fst $1), snd $1, []) }
-  | class_decl_list attr_decl       { (fst $1, List.rev ($2::snd $1), []) }
+  | helper_decl                     { ([$1], []) }
+  | attr_decl                       { ([], [$1]) }
+  | class_decl_list helper_decl     { (List.rev ($2::fst $1), snd $1) }
+  | class_decl_list attr_decl       { (fst $1, List.rev ($2::snd $1)) }
 
 params_list_opt:
      /*nothing */                  {[]}
