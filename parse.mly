@@ -109,18 +109,18 @@ arg:
     non_assign_expr               { $1 }
     // | ID ASSIGN non_assign_expr     {}
 
-
+// is there any way to make typ_opt without conflicts? 
 attr_decl:
     //const_opt typ_opt ID COLON stmt_block {}
     //| const_opt typ_opt ID COLON expr NEWLINE {}  
-    | ID COLON stmt_block {}
-    | typ ID COLON stmt_block {}
-    | CONST ID COLON stmt_block {}
-    | CONST typ ID COLON stmt_block {}
-    | ID COLON expr NEWLINE {}
-    | typ ID COLON expr NEWLINE {}
-    | CONST ID COLON expr NEWLINE {}
-    | CONST typ ID COLON expr NEWLINE {}
+    | ID COLON stmt_block { Adecl($1, $3) }
+    | typ ID COLON stmt_block { TypAdecl($1, $2, $4) }
+    | CONST ID COLON stmt_block { Adecl($2, $4) } //take account for const? 
+    | CONST typ ID COLON stmt_block { TypAdecl($2, $3, $5) }
+    | ID COLON expr NEWLINE { ExprAdecl($1, $3)}
+    | typ ID COLON expr NEWLINE { TypExprAdecl($1, $2, $4)}
+    | CONST ID COLON expr NEWLINE { ExprAdecl($2, $4) }
+    | CONST typ ID COLON expr NEWLINE { TypExprAdecl($2, $3, $5) }
 
 stmt_block: //called in for, while
     NEWLINE LBRACE stmt_list RBRACE              { Block(List.rev $3)}
@@ -144,9 +144,9 @@ class_decl_list:
 //     /* nothing */      {}
 //    | CONST   {}
 
-//typ_opt:
-//     /* nothing */      {}
-//    | typ   {}
+// typ_opt:
+     /* nothing */      //{ None }
+    //| typ   { $1 }
 
 typ:
     | INT               { Int    }

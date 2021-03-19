@@ -37,6 +37,12 @@ type helper_decl =
   | OneHdecl of string * bind list * expr 
   | MultiHdecl of string * bind list * stmt
 
+type attr_decl = 
+  | Adecl of string * stmt 
+  | TypAdecl of typ * string * stmt
+  | ExprAdecl of string * expr 
+  | TypExprAdecl of typ * string * expr
+
 type func_decl = {
     typ : typ;
     fname : string;
