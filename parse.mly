@@ -48,7 +48,8 @@ open Ast
 
 program:
       //newline_list_opt main_decl decls EOF { $2 }
-       newline_list_opt main_decl decls EOF { Program($2, fst $3, snd $3) }
+      newline_list_opt main_decl decls EOF { Program($2, fst $3, snd $3, trd $3) }
+      //newline_list_opt main_decl decls EOF { Program($2, $3) }
 
 newline_list_opt:
       /* nothing */      {}
@@ -59,9 +60,10 @@ newline_list:
       | newline_list NEWLINE  {}
 
 decls:
-     /* nothing */      { ([], []) }
-    | decls action_decl { (($2::fst $1), snd $1) }
-    | decls helper_decl { (fst $1, ($2::snd $1)) }
+     /* nothing */      { ([], [], []) }
+    | decls class_decl  { ((List.rev $2::fst $1), snd $1, trd $1)}
+    | decls action_decl { (fst $1, List.rev ($2::snd $1), trd $1) }
+    | decls helper_decl { (fst $1, snd $1, List.rev ($2::trd $1)) }
     //| decls NEWLINE     {}
     //| decls class_decl  {}
     //| decls action_decl {}
@@ -71,10 +73,10 @@ main_decl:
       MAIN COLON stmt_block { $3 } 
 
 class_decl:
-    LET CLASSID BE typ                               {}
-    | LET CLASSID BE typ WITH COLON class_block        {} 
-    | LET CLASSID LPAREN params_list_opt RPAREN BE typ LPAREN args_list_opt RPAREN     {} 
-    | LET CLASSID LPAREN params_list_opt RPAREN BE typ LPAREN args_list_opt RPAREN WITH COLON class_block     {} 
+    LET CLASSID BE typ                               { Cdecl($2, [], $4, [], [], []) }
+    | LET CLASSID BE typ WITH COLON class_block        { Cdecl($2, [], $4, [], [], []) } 
+    | LET CLASSID LPAREN params_list_opt RPAREN BE typ LPAREN args_list_opt RPAREN     { Cdecl($2, $4, $7, $9, [], []) } 
+    | LET CLASSID LPAREN params_list_opt RPAREN BE typ LPAREN args_list_opt RPAREN WITH COLON class_block     { Cdecl($2, $4, $7, $9, fst $13, snd $13) } 
 
 action_decl:
     WHEN DO ACTIONID COLON stmt_block             { Nahadecl($3, [], $5) }
@@ -84,9 +86,17 @@ action_decl:
 
 helper_decl:
     | ID LPAREN params_list_opt RPAREN COLON expr NEWLINE { OneHdecl($1, $3, $6) }
-    /* | ID LPAREN params_list_opt RPAREN COLON stmt { Hdecl($1, $3, $6) } */
     | ID LPAREN params_list_opt RPAREN COLON stmt_block { MultiHdecl($1,$3,$6)}
 
+class_block:
+    NEWLINE LBRACE class_decl_list RBRACE { $3 }
+
+class_decl_list:
+  | helper_decl                     { ([$1], []) }
+  | attr_decl                       { ([], [$1]) }
+  | class_decl_list helper_decl     { (List.rev ($2::fst $1), snd $1) }
+  | class_decl_list attr_decl       { (fst $1, List.rev ($2::snd $1)) }
+// how to mix, can't do similar tuple method, extract single element from list?
 
 params_list_opt:
      /*nothing */                  {[]}
@@ -126,22 +136,13 @@ attr_decl:
     | CONST typ ID COLON expr NEWLINE { TypExprAdecl($2, $3, $5) }
 
 stmt_block: //called in for, while
-    NEWLINE LBRACE stmt_list RBRACE              { Block(List.rev $3)}
+    NEWLINE LBRACE stmt_list RBRACE              { StmtBlock(List.rev $3)}
 
 stmt_list: //called by stmt_block
     /* nothing */                            { [] }
     // stmt                                  { $1 } //need to get head of list
     // | stmt_list NEWLINE                   { $1 }
     | stmt_list stmt                         { $2 :: $1 }
-
-class_block:
-    NEWLINE LBRACE class_decl_list RBRACE {}
-
-class_decl_list:
-  | helper_decl                     {}
-  | attr_decl                       {}
-  | class_decl_list helper_decl     {}
-  | class_decl_list attr_decl       {}
 
 //const_opt: 
 //     /* nothing */      {}
@@ -168,7 +169,7 @@ stmt:
     // | PASS NEWLINE                       { }
     | RETURN expr_opt NEWLINE               { Return($2)}
     | if_stmt                               { $1 }
-    | FOR ID IN expr COLON stmt_block       { ForId($4, $6)} 
+    | FOR ID IN expr COLON stmt_block       { ForId($2, $4, $6)} 
     // | FOR expr TIMES COLON stmt_block      { ForTimes($2, $5)}
     | WHILE expr COLON stmt_block          { While($2, $4)} 
 
@@ -187,7 +188,7 @@ elif_stmt:
     | ELIF expr COLON stmt_block else_block_opt     { If($2, $4, $5) }
 
 else_block_opt:
-      /* nothing */      { Block([]) }
+      /* nothing */      { StmtBlock([]) }
       | else_block       { $1 }
 
 else_block:
