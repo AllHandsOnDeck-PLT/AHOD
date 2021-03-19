@@ -24,12 +24,11 @@ type expr =
   | Noexpr
 
 type stmt =
-  | StmtBlock of stmt list
+  | Block of stmt list
   | Expr of expr
   | Return of expr
   | If of expr * stmt * stmt 
-  | ForId of string * expr * stmt (* not 100% sure if first expr is correct because it's ID*)
-  (* | ForTimes of expr * stmt *)
+  | For of string * expr * stmt 
   | While of expr * stmt
   | Noexpr
 
@@ -48,22 +47,16 @@ type action_decl =
   | Yesadecl of typ * string * string * bind list * stmt
 
 type class_decl = 
-  | Cdecl of string * bind list * typ * expr list * attr_decl list * helper_decl list
+  | Cdecl of string * bind list * typ * expr list * helper_decl list * attr_decl list 
 
 
 (* can we have 2 cases of records *)
 
 (*type decl = helper_decl | attr_decl | action_decl | class_decl*)
 
-type func_decl = {
-    typ : typ;
-    fname : string;
-    formals : bind list;
-    locals : bind list;
-    body : stmt list;
-  }
+type program = Program of stmt * class_decl list * action_decl list * helper_decl list
+(*type program = Program of stmt * class_decl list * action_decl list*)
 
-type program = Program of stmt * class_decl list * action_decl list * helper_decl list 
 
 (* before when wrote it all out Program of stmt * action_decl list * helper_decl list * class_decl list *)
 (* ^ how to enable any order of the lists *)

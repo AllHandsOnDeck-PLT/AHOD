@@ -2,6 +2,11 @@
 
 %{
 open Ast
+
+let fst (a,_,_) = a;;
+let snd (_,b,_) = b;;
+let trd (_,_,c) = c;;
+
 %}
 
 %token LPAREN RPAREN LBRACE RBRACE LSQUARE RSQUARE LBRACK RBRACK COLON COMMA PLUS MINUS MULT DIVIDE ASSIGN MOD POWER FLOOR DOTDOT DOTDOTDOT NEWLINE
@@ -47,8 +52,10 @@ open Ast
 //hi():5
 
 program:
-      //newline_list_opt main_decl decls EOF { $2 }
+      
       newline_list_opt main_decl decls EOF { Program($2, fst $3, snd $3, trd $3) }
+
+      //newline_list_opt main_decl decls EOF { $2 }
       //newline_list_opt main_decl decls EOF { Program($2, $3) }
 
 newline_list_opt:
@@ -61,13 +68,10 @@ newline_list:
 
 decls:
      /* nothing */      { ([], [], []) }
-    | decls class_decl  { ((List.rev $2::fst $1), snd $1, trd $1)}
+    | decls class_decl  { (List.rev ($2::fst $1), snd $1, trd $1)}
     | decls action_decl { (fst $1, List.rev ($2::snd $1), trd $1) }
     | decls helper_decl { (fst $1, snd $1, List.rev ($2::trd $1)) }
     //| decls NEWLINE     {}
-    //| decls class_decl  {}
-    //| decls action_decl {}
-    //| decls helper_decl {}
 
 main_decl:
       MAIN COLON stmt_block { $3 } 
@@ -136,7 +140,7 @@ attr_decl:
     | CONST typ ID COLON expr NEWLINE { TypExprAdecl($2, $3, $5) }
 
 stmt_block: //called in for, while
-    NEWLINE LBRACE stmt_list RBRACE              { StmtBlock(List.rev $3)}
+    NEWLINE LBRACE stmt_list RBRACE              { Block(List.rev $3)}
 
 stmt_list: //called by stmt_block
     /* nothing */                            { [] }
@@ -165,12 +169,11 @@ template_class:
 
 stmt:
     | stmt_block                            { $1 }
-    | expr NEWLINE                          { Expr($1)} 
+    | expr NEWLINE                          { Expr $1} 
     // | PASS NEWLINE                       { }
-    | RETURN expr_opt NEWLINE               { Return($2)}
+    | RETURN expr_opt NEWLINE               { Return $2}
     | if_stmt                               { $1 }
-    | FOR ID IN expr COLON stmt_block       { ForId($2, $4, $6)} 
-    // | FOR expr TIMES COLON stmt_block      { ForTimes($2, $5)}
+    | FOR ID IN expr COLON stmt_block       { For($2, $4, $6)} 
     | WHILE expr COLON stmt_block          { While($2, $4)} 
 
  
