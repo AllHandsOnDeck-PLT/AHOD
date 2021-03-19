@@ -84,27 +84,29 @@ helper_decl:
     | ID LPAREN params_list_opt RPAREN COLON stmt_block {}
 
 params_list_opt:
-     /*nothing */                  {  }
-    | params_list          {}
+     /*nothing */                  {}
+    | params_list                  {}
 
 params_list:
       param                        {}
     | params_list COMMA param      {}
 
 param:
-      typ ID     { }
+      typ ID                       {}
+
 
 args_list_opt:
-     /*nothing */                  {  }
-    | args_list          {}
+    /*nothing */                  {}
+    | args_list                   {}
 
 args_list:
-      arg                         {}
-    | args_list COMMA arg         {}
+      arg                          {}
+    | args_list COMMA arg          {}
 
 arg:
-      non_assign_expr              {}
-    // ID ASSIGN non_assign_expr    {}
+      non_assign_expr               {}
+    | ID ASSIGN non_assign_expr     {}
+
 
 attr_decl:
     //const_opt typ_opt ID COLON stmt_block {}
@@ -122,19 +124,19 @@ stmt_block: //called in for, while
     NEWLINE LBRACE stmt_list RBRACE              { Block(List.rev $3)}
 
 stmt_list: //called by stmt_block
-    /* nothing */  { [] }
-   // stmt              {$1}
-   // | stmt_list NEWLINE { $1 }
-    | stmt_list stmt { $2 :: $1 }
+    /* nothing */                            { [] }
+    // stmt                                  { $1 }
+    // | stmt_list NEWLINE                   { $1 }
+    | stmt_list stmt                         { $2 :: $1 }
 
 class_block:
     NEWLINE LBRACE class_decl_list RBRACE {}
 
 class_decl_list:
-  | helper_decl {}
-  | attr_decl {}
-  | class_decl_list helper_decl {}
-  | class_decl_list attr_decl {}
+  | helper_decl                     {}
+  | attr_decl                       {}
+  | class_decl_list helper_decl     {}
+  | class_decl_list attr_decl       {}
 
 //const_opt: 
 //     /* nothing */      {}
@@ -145,9 +147,9 @@ class_decl_list:
 //    | typ   {}
 
 typ:
-    | prim_typ {}
-    | CLASSID     {}
-    | template_class {}
+    | prim_typ          {}
+    | CLASSID           {}
+    | template_class    {}
     
 prim_typ:
       INT           { Int }
@@ -156,14 +158,14 @@ prim_typ:
     // SLIT
 
 template_class:
-     CLASSID LBRACK typ RBRACK { }
+     CLASSID LBRACK typ RBRACK {  }
 
 stmt:
     | stmt_block                            { $1 }
     | expr NEWLINE                          { Expr($1)} 
-    // | PASS NEWLINE                         {}
-    | RETURN expr_opt NEWLINE              { Return($2)}
-    | if_stmt                              { $1 }
+    // | PASS NEWLINE                       { }
+    | RETURN expr_opt NEWLINE               { Return($2)}
+    | if_stmt                               { $1 }
     /* | FOR ID IN expr COLON stmt_block      { ForId($4, $6)}  */
     // | FOR expr TIMES COLON stmt_block      { ForTimes($2, $5)}
     /* | WHILE expr COLON stmt_block          { While($2, $4)}  */
@@ -175,11 +177,11 @@ stmt:
 if_stmt:
     //| IF expr COLON stmt_block ELSE stmt_block
 
-    | IF expr COLON stmt_block elif_stmt  { If($2, $4, $5) }
-    | IF expr COLON stmt_block else_block_opt  { If($2, $4, $5) }
+    | IF expr COLON stmt_block elif_stmt        { If($2, $4, $5) }
+    | IF expr COLON stmt_block else_block_opt   { If($2, $4, $5) }
 
 elif_stmt:
-    | ELIF expr COLON stmt_block elif_stmt     { If($2, $4, $5) }
+    | ELIF expr COLON stmt_block elif_stmt          { If($2, $4, $5) }
     | ELIF expr COLON stmt_block else_block_opt     { If($2, $4, $5) }
 
 else_block_opt:
@@ -196,7 +198,7 @@ expr:
 non_assign_expr: // distinction between non_assign_expr and expr due to reduce/reduce ambiguity with arg ID ASSIGN expr and assignment
     | ID               { Id($1)} 
     | NONE             { Noexpr}
-    | ILIT          { Iliteral($1)} 
+    | ILIT             { Iliteral($1)} 
     | FLIT             { Fliteral($1)} 
     | BLIT             { Boollit($1) } 
     | Series_literal   { $1 }
@@ -237,30 +239,30 @@ non_assign_expr: // distinction between non_assign_expr and expr due to reduce/r
 //(not expr) for id in expr
 
 call_class: 
-      CLASSID LPAREN args_list_opt RPAREN     {} 
+     CLASSID LPAREN args_list_opt RPAREN            {} //{ Call($1, $3) } 
 
 call_helper: 
-      ID LPAREN args_list_opt RPAREN      {} 
+      ID LPAREN args_list_opt RPAREN                {} // { Call($1, $3) } 
 
 call_action:
-    | DO ACTIONID    {}
-    | expr DO ACTIONID    {}
-    | DO ACTIONID LPAREN args_list_opt RPAREN   {}
-    | expr DO ACTIONID LPAREN args_list_opt RPAREN   {}
+    | DO ACTIONID                                    {} //{ $2 }
+    | expr DO ACTIONID                               {} //{ ($1, $3) }
+    | DO ACTIONID LPAREN args_list_opt RPAREN       {}// { Call($2, $4)}
+    | expr DO ACTIONID LPAREN args_list_opt RPAREN   {} //{ ($1, Call($3, $5))}
 
 Series_literal:
       LBRACK list_args_opt RBRACK { Seriesliteral($2)}
 
 list_args_opt:
       /* nothing */      {[]}
-      | items      {$1}
+      | items            {$1}
 
 items:
-      expr      {[$1]}
+      expr                {[$1]}
       | items COMMA expr  {$3::$1}
 
 dotted_range:
-      | expr DOTDOT expr  { Dottedrange($1, $3, true)} // true for inclusive of end value, false for exclusive
+      | expr DOTDOT expr    { Dottedrange($1, $3, true)} // true for inclusive of end value, false for exclusive
       | expr DOTDOTDOT expr { Dottedrange($1, $3, false)}
 
 // 3*3..4*4
