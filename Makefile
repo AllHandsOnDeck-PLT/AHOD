@@ -15,13 +15,21 @@ scanner.ml : scanner.mll
 parse.ml parse.mli : parse.mly
 	ocamlyacc $^
 
+
+
 # Depedencies from ocamldep
 #test.cmo : scanner.cmo parse.cmi ast.cmi
 #test.cmx : scanner.cmx parse.cmx ast.cmi
-parse.cmo : ast.cmi parse.cmi
-parse.cmx : ast.cmi parse.cmi
+parse.cmo : ast.cmo parse.cmi
+parse.cmx : ast.cmo parse.cmi
 scanner.cmo : parse.cmi
 scanner.cmx : parse.cmx
+
+################# sast stuff added in ################
+sast.cmo : ast.cmo
+sast.cmi : ast.cmi
+
+######################################################
 
 parse.output : parse.mly
 	ocamlyacc -v parse.mly
