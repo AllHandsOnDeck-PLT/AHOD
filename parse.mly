@@ -39,21 +39,13 @@ let trd (_,_,c) = c;;
 
 %%
 
-// x or (y do something)
-// x or y do something
-//(x=y) do something
-//x=(y do something)
-
-//hi():
-//  return 5
-
-//hi(): 5
-
-//hi():5
-
 program:
-      
-      newline_list_opt main_decl decls EOF { Program($2, frst $3, scnd $3, trd $3) }
+    newline_list_opt main_decl decls EOF 
+    {{ 
+      main = $2;
+      classes = frst $3;
+      actions = scnd $3; 
+      helpers = trd $3 }}
 
 newline_list_opt:
       /* nothing */      {}
@@ -65,14 +57,13 @@ newline_list:
 
 decls:
      /* nothing */      { ([], [], []) }
-    | decls class_decl  { (List.rev ($2::frst $1), scnd $1, trd $1)}
+    | decls class_decl  { (List.rev ($2::frst $1), scnd $1, trd $1) }
     | decls action_decl { (frst $1, List.rev ($2::scnd $1), trd $1) }
     | decls helper_decl { (frst $1, scnd $1, List.rev ($2::trd $1)) }
     //| decls NEWLINE     {}
 
 main_decl:
       MAIN COLON stmt_block { $3 } 
-
 
 class_decl:
     LET CLASSID BE typ                               
@@ -111,12 +102,6 @@ class_decl:
       helpers = fst $13;
       attributes = snd $13 }}
 
-//class_decl:
-//    LET CLASSID BE typ                               { Cdecl($2, [], $4, [], [], []) }
-//    | LET CLASSID BE typ WITH COLON class_block        { Cdecl($2, [], $4, [], fst $7, snd $7) } 
-//    | LET CLASSID LPAREN params_list_opt RPAREN BE typ LPAREN args_list_opt RPAREN     { Cdecl($2, $4, $7, $9, [], []) } 
-//    | LET CLASSID LPAREN params_list_opt RPAREN BE typ LPAREN args_list_opt RPAREN WITH COLON class_block     { Cdecl($2, $4, $7, $9, fst $13, snd $13) } 
-
 action_decl:
     WHEN DO ACTIONID COLON stmt_block             
     {{ 
@@ -150,15 +135,9 @@ action_decl:
       aparams = $7;
       abody = $10 }}
 
-//action_decl:
-//    WHEN DO ACTIONID COLON stmt_block             { Adecl(None, None, $3, [], $5) }
-//    | WHEN DO ACTIONID LPAREN params_list RPAREN COLON stmt_block          { Adecl(None, None, $3, $5, $8) }
-//    | WHEN typ ID DO ACTIONID COLON stmt_block               { Adecl(Some $2, Some $3, $5, [], $7) }
-//    | WHEN typ ID DO ACTIONID LPAREN params_list RPAREN COLON stmt_block   { Adecl(Some $2, Some $3, $5, $7, $10) } 
-
 helper_decl:
     | ID LPAREN params_list_opt RPAREN COLON expr NEWLINE { OneHdecl($1, $3, $6) }
-    | ID LPAREN params_list_opt RPAREN COLON stmt_block { MultiHdecl($1,$3,$6)}
+    | ID LPAREN params_list_opt RPAREN COLON stmt_block { MultiHdecl($1,$3,$6) }
 
 class_block:
     NEWLINE LBRACE class_decl_list RBRACE { $3 }
@@ -170,16 +149,15 @@ class_decl_list:
   | class_decl_list attr_decl       { (fst $1, List.rev ($2::snd $1)) }
 
 params_list_opt:
-     /*nothing */                  {[]}
-    | params_list                  {List.rev $1}
+     /*nothing */                  { [] }
+    | params_list                  { List.rev $1 }
 
 params_list:
-    param                        {[$1]} 
-    | params_list COMMA param      {$3::$1}
+    param                        { [$1] } 
+    | params_list COMMA param      { $3::$1 }
 
 param:
-      typ ID                       {$1, $2}
-
+      typ ID                       { $1, $2 }
 
 args_list_opt:
     /*nothing */                  { [] }
@@ -187,7 +165,7 @@ args_list_opt:
 
 args_list:
     arg                        { [$1] } 
-    | args_list COMMA arg          { $3 :: $1}
+    | args_list COMMA arg          { $3 :: $1 }
 
 arg:
     non_assign_expr               { $1 }
@@ -207,7 +185,7 @@ attr_decl:
     | CONST typ ID COLON expr NEWLINE { OneAdecl(Some $2, $3, $5) }
 
 stmt_block: //called in for, while
-    NEWLINE LBRACE stmt_list RBRACE              { Block(List.rev $3)}
+    NEWLINE LBRACE stmt_list RBRACE              { Block(List.rev $3) }
 
 stmt_list: //called by stmt_block
     stmt                                  { [$1] }
@@ -231,24 +209,18 @@ typ:
     | template_class    { $1 }
 
 template_class:
-     CLASSID LBRACK typ RBRACK {TemplateClass($1, $3)}  
+     CLASSID LBRACK typ RBRACK {TemplateClass($1, $3) }  
 
 stmt:
     | stmt_block                            { $1 }
-    | expr NEWLINE                          { Expr $1} 
+    | expr NEWLINE                          { Expr $1 } 
     // | PASS NEWLINE                       { }
-    | RETURN expr_opt NEWLINE               { Return $2}
+    | RETURN expr_opt NEWLINE               { Return $2 }
     | if_stmt                               { $1 }
-    | FOR ID IN expr COLON stmt_block       { For($2, $4, $6)} 
-    | WHILE expr COLON stmt_block          { While($2, $4)} 
-
- 
-// IF expr COLON stmt_block (ELIF expr COLON stmt_block)* (ELSE COLON stmt_block)?
-// IF = expr * stmt * stmt
+    | FOR ID IN expr COLON stmt_block       { For($2, $4, $6) } 
+    | WHILE expr COLON stmt_block          { While($2, $4) } 
 
 if_stmt:
-    //| IF expr COLON stmt_block ELSE stmt_block
-
     | IF expr COLON stmt_block elif_stmt        { If($2, $4, $5) }
     | IF expr COLON stmt_block else_block_opt   { If($2, $4, $5) }
 
@@ -265,50 +237,46 @@ else_block:
 
 expr:
     non_assign_expr    { $1 }
-    | ID ASSIGN expr   { Assign($1, $3)}
+    | ID ASSIGN expr   { Assign($1, $3) }
 
 non_assign_expr: // distinction between non_assign_expr and expr due to reduce/reduce ambiguity with arg ID ASSIGN expr and assignment
-    | ID               { Id($1)} 
-    | NONE             { Noexpr}
-    | ILIT             { Iliteral($1)} 
-    | FLIT             { Fliteral($1)} 
+    | ID               { Id($1) } 
+    | NONE             { Noexpr }
+    | ILIT             { Iliteral($1) } 
+    | FLIT             { Fliteral($1) } 
     | BLIT             { Boollit($1) } 
     | Series_literal   { $1 }
-    | NOT expr         { Unop(Not, $2)}
-    | LPAREN expr RPAREN { $2}
+    | NOT expr         { Unop(Not, $2) }
+    | LPAREN expr RPAREN { $2 }
 
-    | expr PLUS   expr { Binop($1, Add,     $3)} 
-    | expr MINUS  expr { Binop($1, Sub,     $3)}
-    | expr MULT  expr { Binop($1, Mult,    $3)}
-    | expr DIVIDE expr { Binop($1, Div,     $3)}
-    | expr MOD    expr { Binop($1, Mod,     $3)}
-    | expr POWER  expr { Binop($1, Power,   $3)}
+    | expr PLUS   expr { Binop($1, Add,     $3) } 
+    | expr MINUS  expr { Binop($1, Sub,     $3) }
+    | expr MULT   expr { Binop($1, Mult,    $3) }
+    | expr DIVIDE expr { Binop($1, Div,     $3) }
+    | expr MOD    expr { Binop($1, Mod,     $3) }
+    | expr POWER  expr { Binop($1, Power,   $3) }
     | expr FLOOR  expr { Binop($1, Floor,   $3) } 
-    | expr AND    expr { Binop($1, And,     $3)}
-    | expr OR     expr { Binop($1, Or,      $3)}
+    | expr AND    expr { Binop($1, And,     $3) }
+    | expr OR     expr { Binop($1, Or,      $3) }
 
-    | expr EQ     expr { Binop($1, Equal,   $3)}
-    | expr NEQ    expr { Binop($1, Equal,   $3)}
-    | expr LT     expr { Binop($1, Less,    $3)}
-    | expr LEQ    expr { Binop($1, Leq,     $3)}
-    | expr GT     expr { Binop($1, Greater, $3)}
-    | expr GEQ    expr { Binop($1, Geq,     $3)}
+    | expr EQ     expr { Binop($1, Equal,   $3) }
+    | expr NEQ    expr { Binop($1, Equal,   $3) }
+    | expr LT     expr { Binop($1, Less,    $3) }
+    | expr LEQ    expr { Binop($1, Leq,     $3) }
+    | expr GT     expr { Binop($1, Greater, $3) }
+    | expr GEQ    expr { Binop($1, Geq,     $3) }
 
     // augassign
 
     | call_class       { $1 }
     | call_helper      { $1 } 
-    | call_action      { Noexpr} //lines 178-180: look at decls in microc? 
+    | call_action      { Noexpr } //lines 178-180: look at decls in microc? 
 
     | dotted_range     { $1 }
 
     //    | comprehension    { $1 } 
     //    | index {}
     //    | slice            { $1 }
-
-
-//not (expr for id in expr)
-//(not expr) for id in expr
 
 call_class: 
      CLASSID LPAREN args_list_opt RPAREN            { ClassCall($1, $3) } 
@@ -334,14 +302,14 @@ items:
       | items COMMA expr  {$3::$1}
 
 dotted_range:
-      | expr DOTDOT expr    { Dottedrange($1, $3, true)} // true for inclusive of end value, false for exclusive
-      | expr DOTDOTDOT expr { Dottedrange($1, $3, false)}
+      | expr DOTDOT expr    { Dottedrange($1, $3, true) } // true for inclusive of end value, false for exclusive
+      | expr DOTDOTDOT expr { Dottedrange($1, $3, false) }
 
 // 3*3..4*4
 // 3...9 for id in
 
 //comprehension:
-//    expr FOR ID IN expr { Comprehension($1, $3, $5)}
+//    expr FOR ID IN expr { Comprehension($1, $3, $5) }
 
 //slice:
 //    | expr {}
