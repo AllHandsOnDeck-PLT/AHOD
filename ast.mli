@@ -5,7 +5,7 @@ type op = Add | Sub | Mult | Div | Equal | Neq | Less | Leq | Greater | Geq |
 
 type uop = Neg | Not
 
-type typ = Int | Bool | Float | None 
+type typ = Int | Bool | Float | None | ClassID | TemplateClass of string * typ
 
 type bind = typ * string
 
@@ -32,6 +32,10 @@ type stmt =
   (* | ForTimes of expr * stmt *)
   | While of expr * stmt
   | Noexpr
+
+type helper_decl = 
+  | OneHdecl of string * bind list * expr 
+  | MultiHdecl of string * bind list * stmt
 
 type func_decl = {
     typ : typ;

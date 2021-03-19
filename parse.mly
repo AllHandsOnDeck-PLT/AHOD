@@ -80,8 +80,10 @@ action_decl:
     | WHEN typ ID DO ACTIONID LPAREN params_list RPAREN COLON stmt_block   {} 
 
 helper_decl:
-    | ID LPAREN params_list_opt RPAREN COLON expr NEWLINE {}
-    | ID LPAREN params_list_opt RPAREN COLON stmt_block {}
+    | ID LPAREN params_list_opt RPAREN COLON expr NEWLINE { OneHdecl($1, $3, $6) }
+    /* | ID LPAREN params_list_opt RPAREN COLON stmt { Hdecl($1, $3, $6) } */
+    | ID LPAREN params_list_opt RPAREN COLON stmt_block { MultiHdecl($1,$3,$6)}
+
 
 params_list_opt:
      /*nothing */                  {[]}
@@ -92,7 +94,7 @@ params_list:
     | params_list COMMA param      {$3::$1}
 
 param:
-      typ ID                       {($1,$2)}
+      typ ID                       {$1, $2}
 
 
 args_list_opt:
@@ -147,18 +149,15 @@ class_decl_list:
 //    | typ   {}
 
 typ:
-    | prim_typ          {}
-    | CLASSID           {}
-    | template_class    {}
-    
-prim_typ:
-      INT           { Int }
-    | FLOAT         { Float }
-    | BOOL          { Bool  }
-    // SLIT
+    | INT               { Int    }
+    | BOOL              { Bool   }
+    | FLOAT             { Float  }
+    | NONE              { None   }
+    | CLASSID           { ClassID } 
+    | template_class    { $1 }
 
 template_class:
-     CLASSID LBRACK typ RBRACK {  }
+     CLASSID LBRACK typ RBRACK {TemplateClass($1, $3)}  
 
 stmt:
     | stmt_block                            { $1 }
