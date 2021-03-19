@@ -37,6 +37,10 @@ type helper_decl =
   | OneHdecl of string * bind list * expr 
   | MultiHdecl of string * bind list * stmt
 
+type action_decl = 
+  | Nahadecl of string * bind list * stmt
+  | Yesadecl of typ * string * string * bind list * stmt
+
 type func_decl = {
     typ : typ;
     fname : string;
@@ -45,39 +49,7 @@ type func_decl = {
     body : stmt list;
   }
 
-(*
-We needa figure out how this works lmao
---------------------
-Extra questions: 
- - series literal be changed to list literal so there's consistency (else there should also be stack literal)
-
- To do for next week: 
- - figure out how to call all of the parse file in program 
- - there will be midpoint check-in on Tuesday! 
-
-Jang:
-- if
-- elif
-- else
-- typ
-
-Christi:
-- Data structure (series, ) 
-- For
-- while
-
-Tiff:
-- decl
-- class + param + arg
-
-Mara:
-- expr
-- call_*
-- stmt
-
-*)
-
 (*type program = bind list * func_decl list*)
+type program = Program of stmt * action_decl list 
 
-
-type program = unit(*bind list * func_decl list*)
+(*type program = unit*)

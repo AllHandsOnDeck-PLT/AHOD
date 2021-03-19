@@ -47,7 +47,8 @@ open Ast
 //hi():5
 
 program:
-      newline_list_opt main_decl decls EOF { $2 }
+      //newline_list_opt main_decl decls EOF { $2 }
+       newline_list_opt main_decl decls EOF { Program($2, $3) }
 
 newline_list_opt:
       /* nothing */      {}
@@ -58,14 +59,15 @@ newline_list:
       | newline_list NEWLINE  {}
 
 decls:
-     /* nothing */      {}
-    | decls NEWLINE     {}
-    | decls class_decl  {}
-    | decls action_decl {}
-    | decls helper_decl {}
+     /* nothing */      { [] }
+    | decls action_decl { $2::$1 }
+    //| decls NEWLINE     {}
+    //| decls class_decl  {}
+    //| decls action_decl {}
+    //| decls helper_decl {}
 
 main_decl:
-      MAIN COLON stmt_block {} 
+      MAIN COLON stmt_block { $3 } 
 
 class_decl:
     LET CLASSID BE typ                               {}
@@ -74,10 +76,10 @@ class_decl:
     | LET CLASSID LPAREN params_list_opt RPAREN BE typ LPAREN args_list_opt RPAREN WITH COLON class_block     {} 
 
 action_decl:
-    WHEN DO ACTIONID COLON stmt_block             {}
-    | WHEN DO ACTIONID LPAREN params_list RPAREN COLON stmt_block          {}
-    | WHEN typ ID DO ACTIONID COLON stmt_block               {}
-    | WHEN typ ID DO ACTIONID LPAREN params_list RPAREN COLON stmt_block   {} 
+    WHEN DO ACTIONID COLON stmt_block             { Nahadecl($3, [], $5) }
+    | WHEN DO ACTIONID LPAREN params_list RPAREN COLON stmt_block          { Nahadecl($3, $5, $8) }
+    | WHEN typ ID DO ACTIONID COLON stmt_block               { Yesadecl($2, $3, $5, [], $7) }
+    | WHEN typ ID DO ACTIONID LPAREN params_list RPAREN COLON stmt_block   { Yesadecl($2, $3, $5, $7, $10) } 
 
 helper_decl:
     | ID LPAREN params_list_opt RPAREN COLON expr NEWLINE { OneHdecl($1, $3, $6) }
