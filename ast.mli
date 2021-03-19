@@ -41,9 +41,8 @@ type helper_decl =
 
 (*typ option*)
 type attr_decl = 
-  | TypAdecl of typ option * string * stmt
-  | ExprAdecl of string * expr 
-  | TypExprAdecl of typ * string * expr
+  | MultiAdecl of typ option * string * stmt
+  | OneAdecl of typ option * string * expr 
 
 type action_decl = 
   | Nahadecl of string * bind list * stmt

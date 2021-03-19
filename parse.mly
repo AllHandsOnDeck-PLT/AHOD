@@ -166,14 +166,14 @@ arg:
 attr_decl:
     //const_opt typ_opt ID COLON stmt_block {}
     //| const_opt typ_opt ID COLON expr NEWLINE {}  
-    | ID COLON stmt_block { TypAdecl(None, $1, $3) }
-    | typ ID COLON stmt_block { TypAdecl(Some $1, $2, $4) }
-    | CONST ID COLON stmt_block { TypAdecl(None, $2, $4) } //take account for const? 
-    | CONST typ ID COLON stmt_block { TypAdecl(Some $2, $3, $5) }
-    | ID COLON expr NEWLINE { ExprAdecl($1, $3)}
-    | typ ID COLON expr NEWLINE { TypExprAdecl($1, $2, $4)}
-    | CONST ID COLON expr NEWLINE { ExprAdecl($2, $4) }
-    | CONST typ ID COLON expr NEWLINE { TypExprAdecl($2, $3, $5) }
+    | ID COLON stmt_block { MultiAdecl(None, $1, $3) }
+    | typ ID COLON stmt_block { MultiAdecl(Some $1, $2, $4) }
+    | CONST ID COLON stmt_block { MultiAdecl(None, $2, $4) } //take account for const? 
+    | CONST typ ID COLON stmt_block { MultiAdecl(Some $2, $3, $5) }
+    | ID COLON expr NEWLINE { OneAdecl(None, $1, $3)}
+    | typ ID COLON expr NEWLINE { OneAdecl(Some $1, $2, $4)}
+    | CONST ID COLON expr NEWLINE { OneAdecl(None, $2, $4) }
+    | CONST typ ID COLON expr NEWLINE { OneAdecl(Some $2, $3, $5) }
 
 stmt_block: //called in for, while
     NEWLINE LBRACE stmt_list RBRACE              { Block(List.rev $3)}
