@@ -33,6 +33,20 @@ type stmt =
   | While of expr * stmt
   | Noexpr
 
+(*type class_decl = 
+  | Cdecl of string * bind list * typ * stmt list * stmt*)
+
+type class_decl = {
+  a : string;
+  b : bind list;
+  c : typ;
+  d : stmt list;
+  e : stmt;
+}
+
+type helper_decl = 
+  | Hdecl of string * bind list * stmt
+
 type func_decl = {
     typ : typ;
     fname : string;
@@ -40,6 +54,17 @@ type func_decl = {
     locals : bind list;
     body : stmt list;
   }
+
+type main_decl = stmt
+
+(*type program = bind list * func_decl list * class_decl list*)
+
+type program = 
+  | Program of main_decl * class_decl list * helper_decl list
+(*type program = main_decl * class_decl list * action_decl list * helper_decl list*)
+
+(*type program = unit*)
+
 
 (*
 We needa figure out how this works lmao
@@ -72,8 +97,3 @@ Mara:
 - stmt
 
 *)
-
-(*type program = bind list * func_decl list*)
-
-
-type program = unit(*bind list * func_decl list*)

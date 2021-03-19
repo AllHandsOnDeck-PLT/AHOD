@@ -47,7 +47,8 @@ open Ast
 //hi():5
 
 program:
-      newline_list_opt main_decl decls EOF { $2 }
+      newline_list_opt main_decl decls EOF { Program($2, $3) }
+      //decls EOF {$1}
 
 newline_list_opt:
       /* nothing */      {}
@@ -58,20 +59,49 @@ newline_list:
       | newline_list NEWLINE  {}
 
 decls:
-     /* nothing */      {}
-    | decls NEWLINE     {}
-    | decls class_decl  {}
-    | decls action_decl {}
-    | decls helper_decl {}
+     // /* nothing */      { ([], [], []) }
+     /* nothing */      { ([],[]) }
+    //| decls NEWLINE     { $1 }
+    | decls class_decl  { ($2:: fst $1), snd $1 }
+    | decls helper_decl { (fst $1, ($2::snd $1)) }
+    //| decls class_decl  { (($2::fst $1), snd $1, trd $1) }
+    //| decls action_decl { (fst $1, ($2::snd $1), trd $1) }
+    //| decls helper_decl { (fst $1, snd $1, ($2::trd $1)) }
 
 main_decl:
-      MAIN COLON stmt_block {} 
+      MAIN COLON stmt_block { $3 } 
 
 class_decl:
-    LET CLASSID BE typ                               {}
-    | LET CLASSID BE typ WITH COLON class_block        {} 
-    | LET CLASSID LPAREN params_list_opt RPAREN BE typ LPAREN args_list_opt RPAREN     {} 
-    | LET CLASSID LPAREN params_list_opt RPAREN BE typ LPAREN args_list_opt RPAREN WITH COLON class_block     {} 
+    LET CLASSID BE typ                               
+    { {
+      a = $2;
+      b = []; 
+      c = $4; 
+      d = []; 
+      e = Block([]) }}
+
+    | LET CLASSID BE typ WITH COLON class_block        { 
+    {{ 
+      a = $2;
+      b = [];
+      c = $4;
+      d = [];
+      e = $7 }}
+
+    | LET CLASSID LPAREN params_list_opt RPAREN BE typ LPAREN args_list_opt RPAREN     
+    {{
+      a = $2;
+      b = $4;
+      c = $7;
+
+      e = Block([]) }}
+
+    | LET CLASSID LPAREN params_list_opt RPAREN BE typ LPAREN args_list_opt RPAREN WITH COLON class_block     
+    {{
+      a = $2;
+      b = $4; 
+      c = $7; 
+      e = $7 }}
 
 action_decl:
     WHEN DO ACTIONID COLON stmt_block             {}
@@ -80,30 +110,34 @@ action_decl:
     | WHEN typ ID DO ACTIONID LPAREN params_list RPAREN COLON stmt_block   {} 
 
 helper_decl:
-    | ID LPAREN params_list_opt RPAREN COLON expr NEWLINE {}
-    | ID LPAREN params_list_opt RPAREN COLON stmt_block {}
+    /*| ID LPAREN params_list_opt RPAREN COLON expr NEWLINE { Hdecl($1, $3, $6) }*/
+    | ID LPAREN params_list_opt RPAREN COLON stmt { Hdecl($1, $3, $6) }
+    | ID LPAREN params_list_opt RPAREN COLON stmt_block { Hdecl($1,$3,$6)}
+    // is doing stmt instead of expr NEWLINE in order to avoid having two Hdecls in the ast ok
+
+//helper_decl_body stmt_block, distinguish between expr NEWLINE and stmt_block
 
 params_list_opt:
-     /*nothing */                  {  }
-    | params_list          {}
+     /*nothing */                  {[]}
+    | params_list          {List.rev $1}
 
 params_list:
-      param                        {}
-    | params_list COMMA param      {}
+    //  param                        {}
+    | params_list COMMA param      {$3::$1}
 
 param:
-      typ ID     { }
+      typ ID     { ($1,$2) }
 
 args_list_opt:
-     /*nothing */                  {  }
-    | args_list          {}
+     /*nothing */                  { [] }
+    | args_list          { List.rev $1 }
 
 args_list:
-      arg                         {}
-    | args_list COMMA arg         {}
+    //  arg                         {}
+    | args_list COMMA arg         {$3 :: $1}
 
 arg:
-      non_assign_expr              {}
+      non_assign_expr              {$1}
     // ID ASSIGN non_assign_expr    {}
 
 attr_decl:
@@ -128,13 +162,13 @@ stmt_list: //called by stmt_block
     | stmt_list stmt { $2 :: $1 }
 
 class_block:
-    NEWLINE LBRACE class_decl_list RBRACE {}
+    NEWLINE LBRACE class_decl_list RBRACE { $3}
 
 class_decl_list:
-  | helper_decl {}
-  | attr_decl {}
-  | class_decl_list helper_decl {}
-  | class_decl_list attr_decl {}
+  | helper_decl { $1}
+  | attr_decl { $1}
+  | class_decl_list helper_decl { $2::$1}
+  | class_decl_list attr_decl { $2::$1}
 
 //const_opt: 
 //     /* nothing */      {}
