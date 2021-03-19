@@ -20,7 +20,10 @@ type expr =
   | Binop of expr * op * expr
   | Unop of uop * expr
   | Assign of string * expr
-  | Call of string * expr list
+  | ClassCall of string * expr list
+  | HelperCall of string * expr list
+  | ActionCall of string * expr list
+  | ExprActionCall of expr * string * expr list
   | Noexpr
 
 type stmt =
