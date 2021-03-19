@@ -1,0 +1,19 @@
+main:{
+	print('Hello world')
+}
+
+/* 
+print is a BUILT-IN FUNCTION
+
+Semant (Jang)
+------
+0. Initiate StringMap (hash?)
+1. read main
+2. identify the content within {} is a stmt_block
+3. recognize and perform "print"
+	- recognize that 'Hello world' is of type String
+ 
+Codegen (Mara + Tiff)
+-------
+1. 
+*/
