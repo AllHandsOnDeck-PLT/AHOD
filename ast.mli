@@ -49,9 +49,18 @@ type action_decl =
   | Nahadecl of string * bind list * stmt
   | Yesadecl of typ * string * string * bind list * stmt
 
-type class_decl = 
+(*type class_decl = 
   | Cdecl of string * bind list * typ * expr list * helper_decl list * attr_decl list 
+*)
 
+type class_decl = {
+  cname : string;
+  params : bind list;
+  typ : typ;
+  args : expr list;
+  helpers : helper_decl list;
+  attributes : attr_decl list;
+}
 
 (* can we have 2 cases of records *)
 

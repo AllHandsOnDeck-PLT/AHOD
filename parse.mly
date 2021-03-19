@@ -55,9 +55,6 @@ program:
       
       newline_list_opt main_decl decls EOF { Program($2, fst $3, snd $3, trd $3) }
 
-      //newline_list_opt main_decl decls EOF { $2 }
-      //newline_list_opt main_decl decls EOF { Program($2, $3) }
-
 newline_list_opt:
       /* nothing */      {}
       | newline_list     {}
@@ -76,11 +73,51 @@ decls:
 main_decl:
       MAIN COLON stmt_block { $3 } 
 
+
 class_decl:
-    LET CLASSID BE typ                               { Cdecl($2, [], $4, [], [], []) }
-    | LET CLASSID BE typ WITH COLON class_block        { Cdecl($2, [], $4, [], [], []) } 
-    | LET CLASSID LPAREN params_list_opt RPAREN BE typ LPAREN args_list_opt RPAREN     { Cdecl($2, $4, $7, $9, [], []) } 
-    | LET CLASSID LPAREN params_list_opt RPAREN BE typ LPAREN args_list_opt RPAREN WITH COLON class_block     { Cdecl($2, $4, $7, $9, fst $13, snd $13) } 
+    LET CLASSID BE typ                               
+    { {
+      cname = $2;
+      params = []; 
+      typ = $4; 
+      args = []; 
+      helpers = [];
+      attributes = [] }}
+
+    | LET CLASSID BE typ WITH COLON class_block        
+    {{ 
+      cname = $2;
+      params = [];
+      typ = $4;
+      args = [];
+      helpers = fst $7;
+      attributes = snd $7 }}
+
+    | LET CLASSID LPAREN params_list_opt RPAREN BE typ LPAREN args_list_opt RPAREN     
+    {{
+      cname = $2;
+      params = $4;
+      typ = $7;
+      args = $9;
+      helpers = [];
+      attributes = [] }}
+
+    | LET CLASSID LPAREN params_list_opt RPAREN BE typ LPAREN args_list_opt RPAREN WITH COLON class_block     
+    {{
+      cname = $2;
+      params = $4; 
+      typ = $7; 
+      args = $9;
+      helpers = fst $13;
+      attributes = snd $13
+       }}
+
+
+//class_decl:
+//    LET CLASSID BE typ                               { Cdecl($2, [], $4, [], [], []) }
+//    | LET CLASSID BE typ WITH COLON class_block        { Cdecl($2, [], $4, [], fst $7, snd $7) } 
+//    | LET CLASSID LPAREN params_list_opt RPAREN BE typ LPAREN args_list_opt RPAREN     { Cdecl($2, $4, $7, $9, [], []) } 
+//    | LET CLASSID LPAREN params_list_opt RPAREN BE typ LPAREN args_list_opt RPAREN WITH COLON class_block     { Cdecl($2, $4, $7, $9, fst $13, snd $13) } 
 
 action_decl:
     WHEN DO ACTIONID COLON stmt_block             { Nahadecl($3, [], $5) }
