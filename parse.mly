@@ -96,11 +96,10 @@ class_block:
     NEWLINE LBRACE class_decl_list RBRACE { $3 }
 
 class_decl_list:
-  | helper_decl                     { ([$1], []) }
-  | attr_decl                       { ([], [$1]) }
-  | class_decl_list helper_decl     { (List.rev ($2::fst $1), snd $1) }
-  | class_decl_list attr_decl       { (fst $1, List.rev ($2::snd $1)) }
-// how to mix, can't do similar tuple method, extract single element from list?
+  | helper_decl                     { ([$1], [], []) }
+  | attr_decl                       { ([], [$1], []) }
+  | class_decl_list helper_decl     { (List.rev ($2::fst $1), snd $1, []) }
+  | class_decl_list attr_decl       { (fst $1, List.rev ($2::snd $1), []) }
 
 params_list_opt:
      /*nothing */                  {[]}
@@ -191,7 +190,7 @@ elif_stmt:
     | ELIF expr COLON stmt_block else_block_opt     { If($2, $4, $5) }
 
 else_block_opt:
-      /* nothing */      { StmtBlock([]) }
+      /* nothing */      { Block([]) }
       | else_block       { $1 }
 
 else_block:
