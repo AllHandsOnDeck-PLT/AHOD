@@ -270,7 +270,7 @@ non_assign_expr: // distinction between non_assign_expr and expr due to reduce/r
 
     | call_class       { $1 }
     | call_helper      { $1 } 
-    | call_action      { Noexpr } //lines 178-180: look at decls in microc? 
+    | call_action      { $1 } 
 
     | dotted_range     { $1 }
 
@@ -291,15 +291,15 @@ call_action:
     | expr DO ACTIONID LPAREN args_list_opt RPAREN   { ExprActionCall($1, $3, $5) } 
 
 Series_literal:
-      LBRACK list_args_opt RBRACK { Seriesliteral($2)}
+      LBRACK list_args_opt RBRACK { Seriesliteral($2) }
 
 list_args_opt:
-      /* nothing */      {[]}
-      | items            {$1}
+      /* nothing */      { [] }
+      | items            { $1 }
 
 items:
-      expr                {[$1]}
-      | items COMMA expr  {$3::$1}
+      expr                { [$1] }
+      | items COMMA expr  { $3::$1 }
 
 dotted_range:
       | expr DOTDOT expr    { Dottedrange($1, $3, true) } // true for inclusive of end value, false for exclusive
