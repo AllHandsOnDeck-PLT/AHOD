@@ -39,9 +39,9 @@ type helper_decl =
   | OneHdecl of string * bind list * expr 
   | MultiHdecl of string * bind list * stmt
 
+(*typ option*)
 type attr_decl = 
-  | Adecl of string * stmt 
-  | TypAdecl of typ * string * stmt
+  | TypAdecl of typ option * string * stmt
   | ExprAdecl of string * expr 
   | TypExprAdecl of typ * string * expr
 
