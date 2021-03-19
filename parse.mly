@@ -48,7 +48,7 @@ open Ast
 
 program:
       //newline_list_opt main_decl decls EOF { $2 }
-       newline_list_opt main_decl decls EOF { Program($2, $3) }
+       newline_list_opt main_decl decls EOF { Program($2, fst $3, snd $3) }
 
 newline_list_opt:
       /* nothing */      {}
@@ -59,8 +59,9 @@ newline_list:
       | newline_list NEWLINE  {}
 
 decls:
-     /* nothing */      { [] }
-    | decls action_decl { $2::$1 }
+     /* nothing */      { ([], []) }
+    | decls action_decl { (($2::fst $1), snd $1) }
+    | decls helper_decl { (fst $1, ($2::snd $1)) }
     //| decls NEWLINE     {}
     //| decls class_decl  {}
     //| decls action_decl {}

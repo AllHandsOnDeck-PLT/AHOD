@@ -50,6 +50,6 @@ type func_decl = {
   }
 
 (*type program = bind list * func_decl list*)
-type program = Program of stmt * action_decl list 
+type program = Program of stmt * action_decl list * helper_decl list
 
 (*type program = unit*)
