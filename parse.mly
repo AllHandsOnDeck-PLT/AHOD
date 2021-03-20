@@ -201,12 +201,15 @@ stmt_list: //called by stmt_block
     //| typ   { $1 }
 
 typ:
+    | prim_typ          { $1 }
+    | CLASSID           { ClassID } 
+    | template_class    { $1 }
+
+prim_typ:
     | INT               { Int    }
     | BOOL              { Bool   }
     | FLOAT             { Float  }
     | NONE              { None   }
-    | CLASSID           { ClassID } 
-    | template_class    { $1 }
 
 template_class:
      CLASSID LBRACK typ RBRACK {TemplateClass($1, $3) }  

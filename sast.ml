@@ -2,64 +2,64 @@
 
 open Ast
 
-type styp = typ | STemplateClass of string * typ
+type sexpr = typ * sx
 
-type sexpr =
+type sx =
   | SIliteral of int
-  | SSeriesliteral of expr list
+  | SSeriesliteral of sexpr list
   (* | Comprehension of expr * string * expr *)
-  | SDottedrange of expr * expr * bool
+  | SDottedrange of sexpr * sexpr * bool
   | SFliteral of string
   | SBoollit of bool
   | SId of string
-  | SBinop of expr * op * expr
-  | SUnop of uop * expr
-  | SAssign of string * expr
-  | SClassCall of string * expr list
-  | SHelperCall of string * expr list
-  | SActionCall of string * expr list
-  | SExprActionCall of expr * string * expr list
+  | SBinop of sexpr * op * sexpr
+  | SUnop of uop * sexpr
+  | SAssign of string * sexpr
+  | SClassCall of string * sexpr list
+  | SHelperCall of string * sexpr list
+  | SActionCall of string * sexpr list
+  | SExprActionCall of sexpr * string * sexpr list
   | SNoexpr
 
 type sstmt =
-  | SBlock of stmt list
-  | SExpr of expr
-  | SReturn of expr
-  | SIf of expr * stmt * stmt 
-  | SFor of string * expr * stmt 
-  | SWhile of expr * stmt
+  | SBlock of sstmt list
+  | SExpr of sexpr
+  | SReturn of sexpr
+  | SIf of sexpr * sstmt * sstmt 
+  | SFor of string * sexpr * sstmt 
+  | SWhile of sexpr * sstmt
   | SNoexpr
 
 type shelper_decl = 
-  | SOneHdecl of string * bind list * expr 
-  | SMultiHdecl of string * bind list * stmt
+  | SOneHdecl of string * bind list * sexpr 
+  | SMultiHdecl of string * bind list * sstmt
 
 type sattr_decl = 
-  | SMultiAdecl of typ option * string * stmt
-  | SOneAdecl of typ option * string * expr 
+  | SMultiAdecl of typ option * string * sstmt
+  | SOneAdecl of typ option * string * sexpr 
 
 type saction_decl = {
   sentitytyp : typ option;
   sentityid : string option;
   saname : string;
   saparams : bind list;
-  sabody: stmt;
+  sabody: sstmt;
 }
 
 type sclass_decl = {
   scname : string;
   scparams : bind list;
   sctyp : typ;
-  scargs : expr list;
-  shelpers : helper_decl list;
-  sattributes : attr_decl list;
+  scargs : sexpr list;
+  shelpers : shelper_decl list;
+  sattributes : sattr_decl list;
 }
 
 (* can we have 2 cases of records *)
 
 type sprogram = {
-  smain : stmt;
-  sclasses : class_decl list;
-  sactions : action_decl list;
-  shelpers : helper_decl list;
+  smain : sstmt;
+  sclasses : sclass_decl list;
+  sactions : saction_decl list;
+  shelpers : shelper_decl list;
 }
