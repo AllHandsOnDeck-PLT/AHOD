@@ -14,7 +14,7 @@ let trd (_,_,c) = c;;
 %token RETURN IF ELIF ELSE FOR WHILE INT BOOL FLOAT NONE STRING RANGE WHEN DO LET BE WITH PASS MAIN TIMES CONST
 %token <int> ILIT
 %token <bool> BLIT
-%token <string> ID ACTIONID CLASSID FLIT
+%token <string> ID ACTIONID CLASSID FLIT SLIT
 %token EOF
 
 %start program
