@@ -4,7 +4,7 @@ open Ast
 
 type sexpr = typ * sx
 
-type sx =
+and sx =
   | SIliteral of int
   | SSeriesliteral of sexpr list
   (* | Comprehension of expr * string * expr *)
