@@ -14,7 +14,7 @@ let trd (_,_,c) = c;;
 %token RETURN IF ELIF ELSE FOR WHILE INT BOOL FLOAT NONE STRING RANGE WHEN DO LET BE WITH PASS MAIN TIMES CONST
 %token <int> ILIT
 %token <bool> BLIT
-%token <string> ID ACTIONID CLASSID FLIT
+%token <string> ID ACTIONID CLASSID FLIT SLIT
 %token EOF
 
 %start program
@@ -201,12 +201,15 @@ stmt_list: //called by stmt_block
     //| typ   { $1 }
 
 typ:
+    | prim_typ          { $1 }
+    | CLASSID           { ClassID } 
+    | template_class    { $1 }
+
+prim_typ:
     | INT               { Int    }
     | BOOL              { Bool   }
     | FLOAT             { Float  }
     | NONE              { None   }
-    | CLASSID           { ClassID } 
-    | template_class    { $1 }
 
 template_class:
      CLASSID LBRACK typ RBRACK {TemplateClass($1, $3) }  
