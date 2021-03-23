@@ -1,7 +1,16 @@
 # "ocamlbuild test.native" will also build 
+test2 : testall.sh
+	./testall.sh
 
 test : parse.cmo scanner.cmo ast.cmo sast.cmo # test.cmo
 	ocamlc -o test $^
+
+# .PHONY : all
+# all : microc.native printbig.o
+
+# AHOD.native :
+# 	opam config exec -- \
+# 	ocamlbuild -use-ocamlfind AHOD.native
 
 %.cmo : %.ml
 	ocamlc -c $<

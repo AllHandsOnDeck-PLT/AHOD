@@ -1,0 +1,5 @@
+
+###### Testing test-helloworld
+./AHOD.native tests/test-helloworld.ahd > test-helloworld.ll
+./testall.sh: 1: eval: ./AHOD.native: not found
+###### SUCCESS

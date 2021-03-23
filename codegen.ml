@@ -92,5 +92,5 @@ let global_vars : L.llvalue StringMap.t =
     *)
 
 
-(*List.iter build_function_body functions;
-the_module*)
+List.iter build_function_body functions;
+the_module
