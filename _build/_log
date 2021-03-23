@@ -1,0 +1,32 @@
+### Starting build.
+# Target: AHOD.ml.depends, tags: { extension:ml, file:AHOD.ml, ocaml, ocamldep, quiet }
+ocamlfind ocamldep -modules AHOD.ml > AHOD.ml.depends
+# Target: ast.ml.depends, tags: { extension:ml, file:ast.ml, ocaml, ocamldep, quiet }
+ocamlfind ocamldep -modules ast.ml > ast.ml.depends
+# Target: codegen.ml.depends, tags: { extension:ml, file:codegen.ml, ocaml, ocamldep, quiet }
+ocamlfind ocamldep -modules codegen.ml > codegen.ml.depends
+# Target: ast.cmo, tags: { byte, compile, extension:cmo, extension:ml, file:ast.cmo, file:ast.ml, implem, ocaml, quiet }
+ocamlfind ocamlc -c -o ast.cmo ast.ml
+# Target: sast.ml.depends, tags: { extension:ml, file:sast.ml, ocaml, ocamldep, quiet }
+ocamlfind ocamldep -modules sast.ml > sast.ml.depends
+# Target: sast.cmo, tags: { byte, compile, extension:cmo, extension:ml, file:sast.cmo, file:sast.ml, implem, ocaml, quiet }
+ocamlfind ocamlc -c -o sast.cmo sast.ml
+# Target: scanner.mll, tags: { extension:mll, file:scanner.mll, lexer, ocaml, ocamllex, quiet }
+/home/tiffeny_chen/.opam/4.11.1/bin/ocamllex.opt -q scanner.mll
+# Target: scanner.ml.depends, tags: { extension:ml, file:scanner.ml, ocaml, ocamldep, quiet }
+ocamlfind ocamldep -modules scanner.ml > scanner.ml.depends
+# Target: parse.mly, tags: { extension:mly, file:parse.mly, infer, ocaml, ocamlyacc, parser, quiet }
+/home/tiffeny_chen/.opam/4.11.1/bin/ocamlyacc parse.mly
+# Target: parse.mli.depends, tags: { extension:mli, file:parse.mli, ocaml, ocamldep, quiet }
+ocamlfind ocamldep -modules parse.mli > parse.mli.depends
+# Target: parse.cmi, tags: { byte, compile, extension:mli, file:parse.mli, interf, ocaml, quiet }
+ocamlfind ocamlc -c -o parse.cmi parse.mli
+# Target: codegen.cmo, tags: { byte, compile, extension:cmo, extension:ml, file:codegen.cmo, file:codegen.ml, implem, ocaml, quiet }
+ocamlfind ocamlc -c -o codegen.cmo codegen.ml
++ ocamlfind ocamlc -c -o codegen.cmo codegen.ml
+File "codegen.ml", line 17, characters 11-15:
+17 | module L = Llvm
+                ^^^^
+Error: Unbound module Llvm
+Command exited with code 2.
+# Compilation unsuccessful.
