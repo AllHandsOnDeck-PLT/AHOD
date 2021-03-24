@@ -63,3 +63,6 @@ type sprogram = {
   sactions : saction_decl list;
   shelpers : shelper_decl list;
 }
+let string_of_sprogram (vars, funcs) =
+  String.concat "" (List.map string_of_vdecl vars) ^ "\n" ^
+  String.concat "\n" (List.map string_of_sfdecl funcs)

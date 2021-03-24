@@ -34,23 +34,26 @@ let translate (globals, functions) =
      and i8_t       = L.i8_type     context
      and i1_t       = L.i1_type     context
      and float_t    = L.double_type context
+     and string_t   = L.pointer_type (L.i8_type context)
 
      (*
      (* should we have these as actual data types in scanner/ parser?*)
      and none_t     = L.void_type   context
-     and string_t   = L.pointer_type (L.i8_type context)
+     
      *)
 in
 
 (* Return the LLVM type for a AHOD type *)
-let rec ltype_of_typ = function
+let ltype_of_typ = function
   A.Int   -> i32_t
   | A.Bool  -> i1_t
   | A.Float -> float_t
+  (* | A.typ -> typ *)
   (*| A.None  -> none_t
   | A.String -> string_t
+  | A.Seriesliteral(t) -> L.pointer_type (ltype_of_typ t)
   *)
-| A.Seriesliteral(t) -> L.pointer_type (ltype_of_typ t)
+
 in
 
 (* look into *)
@@ -72,25 +75,22 @@ let global_vars : L.llvalue StringMap.t =
   let printf_func : L.llvalue =
     L.declare_function "printf" printf_t the_module in
 
-    (*Check if we need printbig ASK OH*)
+  (* let main_t : L.lltype =
+    L.var_arg_function_type i32_t [|  |]  in 
+  let main_func : L.llvalue =
+    L.declare_function "main" main_t the_module in 
 
-  let printbig_t : L.lltype =
-    L.function_type i32_t [| i32_t |] in
-  let printbig_func : L.llvalue =
-    L.declare_function "printbig" printbig_t the_module in
+  let build_main st = 
+    let output e b = 
+      let str= L.build_global_stringptr st "str" builder in 
+      L.build_call printf_func [| str_format_str ; str|] "printf" builder 
+    in output (List.hd exp_list ) builder  *)
 
-  let string_concat_t : L.lltype =
-    L.function_type string_t [| string_t; string_t |] in
-  let string_concat_f : L.llvalue =
-    L.declare_function "string_concat" string_concat_t the_module in
-
-
-    (*TODO:
-    - look into function prototypes (function_decls, build_function_body, formals, locals)
-    - look into stmt builder
-    - built in functions (SCall)
-    *)
+  (* let build_function_body fdecl =
+    let (the_function, _) = StringMap.find fdecl.sfname function_decls in
+    let builder = L.builder_at_end context (L.entry_block the_function) in *)
 
 
-List.iter build_function_body functions;
+  (* in let _ = List.map build_main (List.rev statements ) in  *)
+  (* in let _ = L.build_ret (L.const_int i32_t 0 ) builder in *)
 the_module

@@ -1,4 +1,4 @@
-(* Top-level of the MicroC compiler: scan & parse the input,
+(* (* Top-level of the MicroC compiler: scan & parse the input,
    check the resulting AST and generate an SAST from it, generate LLVM IR,
    and dump the module *)
 
@@ -19,15 +19,15 @@
      Arg.parse speclist (fun filename -> channel := open_in filename) usage_msg;
      
      let lexbuf = Lexing.from_channel !channel in
-     let ast = Microcparse.program Scanner.token lexbuf in  
-     match !action with
+     (* let ast = Parse.program Scanner.token lexbuf in  
+      match !action with
        Ast -> print_string (Ast.string_of_program ast)
      | _ -> let sast = Semant.check ast in
        match !action with
          Ast     -> ()
        | Sast    -> print_string (Sast.string_of_sprogram sast)
        | LLVM_IR -> print_string (Llvm.string_of_llmodule (Codegen.translate sast))
-       | Compile -> let m = Codegen.translate sast in
+       | Compile -> let m = Codegen.translate sast in *)
      Llvm_analysis.assert_valid_module m;
-     print_string (Llvm.string_of_llmodule m)
-   
+     (* print_string (Llvm.string_of_llmodule m) *)
+    *)
