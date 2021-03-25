@@ -1,0 +1,68 @@
+### Starting build.
+# Target: prettyPrint.ml.depends, tags: { extension:ml, file:prettyPrint.ml, ocaml, ocamldep, quiet }
+/Users/christikim/.opam/4.11.1/bin/ocamldep.opt -modules prettyPrint.ml > prettyPrint.ml.depends
+# Target: ast.ml.depends, tags: { extension:ml, file:ast.ml, ocaml, ocamldep, quiet }
+/Users/christikim/.opam/4.11.1/bin/ocamldep.opt -modules ast.ml > ast.ml.depends
+# Target: parse.mly, tags: { extension:mly, file:parse.mly, infer, ocaml, ocamlyacc, parser, quiet }
+/Users/christikim/.opam/4.11.1/bin/ocamlyacc parse.mly
++ /Users/christikim/.opam/4.11.1/bin/ocamlyacc parse.mly
+64 rules never reduced
+# Target: parse.mli.depends, tags: { extension:mli, file:parse.mli, ocaml, ocamldep, quiet }
+/Users/christikim/.opam/4.11.1/bin/ocamldep.opt -modules parse.mli > parse.mli.depends
+# Target: ast.cmo, tags: { byte, compile, extension:cmo, extension:ml, file:ast.cmo, file:ast.ml, implem, ocaml, quiet }
+/Users/christikim/.opam/4.11.1/bin/ocamlc.opt -c -o ast.cmo ast.ml
+# Target: scanner.mll, tags: { extension:mll, file:scanner.mll, lexer, ocaml, ocamllex, quiet }
+/Users/christikim/.opam/4.11.1/bin/ocamllex.opt -q scanner.mll
+# Target: scanner.ml.depends, tags: { extension:ml, file:scanner.ml, ocaml, ocamldep, quiet }
+/Users/christikim/.opam/4.11.1/bin/ocamldep.opt -modules scanner.ml > scanner.ml.depends
+# Target: parse.cmi, tags: { byte, compile, extension:mli, file:parse.mli, interf, ocaml, quiet }
+/Users/christikim/.opam/4.11.1/bin/ocamlc.opt -c -o parse.cmi parse.mli
+# Target: scanner.cmo, tags: { byte, compile, extension:cmo, extension:ml, file:scanner.cmo, file:scanner.ml, implem, ocaml, quiet }
+/Users/christikim/.opam/4.11.1/bin/ocamlc.opt -c -o scanner.cmo scanner.ml
+# Target: prettyPrint.cmo, tags: { byte, compile, extension:cmo, extension:ml, file:prettyPrint.cmo, file:prettyPrint.ml, implem, ocaml, quiet }
+/Users/christikim/.opam/4.11.1/bin/ocamlc.opt -c -o prettyPrint.cmo prettyPrint.ml
++ /Users/christikim/.opam/4.11.1/bin/ocamlc.opt -c -o prettyPrint.cmo prettyPrint.ml
+File "prettyPrint.ml", lines 29-53, characters 27-16:
+29 | ...........................function
+30 |     Iliteral(l) -> string_of_int l
+31 |   (* | Seriesliteral(exprs) -> 
+32 |       "[" ^ String.concat ", " (List.map string_of_expr exprs) ^ "]"
+33 |   | Dottedrange(e1, e2, true) -> 
+...
+50 |       "do " ^ f ^ "(" ^ String.concat ", " (List.map string_of_expr el) ^ ")"
+51 |   | ExprActionCall(e, f, el) ->
+52 |       "do " ^ f ^ "(" ^ String.concat ", " (List.map string_of_expr el) ^ ")" *)
+53 |   | Noexpr -> ""
+Warning 8: this pattern-matching is not exhaustive.
+Here is an example of a case that is not matched:
+(Seriesliteral _|Dottedrange (_, _, _)|ClassCall (_, _)|HelperCall (_, _)|
+ActionCall (_, _)|ExprActionCall (_, _, _))
+# Target: parse.ml.depends, tags: { extension:ml, file:parse.ml, ocaml, ocamldep, quiet }
+/Users/christikim/.opam/4.11.1/bin/ocamldep.opt -modules parse.ml > parse.ml.depends
+# Target: ast.cmx, tags: { compile, extension:cmx, extension:ml, file:ast.cmx, file:ast.ml, implem, native, ocaml, quiet }
+/Users/christikim/.opam/4.11.1/bin/ocamlopt.opt -c -o ast.cmx ast.ml
+# Target: parse.cmx, tags: { compile, extension:cmx, extension:ml, file:parse.cmx, file:parse.ml, implem, native, ocaml, quiet }
+/Users/christikim/.opam/4.11.1/bin/ocamlopt.opt -c -o parse.cmx parse.ml
+# Target: scanner.cmx, tags: { compile, extension:cmx, extension:ml, file:scanner.cmx, file:scanner.ml, implem, native, ocaml, quiet }
+/Users/christikim/.opam/4.11.1/bin/ocamlopt.opt -c -o scanner.cmx scanner.ml
+# Target: prettyPrint.cmx, tags: { compile, extension:cmx, extension:ml, file:prettyPrint.cmx, file:prettyPrint.ml, implem, native, ocaml, quiet }
+/Users/christikim/.opam/4.11.1/bin/ocamlopt.opt -c -o prettyPrint.cmx prettyPrint.ml
++ /Users/christikim/.opam/4.11.1/bin/ocamlopt.opt -c -o prettyPrint.cmx prettyPrint.ml
+File "prettyPrint.ml", lines 29-53, characters 27-16:
+29 | ...........................function
+30 |     Iliteral(l) -> string_of_int l
+31 |   (* | Seriesliteral(exprs) -> 
+32 |       "[" ^ String.concat ", " (List.map string_of_expr exprs) ^ "]"
+33 |   | Dottedrange(e1, e2, true) -> 
+...
+50 |       "do " ^ f ^ "(" ^ String.concat ", " (List.map string_of_expr el) ^ ")"
+51 |   | ExprActionCall(e, f, el) ->
+52 |       "do " ^ f ^ "(" ^ String.concat ", " (List.map string_of_expr el) ^ ")" *)
+53 |   | Noexpr -> ""
+Warning 8: this pattern-matching is not exhaustive.
+Here is an example of a case that is not matched:
+(Seriesliteral _|Dottedrange (_, _, _)|ClassCall (_, _)|HelperCall (_, _)|
+ActionCall (_, _)|ExprActionCall (_, _, _))
+# Target: prettyPrint.native, tags: { dont_link_with, extension:native, file:prettyPrint.native, link, native, ocaml, program, quiet }
+/Users/christikim/.opam/4.11.1/bin/ocamlopt.opt ast.cmx parse.cmx scanner.cmx prettyPrint.cmx -o prettyPrint.native
+# Compilation successful.

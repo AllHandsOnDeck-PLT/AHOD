@@ -169,7 +169,7 @@ args_list:
 
 arg:
     non_assign_expr               { $1 }
-    /* | ID ASSIGN non_assign_expr     {} */
+    // | ID ASSIGN non_assign_expr     {}
 
 // is there any way to make typ_opt without conflicts? 
 attr_decl:
