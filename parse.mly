@@ -40,12 +40,14 @@ let trd (_,_,c) = c;;
 %%
 
 program:
-    newline_list_opt main_decl decls EOF 
-    {{ 
-      main = $2;
-      classes = frst $3;
-      actions = scnd $3; 
-      helpers = trd $3 }}
+    // newline_list_opt main_decl decls EOF
+    main_decl decls EOF {$2}
+
+    // {{ 
+    //   main = $2;
+    //   classes = frst $3;
+    //   actions = scnd $3; 
+    //   helpers = trd $3 }}
 
 newline_list_opt:
       /* nothing */      {}
@@ -60,7 +62,23 @@ decls:
     | decls class_decl  { (List.rev ($2::frst $1), scnd $1, trd $1) }
     | decls action_decl { (frst $1, List.rev ($2::scnd $1), trd $1) }
     | decls helper_decl { (frst $1, scnd $1, List.rev ($2::trd $1)) }
+    | decls fdecl { (fst $1, ($2 :: snd $1)) }
     //| decls NEWLINE     {}
+
+fdecl:
+   typ ID LPAREN params_list_opt RPAREN LBRACE vdecl_list stmt_list RBRACE
+     { { typ = $1;
+	 fname = $2;
+	 formals = List.rev $4;
+	 locals = List.rev $7;
+	 body = List.rev $8 } }
+
+vdecl_list:
+    /* nothing */    { [] }
+  | vdecl_list vdecl { $2 :: $1 }
+
+vdecl:
+   typ ID { ($1, $2) }
 
 main_decl:
       MAIN COLON stmt_block { $3 } 

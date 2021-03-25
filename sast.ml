@@ -46,6 +46,14 @@ type saction_decl = {
   sabody: sstmt;
 }
 
+type sfunc_decl = {
+    styp : typ;
+    sfname : string;
+    sformals : bind list;
+    slocals : bind list;
+    sbody : sstmt list;
+  }
+
 type sclass_decl = {
   scname : string;
   scparams : bind list;
@@ -63,6 +71,6 @@ type sprogram = {
   sactions : saction_decl list;
   shelpers : shelper_decl list;
 }
-let string_of_sprogram (vars, funcs) =
+(* let string_of_sprogram (vars, funcs) =
   String.concat "" (List.map string_of_vdecl vars) ^ "\n" ^
-  String.concat "\n" (List.map string_of_sfdecl funcs)
+  String.concat "\n" (List.map string_of_sfdecl funcs) *)

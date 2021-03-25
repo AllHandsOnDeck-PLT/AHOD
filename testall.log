@@ -1,7 +1,5 @@
 
 ###### Testing test-helloworld
 ./AHOD.native tests/test-helloworld.ahd > test-helloworld.ll
-llc -relocation-model=pic test-helloworld.ll > test-helloworld.s
-cc -o test-helloworld.exe test-helloworld.s printbig.o
-cc: error: printbig.o: No such file or directory
+./testall.sh: 1: eval: ./AHOD.native: not found
 ###### SUCCESS

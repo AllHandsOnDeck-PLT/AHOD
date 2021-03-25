@@ -21,7 +21,7 @@ open Sast
 module StringMap = Map.Make(String)
 
 (* translate : Sast.program -> Llvm.module *)
-let translate (globals, functions) =
+let translate (functions) =
   let context    = L.global_context () in
 
 
@@ -61,13 +61,13 @@ in
 (* Create a map of global variables after creating each *)
 
 
-let global_vars : L.llvalue StringMap.t =
+(* let global_vars : L.llvalue StringMap.t =
   let global_var m (t, n) =
     let init = match t with
         A.Float -> L.const_float (ltype_of_typ t) 0.0
       | _ -> L.const_int (ltype_of_typ t) 0
     in StringMap.add n (L.define_global n init the_module) m in
-  List.fold_left global_var StringMap.empty globals in
+  List.fold_left global_var StringMap.empty globals in *)
 
 
   let printf_t : L.lltype =
@@ -77,7 +77,8 @@ let global_vars : L.llvalue StringMap.t =
 
   let main_t : L.lltype =
     L.function_type i32_t [|  |]  in 
-  let main_func : L.define_function "main" main_t the_module in 
+  let main_func : L.llvalue =
+    L.declare_function "main" main_t the_module in 
 
   let builder = L.builder_at_end context (L.entry_block main_func) in 
 
@@ -90,7 +91,8 @@ let global_vars : L.llvalue StringMap.t =
     let output e b = 
       let str= L.build_global_stringptr st "str" builder in 
       L.build_call printf_func [| str_format_str ; str|] "printf" builder 
-    in output (List.hd exp_list ) builder 
+    in output () builder 
+  in
 
   (* let build_function_body fdecl =
     let (the_function, _) = StringMap.find fdecl.sfname function_decls in

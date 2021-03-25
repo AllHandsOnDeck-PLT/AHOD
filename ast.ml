@@ -51,6 +51,14 @@ type action_decl = {
   abody: stmt;
 }
 
+type func_decl = {
+  typ : typ;
+  fname : string;
+  formals : bind list;
+  locals : bind list;
+  body : stmt list;
+  }
+
 type class_decl = {
   cname : string;
   cparams : bind list;
@@ -62,14 +70,16 @@ type class_decl = {
 
 (* can we have 2 cases of records *)
 
-type program = {
+type program = 
+func_decl list
+(* {
   main : stmt;
   classes : class_decl list;
   actions : action_decl list;
   helpers : helper_decl list;
-}
+} *)
 
 
-let string_of_program (vars, funcs) =
+(* let string_of_program (vars, funcs) =
   String.concat "" (List.map string_of_vdecl vars) ^ "\n" ^
-  String.concat "\n" (List.map string_of_fdecl funcs)
+  String.concat "\n" (List.map string_of_fdecl funcs) *)
