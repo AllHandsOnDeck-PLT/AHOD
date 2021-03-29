@@ -34,7 +34,8 @@ let translate (globals, functions) =
      and i8_t       = L.i8_type     context
      and i1_t       = L.i1_type     context
      and float_t    = L.double_type context
-
+     and none_t     = L.void_type   context
+     and string_t   = L.pointer_type (L.i8_type context)
      (*
      (* should we have these as actual data types in scanner/ parser?*)
      and none_t     = L.void_type   context
@@ -43,14 +44,13 @@ let translate (globals, functions) =
 in
 
 (* Return the LLVM type for a AHOD type *)
-let rec ltype_of_typ = function
+let ltype_of_typ = function
   A.Int   -> i32_t
   | A.Bool  -> i1_t
   | A.Float -> float_t
-  (*| A.None  -> none_t
+  | A.None  -> none_t
   | A.String -> string_t
-  *)
-| A.Seriesliteral(t) -> L.pointer_type (ltype_of_typ t)
+  | _ -> none_t
 in
 
 (* look into *)
@@ -72,17 +72,18 @@ let global_vars : L.llvalue StringMap.t =
   let printf_func : L.llvalue =
     L.declare_function "printf" printf_t the_module in
 
-    (*Check if we need printbig ASK OH*)
+ (* let main_t : L.lltype = 
+    L.var_arg_function_type  i32_t [| |] in
+  let main_func : L.llvalue = 
+    L.declare_function "main" main_t the_module in
 
-  let printbig_t : L.lltype =
-    L.function_type i32_t [| i32_t |] in
-  let printbig_func : L.llvalue =
-    L.declare_function "printbig" printbig_t the_module in
-
-  let string_concat_t : L.lltype =
-    L.function_type string_t [| string_t; string_t |] in
-  let string_concat_f : L.llvalue =
-    L.declare_function "string_concat" string_concat_t the_module in
+  let build_main st =
+    let output e b =
+      let str = L.build_global_stringptr str "str" builder 
+      in
+      l.build_call printf_func [| str_format_str ; str|]
+      "printf" builder
+    in output(List.hd exp_list ) builder*)
 
 
     (*TODO:
@@ -91,6 +92,5 @@ let global_vars : L.llvalue StringMap.t =
     - built in functions (SCall)
     *)
 
-
-List.iter build_function_body functions;
+ (* in let _ = List.map build_main in *)
 the_module

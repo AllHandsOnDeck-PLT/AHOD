@@ -1,32 +1,31 @@
 ### Starting build.
-# Target: AHOD.ml.depends, tags: { extension:ml, file:AHOD.ml, ocaml, ocamldep, quiet }
-ocamlfind ocamldep -modules AHOD.ml > AHOD.ml.depends
-# Target: ast.ml.depends, tags: { extension:ml, file:ast.ml, ocaml, ocamldep, quiet }
-ocamlfind ocamldep -modules ast.ml > ast.ml.depends
-# Target: codegen.ml.depends, tags: { extension:ml, file:codegen.ml, ocaml, ocamldep, quiet }
-ocamlfind ocamldep -modules codegen.ml > codegen.ml.depends
-# Target: ast.cmo, tags: { byte, compile, extension:cmo, extension:ml, file:ast.cmo, file:ast.ml, implem, ocaml, quiet }
-ocamlfind ocamlc -c -o ast.cmo ast.ml
-# Target: sast.ml.depends, tags: { extension:ml, file:sast.ml, ocaml, ocamldep, quiet }
-ocamlfind ocamldep -modules sast.ml > sast.ml.depends
-# Target: sast.cmo, tags: { byte, compile, extension:cmo, extension:ml, file:sast.cmo, file:sast.ml, implem, ocaml, quiet }
-ocamlfind ocamlc -c -o sast.cmo sast.ml
-# Target: scanner.mll, tags: { extension:mll, file:scanner.mll, lexer, ocaml, ocamllex, quiet }
-/home/tiffeny_chen/.opam/4.11.1/bin/ocamllex.opt -q scanner.mll
-# Target: scanner.ml.depends, tags: { extension:ml, file:scanner.ml, ocaml, ocamldep, quiet }
-ocamlfind ocamldep -modules scanner.ml > scanner.ml.depends
-# Target: parse.mly, tags: { extension:mly, file:parse.mly, infer, ocaml, ocamlyacc, parser, quiet }
-/home/tiffeny_chen/.opam/4.11.1/bin/ocamlyacc parse.mly
-# Target: parse.mli.depends, tags: { extension:mli, file:parse.mli, ocaml, ocamldep, quiet }
-ocamlfind ocamldep -modules parse.mli > parse.mli.depends
-# Target: parse.cmi, tags: { byte, compile, extension:mli, file:parse.mli, interf, ocaml, quiet }
-ocamlfind ocamlc -c -o parse.cmi parse.mli
-# Target: codegen.cmo, tags: { byte, compile, extension:cmo, extension:ml, file:codegen.cmo, file:codegen.ml, implem, ocaml, quiet }
-ocamlfind ocamlc -c -o codegen.cmo codegen.ml
-+ ocamlfind ocamlc -c -o codegen.cmo codegen.ml
-File "codegen.ml", line 17, characters 11-15:
-17 | module L = Llvm
-                ^^^^
-Error: Unbound module Llvm
+# Target: AHOD.ml.depends, tags: { package(llvm), package(llvm.analysis), warn(+a-4), extension:ml, file:AHOD.ml, ocaml, ocamldep, quiet, traverse }
+ocamlfind ocamldep -package llvm -package llvm.analysis -modules AHOD.ml > AHOD.ml.depends # cached
+# Target: ast.ml.depends, tags: { package(llvm), package(llvm.analysis), warn(+a-4), extension:ml, file:ast.ml, ocaml, ocamldep, quiet, traverse }
+ocamlfind ocamldep -package llvm -package llvm.analysis -modules ast.ml > ast.ml.depends
+# Target: parse.mly, tags: { package(llvm), package(llvm.analysis), warn(+a-4), extension:mly, file:parse.mly, infer, ocaml, ocamlyacc, parser, quiet, traverse }
+ocamlyacc parse.mly # cached
+# Target: parse.mli.depends, tags: { package(llvm), package(llvm.analysis), warn(+a-4), extension:mli, file:parse.mli, ocaml, ocamldep, quiet, traverse }
+ocamlfind ocamldep -package llvm -package llvm.analysis -modules parse.mli > parse.mli.depends # cached
+# Target: ast.cmo, tags: { package(llvm), package(llvm.analysis), warn(+a-4), byte, compile, extension:cmo, extension:ml, file:ast.cmo, file:ast.ml, implem, ocaml, quiet, traverse }
+ocamlfind ocamlc -c -w +a-4 -package llvm -package llvm.analysis -o ast.cmo ast.ml
++ ocamlfind ocamlc -c -w +a-4 -package llvm -package llvm.analysis -o ast.cmo ast.ml
+File "ast.ml", line 110, characters 4-10:
+Warning 42: this use of Noexpr relies on type-directed disambiguation,
+it will not compile with OCaml 4.00 or earlier.
+# Target: parse.cmi, tags: { package(llvm), package(llvm.analysis), warn(+a-4), byte, compile, extension:mli, file:parse.mli, interf, ocaml, quiet, traverse }
+ocamlfind ocamlc -c -w +a-4 -package llvm -package llvm.analysis -o parse.cmi parse.mli # cached
+# Target: scanner.mll, tags: { package(llvm), package(llvm.analysis), warn(+a-4), extension:mll, file:scanner.mll, lexer, ocaml, ocamllex, quiet, traverse }
+ocamllex.opt -q scanner.mll # cached
+# Target: scanner.ml.depends, tags: { package(llvm), package(llvm.analysis), warn(+a-4), extension:ml, file:scanner.ml, ocaml, ocamldep, quiet, traverse }
+ocamlfind ocamldep -package llvm -package llvm.analysis -modules scanner.ml > scanner.ml.depends # cached
+# Target: scanner.cmo, tags: { package(llvm), package(llvm.analysis), warn(+a-4), byte, compile, extension:cmo, extension:ml, file:scanner.cmo, file:scanner.ml, implem, ocaml, quiet, traverse }
+ocamlfind ocamlc -c -w +a-4 -package llvm -package llvm.analysis -o scanner.cmo scanner.ml # cached
+# Target: AHOD.cmo, tags: { package(llvm), package(llvm.analysis), warn(+a-4), byte, compile, extension:cmo, extension:ml, file:AHOD.cmo, file:AHOD.ml, implem, ocaml, quiet, traverse }
+ocamlfind ocamlc -c -w +a-4 -package llvm -package llvm.analysis -o AHOD.cmo AHOD.ml
++ ocamlfind ocamlc -c -w +a-4 -package llvm -package llvm.analysis -o AHOD.cmo AHOD.ml
+File "AHOD.ml", line 21, characters 14-26:
+Error: This function has type string -> unit
+       It is applied to too many arguments; maybe you forgot a `;'.
 Command exited with code 2.
 # Compilation unsuccessful.

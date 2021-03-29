@@ -60,5 +60,5 @@ type token =
   | SLIT of (string)
   | EOF
 
-val program :
-  (Lexing.lexbuf  -> token) -> Lexing.lexbuf -> Ast.program
+val expr :
+  (Lexing.lexbuf  -> token) -> Lexing.lexbuf -> Ast.expr

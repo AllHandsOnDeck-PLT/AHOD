@@ -5,7 +5,7 @@ type op = Add | Sub | Mult | Div | Equal | Neq | Less | Leq | Greater | Geq |
 
 type uop = Neg | Not
 
-type typ = Int | Bool | Float | None | ClassID | TemplateClass of string * typ
+type typ = Int | Bool | String | Float | None | ClassID | TemplateClass of string * typ
 
 type bind = typ * string
 
@@ -15,6 +15,7 @@ type expr =
   (* | Comprehension of expr * string * expr *)
   | Dottedrange of expr * expr * bool
   | Fliteral of string
+  | Sliteral of string
   | Boollit of bool
   | Id of string
   | Binop of expr * op * expr
@@ -69,4 +70,49 @@ type program = {
   helpers : helper_decl list;
 }
 
+(*------------------------------------------------------------*)
+
+(*let string_of_op = function
+    Add -> "+"
+  | Sub -> "-"
+  | Mult -> "*"
+  | Div -> "/"
+  | Equal -> "=="
+  | Neq -> "!="
+  | Less -> "<"
+  | Leq -> "<="
+  | Greater -> ">"
+  | Geq -> ">="
+  | And -> "&&"
+  | Or -> "||"
+  | Mod -> "%"
+  | Power -> "**"
+  | Floor -> "//"
+
+let string_of_uop = function
+    Neg -> "-"
+  | Not -> "!"
+
+let rec string_of_expr = function
+    Iliteral(l) -> string_of_int l
+  (*| Seriesliteral(l) -> (List.map string_of_expr el)*)
+  | Fliteral(l) -> l
+  | Sliteral(l) -> l
+  | Boollit(true) -> "True"
+  | Boollit(false) -> "False"
+  | Id(s) -> s
+  | Binop(e1, o, e2) ->
+      string_of_expr e1 ^ " " ^ string_of_op o ^ " " ^ string_of_expr e2
+  | Unop(o, e) -> string_of_uop o ^ string_of_expr e
+  | Assign(v, e) -> v ^ " = " ^ string_of_expr e
+  (*| Call(f, el) ->
+      f ^ "(" ^ String.concat ", " (List.map string_of_expr el) ^ ")"*)
+  | Noexpr -> ""
+  | _ -> ""
+*)
+
+  (*| Dottedrange of expr * expr * bool
+  | HelperCall of string * expr list
+  | ActionCall of string * expr list
+  | ExprActionCall of expr * string * expr list*)
 

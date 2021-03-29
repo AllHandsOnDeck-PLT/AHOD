@@ -17,8 +17,8 @@ let trd (_,_,c) = c;;
 %token <string> ID ACTIONID CLASSID FLIT SLIT
 %token EOF
 
-%start program
-%type <Ast.program> program
+%start expr
+%type <Ast.expr> expr
 
 
 %nonassoc FOR IN
@@ -208,6 +208,7 @@ typ:
 prim_typ:
     | INT               { Int    }
     | BOOL              { Bool   }
+    | STRING            { String }
     | FLOAT             { Float  }
     | NONE              { None   }
 
@@ -246,6 +247,7 @@ non_assign_expr: // distinction between non_assign_expr and expr due to reduce/r
     | ID               { Id($1) } 
     | NONE             { Noexpr }
     | ILIT             { Iliteral($1) } 
+    | SLIT             { Sliteral($1) } 
     | FLIT             { Fliteral($1) } 
     | BLIT             { Boollit($1) } 
     | Series_literal   { $1 }
