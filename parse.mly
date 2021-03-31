@@ -9,9 +9,9 @@ let trd (_,_,c) = c;;
 
 %}
 
-%token LPAREN RPAREN LBRACE RBRACE LSQUARE RSQUARE LBRACK RBRACK COLON COMMA PLUS MINUS MULT DIVIDE ASSIGN MOD POWER FLOOR DOTDOT DOTDOTDOT NEWLINE
+%token LPAREN RPAREN LBRACE RBRACE LSQUARE RSQUARE LBRACK RBRACK COLON COMMA PLUS MINUS MULT DIVIDE ASSIGN MOD POWER FLOOR DOT DOTDOT DOTDOTDOT NEWLINE
 %token NOT EQ NEQ LT LEQ GT GEQ AND OR IN
-%token RETURN IF ELIF ELSE FOR WHILE INT BOOL FLOAT NONE STRING RANGE WHEN DO LET BE WITH PASS MAIN TIMES CONST
+%token RETURN IF ELIF ELSE FOR WHILE INT BOOL FLOAT NONE STRING RANGE WHEN DO EXTERNAL LET BE WITH PASS MAIN TIMES CONST
 %token <int> ILIT
 %token <bool> BLIT
 %token <string> ID ACTIONID CLASSID FLIT SLIT
@@ -154,8 +154,9 @@ action_decl:
       abody = $10 }}
 
 helper_decl:
-    | ID LPAREN params_list_opt RPAREN COLON expr NEWLINE { OneHdecl($1, $3, $6) }
+    | ID LPAREN params_list_opt RPAREN COLON expr NEWLINE { MultiHdecl($1, $3, Expr($6)) }
     | ID LPAREN params_list_opt RPAREN COLON stmt_block { MultiHdecl($1,$3,$6) }
+    | ID LPAREN params_list_opt RPAREN COLON EXTERNAL { MultiHdecl($1,$3,Block([])) }
 
 class_block:
     NEWLINE LBRACE class_decl_list RBRACE { $3 }
@@ -227,6 +228,7 @@ prim_typ:
     | INT               { Int    }
     | BOOL              { Bool   }
     | FLOAT             { Float  }
+    | STRING            { String  }
     | NONE              { None   }
 
 template_class:
@@ -304,6 +306,9 @@ call_class:
 
 call_helper: 
       ID LPAREN args_list_opt RPAREN                { HelperCall($1, $3) }
+
+call_classhelper: 
+      expr DOT ID LPAREN args_list_opt RPAREN       { ClassHelperCall($1, $3, $5) }
 
 call_action:
     | DO ACTIONID                                    { ActionCall($2, []) } 

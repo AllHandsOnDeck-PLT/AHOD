@@ -5,7 +5,7 @@ type op = Add | Sub | Mult | Div | Equal | Neq | Less | Leq | Greater | Geq |
 
 type uop = Neg | Not
 
-type typ = Int | Bool | Float | None | ClassID | TemplateClass of string * typ
+type typ = Int | Bool | Float | String | None | ClassID | TemplateClass of string * typ
 
 type bind = typ * string
 
@@ -22,6 +22,7 @@ type expr =
   | Assign of string * expr
   | ClassCall of string * expr list
   | HelperCall of string * expr list
+  | ClassHelperCall of expr * string * expr list
   | ActionCall of string * expr list
   | ExprActionCall of expr * string * expr list
   | Noexpr
@@ -36,8 +37,7 @@ type stmt =
   | Noexpr
 
 type helper_decl = 
-  | OneHdecl of string * bind list * expr 
-  | MultiHdecl of string * bind list * stmt
+  | MultiHdecl of string * bind list * stmt 
 
 type attr_decl = 
   | MultiAdecl of typ option * string * stmt
