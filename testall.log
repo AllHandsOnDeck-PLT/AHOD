@@ -1,5 +1,16 @@
+/usr/bin/lli
 
 ###### Testing test-helloworld
-./AHOD.native tests/test-helloworld.ahd > test-helloworld.ll
-./testall.sh: line 63: ./AHOD.native: No such file or directory
+./AHOD.native tests/test-helloworld.ah > test-helloworld.ll
+llc -relocation-model=pic test-helloworld.ll > test-helloworld.s
+cc -o test-helloworld.exe test-helloworld.s
+./test-helloworld.exe
+diff -b test-helloworld.out tests/test-helloworld.out > test-helloworld.diff
 ###### SUCCESS
+
+###### Testing fail-*
+./AHOD.native < tests/fail-*.ah 2> fail-*.err >> testall.log
+./testall.sh: 1: eval: cannot open tests/fail-*.ah: No such file
+diff -b fail-*.err tests/fail-*.err > fail-*.diff
+FAILED fail-*.err differs from tests/fail-*.err
+###### FAILED

@@ -31,19 +31,19 @@ globalerror=0
 keep=0
 
 Usage() {
-    echo "Usage: testall.sh [options] [.ahd files]"
+    echo "Usage: testall.sh [options] [.mc files]"
     echo "-k    Keep intermediate files"
     echo "-h    Print this help"
     exit 1
 }
 
-# SignalError() {
-#     if [ $error -eq 0 ] ; then
-# 	echo "FAILED"
-# 	error=1
-#     fi
-#     echo "  $1"
-# }
+SignalError() {
+    if [ $error -eq 0 ] ; then
+	echo "FAILED"
+	error=1
+    fi
+    echo "  $1"
+}
 
 # Compare <outfile> <reffile> <difffile>
 # Compares the outfile with reffile.  Differences, if any, written to difffile
@@ -61,27 +61,27 @@ Compare() {
 Run() {
     echo $* 1>&2
     eval $* || {
-	#SignalError "$1 failed on $*"
+	SignalError "$1 failed on $*"
 	return 1
     }
 }
 
 # RunFail <args>
 # Report the command, run it, and expect an error
-# RunFail() {
-#     echo $* 1>&2
-#     eval $* && {
-# 	SignalError "failed: $* did not report an error"
-# 	return 1
-#     }
-#     return 0
-# }
+RunFail() {
+    echo $* 1>&2
+    eval $* && {
+	SignalError "failed: $* did not report an error"
+	return 1
+    }
+    return 0
+}
 
 Check() {
     error=0
     basename=`echo $1 | sed 's/.*\\///
-                             s/.ahd//'`
-    reffile=`echo $1 | sed 's/.ahd$//'`
+                             s/.ah//'`
+    reffile=`echo $1 | sed 's/.ah$//'`
     basedir="`echo $1 | sed 's/\/[^\/]*$//'`/."
 
     echo -n "$basename..."
@@ -94,7 +94,7 @@ Check() {
     generatedfiles="$generatedfiles ${basename}.ll ${basename}.s ${basename}.exe ${basename}.out" &&
     Run "$AHOD" "$1" ">" "${basename}.ll" &&
     Run "$LLC" "-relocation-model=pic" "${basename}.ll" ">" "${basename}.s" &&
-    Run "$CC" "-o" "${basename}.exe" "${basename}.s" "printbig.o" &&
+    Run "$CC" "-o" "${basename}.exe" "${basename}.s" &&
     Run "./${basename}.exe" > "${basename}.out" &&
     Compare ${basename}.out ${reffile}.out ${basename}.diff
 
@@ -108,41 +108,41 @@ Check() {
 	echo "###### SUCCESS" 1>&2
     else
 	echo "###### FAILED" 1>&2
-	#globalerror=$error
+	globalerror=$error
     fi
 }
 
-# CheckFail() {
-#     error=0
-#     basename=`echo $1 | sed 's/.*\\///
-#                              s/.mc//'`
-#     reffile=`echo $1 | sed 's/.mc$//'`
-#     basedir="`echo $1 | sed 's/\/[^\/]*$//'`/."
+CheckFail() {
+    error=0
+    basename=`echo $1 | sed 's/.*\\///
+                             s/.ah//'`
+    reffile=`echo $1 | sed 's/.ah$//'`
+    basedir="`echo $1 | sed 's/\/[^\/]*$//'`/."
 
-#     echo -n "$basename..."
+    echo -n "$basename..."
 
-#     echo 1>&2
-#     echo "###### Testing $basename" 1>&2
+    echo 1>&2
+    echo "###### Testing $basename" 1>&2
 
-#     generatedfiles=""
+    generatedfiles=""
 
-#     generatedfiles="$generatedfiles ${basename}.err ${basename}.diff" &&
-#     RunFail "$MICROC" "<" $1 "2>" "${basename}.err" ">>" $globallog &&
-#     Compare ${basename}.err ${reffile}.err ${basename}.diff
+    generatedfiles="$generatedfiles ${basename}.err ${basename}.diff" &&
+    RunFail "$AHOD" "<" $1 "2>" "${basename}.err" ">>" $globallog &&
+    Compare ${basename}.err ${reffile}.err ${basename}.diff
 
-#     # Report the status and clean up the generated files
+    # Report the status and clean up the generated files
 
-#     if [ $error -eq 0 ] ; then
-# 	if [ $keep -eq 0 ] ; then
-# 	    rm -f $generatedfiles
-# 	fi
-# 	echo "OK"
-# 	echo "###### SUCCESS" 1>&2
-#     else
-# 	echo "###### FAILED" 1>&2
-# 	globalerror=$error
-#     fi
-# }
+    if [ $error -eq 0 ] ; then
+	if [ $keep -eq 0 ] ; then
+	    rm -f $generatedfiles
+	fi
+	echo "OK"
+	echo "###### SUCCESS" 1>&2
+    else
+	echo "###### FAILED" 1>&2
+	globalerror=$error
+    fi
+}
 
 while getopts kdpsh c; do
     case $c in
@@ -157,26 +157,19 @@ done
 
 shift `expr $OPTIND - 1`
 
-# LLIFail() {
-#   echo "Could not find the LLVM interpreter \"$LLI\"."
-#   echo "Check your LLVM installation and/or modify the LLI variable in testall.sh"
-#   exit 1
-# }
+LLIFail() {
+  echo "Could not find the LLVM interpreter \"$LLI\"."
+  echo "Check your LLVM installation and/or modify the LLI variable in testall.sh"
+  exit 1
+}
 
-# which "$LLI" >> $globallog || LLIFail
-
-# if [ ! -f printbig.o ]
-# then
-#     echo "Could not find printbig.o"
-#     echo "Try \"make printbig.o\""
-#     exit 1
-# fi
+which "$LLI" >> $globallog || LLIFail
 
 if [ $# -ge 1 ]
 then
     files=$@
 else
-    files="tests/test-*.ahd tests/fail-*.ahd"
+    files="tests/test-*.ah tests/fail-*.ah"
 fi
 
 for file in $files
@@ -185,13 +178,13 @@ do
 	*test-*)
 	    Check $file 2>> $globallog
 	    ;;
-	# *fail-*)
-	#     CheckFail $file 2>> $globallog
-	#     ;;
-	# *)
-	#     echo "unknown file type $file"
-	#     globalerror=1
-	#     ;;
+	*fail-*)
+	    CheckFail $file 2>> $globallog
+	    ;;
+	*)
+	    echo "unknown file type $file"
+	    globalerror=1
+	    ;;
     esac
 done
 
