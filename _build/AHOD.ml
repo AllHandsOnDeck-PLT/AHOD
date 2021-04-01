@@ -14,7 +14,7 @@
        ("-c", Arg.Unit (set_action Compile),
          "Check and print the generated LLVM IR (default)");
      ] in  
-     let usage_msg = "usage: ./microc.native [-a|-s|-l|-c] [file.mc]" in
+     let usage_msg = "usage: ./AHOD.native [-a|-s|-l|-c] [test-helloworld.ahd]" in
      let channel = ref stdin in
      Arg.parse speclist (fun filename -> channel := open_in filename) usage_msg;
      

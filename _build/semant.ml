@@ -21,22 +21,20 @@ let check (functions) =
   (* Collect function declarations for built-in functions: no bodies *)
   let built_in_decls = 
     let add_bind map (name, ty) = StringMap.add name {
-      typ = None;
-      fname = name; 
-      formals = [(ty, "x")];
-      locals = []; body = [] } map
-    in List.fold_left add_bind StringMap.empty [ ("print", Int);
-			                         ("printb", Bool);
-			                         ("printf", Float);
-			                         ]
+      entitytyp = None;
+      entityid = None; 
+      aname = name;
+      aparams = [(ty, "x")]; 
+      abody = Block([]) } map
+    in List.fold_left add_bind StringMap.empty [ ("print", String) ]
   in
 
   (* Add function name to symbol table *)
   let add_func map fd = 
-    let built_in_err = "function " ^ fd.fname ^ " may not be defined"
-    and dup_err = "duplicate function " ^ fd.fname
+    let built_in_err = "function " ^ fd.aname ^ " may not be defined"
+    and dup_err = "duplicate function " ^ fd.aname
     and make_err er = raise (Failure er)
-    and n = fd.fname (* Name of the function *)
+    and n = fd.aname (* Name of the function *)
     in match fd with (* No duplicate functions or redefinitions of built-ins *)
          _ when StringMap.mem n built_in_decls -> make_err built_in_err
        | _ when StringMap.mem n map -> make_err dup_err  
@@ -58,9 +56,10 @@ let check (functions) =
   let check_function func =
        (* Raise an exception if the given rvalue type cannot be assigned to
        the given lvalue type *)
-    (* let check_assign lvaluet rvaluet err =
+    (*check_binds "aparams" func.aparams;*)
+    let check_assign lvaluet rvaluet err =
        if lvaluet = rvaluet then lvaluet else raise (Failure err)
-    in    *)
+    in    
 
     (* Build local symbol table of variables for this function *)
     (* let symbols = List.fold_left (fun m (ty, name) -> StringMap.add name ty m)
@@ -73,9 +72,26 @@ let check (functions) =
       with Not_found -> raise (Failure ("undeclared identifier " ^ s))
     in *)
 
+    let rec expr = function
+	| ActionCall(aname, args) as call -> 
+          let fd = find_func aname in (*whether function is defined*)
+          let param_length = List.length fd.aparams in
+          if List.length args != param_length then (*checking # of args*)
+            raise (Failure ("expecting " ^ string_of_int param_length ^ 
+                            " arguments in " ^ string_of_expr call))
+          else let check_call (ft, _) e = 
+            let (et, e') = expr e in 
+            let err = "illegal argument found " ^ string_of_typ et ^
+              " expected " ^ string_of_typ ft ^ " in " ^ string_of_expr e
+            in (check_assign ft et err, e')
+          in 
+          let args' = List.map2 check_call fd.aparams args
+          in (fd.entitytyp, SActionCall(aname, args'))
+    in
+
      (* Return a semantically-checked statement i.e. containing sexprs *)
     let rec check_stmt = function
-        (* Expr e -> SExpr (expr e) *)
+        Expr e -> SExpr (expr e) 
         (* | Return e -> let (t, e') = expr e in
         if t = func.typ then SReturn (t, e') 
         else raise (
@@ -96,11 +112,11 @@ let check (functions) =
           SBlock(check_stmt_list sl)
       | _ -> raise ( Failure ("not supported"))
     in (* body of check_function *)
-    { styp = func.typ;
-      sfname = func.fname;
-      sformals = func.formals;
-      slocals  = func.locals;
-      sbody = match check_stmt (Block func.body) with
+    { sentitytyp = func.entitytyp;
+      sentityid = func.entityid;
+      saname = func.aname;
+      saparams  = func.aparams;
+      sabody = match check_stmt (Block func.abody) with
 	SBlock(sl) -> sl
       | _ -> raise (Failure ("internal error: block didn't become a block?"))
     }

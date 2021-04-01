@@ -14,37 +14,30 @@ ocamlfind ocamlc -c -w +a-4 -package llvm -package llvm.analysis -o sast.cmo sas
 # Target: codegen.cmo, tags: { package(llvm), package(llvm.analysis), warn(+a-4), byte, compile, extension:cmo, extension:ml, file:codegen.cmo, file:codegen.ml, implem, ocaml, quiet, traverse }
 ocamlfind ocamlc -c -w +a-4 -package llvm -package llvm.analysis -o codegen.cmo codegen.ml # cached
 # Target: parse.mly, tags: { package(llvm), package(llvm.analysis), warn(+a-4), extension:mly, file:parse.mly, infer, ocaml, ocamlyacc, parser, quiet, traverse }
-ocamlyacc parse.mly
-+ ocamlyacc parse.mly
-4 rules never reduced
+ocamlyacc parse.mly # cached
 # Target: parse.mli.depends, tags: { package(llvm), package(llvm.analysis), warn(+a-4), extension:mli, file:parse.mli, ocaml, ocamldep, quiet, traverse }
-ocamlfind ocamldep -package llvm -package llvm.analysis -modules parse.mli > parse.mli.depends
+ocamlfind ocamldep -package llvm -package llvm.analysis -modules parse.mli > parse.mli.depends # cached
+# Target: parse.cmi, tags: { package(llvm), package(llvm.analysis), warn(+a-4), byte, compile, extension:mli, file:parse.mli, interf, ocaml, quiet, traverse }
+ocamlfind ocamlc -c -w +a-4 -package llvm -package llvm.analysis -o parse.cmi parse.mli # cached
 # Target: scanner.mll, tags: { package(llvm), package(llvm.analysis), warn(+a-4), extension:mll, file:scanner.mll, lexer, ocaml, ocamllex, quiet, traverse }
 ocamllex.opt -q scanner.mll # cached
 # Target: scanner.ml.depends, tags: { package(llvm), package(llvm.analysis), warn(+a-4), extension:ml, file:scanner.ml, ocaml, ocamldep, quiet, traverse }
 ocamlfind ocamldep -package llvm -package llvm.analysis -modules scanner.ml > scanner.ml.depends # cached
-# Target: parse.cmi, tags: { package(llvm), package(llvm.analysis), warn(+a-4), byte, compile, extension:mli, file:parse.mli, interf, ocaml, quiet, traverse }
-ocamlfind ocamlc -c -w +a-4 -package llvm -package llvm.analysis -o parse.cmi parse.mli
-# Target: semant.ml.depends, tags: { package(llvm), package(llvm.analysis), warn(+a-4), extension:ml, file:semant.ml, ocaml, ocamldep, quiet, traverse }
-ocamlfind ocamldep -package llvm -package llvm.analysis -modules semant.ml > semant.ml.depends # cached
-# Target: semant.cmo, tags: { package(llvm), package(llvm.analysis), warn(+a-4), byte, compile, extension:cmo, extension:ml, file:semant.cmo, file:semant.ml, implem, ocaml, quiet, traverse }
-ocamlfind ocamlc -c -w +a-4 -package llvm -package llvm.analysis -o semant.cmo semant.ml # cached
 # Target: scanner.cmo, tags: { package(llvm), package(llvm.analysis), warn(+a-4), byte, compile, extension:cmo, extension:ml, file:scanner.cmo, file:scanner.ml, implem, ocaml, quiet, traverse }
-ocamlfind ocamlc -c -w +a-4 -package llvm -package llvm.analysis -o scanner.cmo scanner.ml
-# Target: AHOD.cmo, tags: { package(llvm), package(llvm.analysis), warn(+a-4), byte, compile, extension:cmo, extension:ml, file:AHOD.cmo, file:AHOD.ml, implem, ocaml, quiet, traverse }
-ocamlfind ocamlc -c -w +a-4 -package llvm -package llvm.analysis -o AHOD.cmo AHOD.ml
-# Target: ast.cmx, tags: { package(llvm), package(llvm.analysis), warn(+a-4), compile, extension:cmx, extension:ml, file:ast.cmx, file:ast.ml, implem, native, ocaml, quiet, traverse }
-ocamlfind ocamlopt -c -w +a-4 -package llvm -package llvm.analysis -o ast.cmx ast.ml # cached
-# Target: sast.cmx, tags: { package(llvm), package(llvm.analysis), warn(+a-4), compile, extension:cmx, extension:ml, file:sast.cmx, file:sast.ml, implem, native, ocaml, quiet, traverse }
-ocamlfind ocamlopt -c -w +a-4 -package llvm -package llvm.analysis -o sast.cmx sast.ml # cached
-# Target: parse.ml.depends, tags: { package(llvm), package(llvm.analysis), warn(+a-4), extension:ml, file:parse.ml, ocaml, ocamldep, quiet, traverse }
-ocamlfind ocamldep -package llvm -package llvm.analysis -modules parse.ml > parse.ml.depends
-# Target: parse.cmx, tags: { package(llvm), package(llvm.analysis), warn(+a-4), compile, extension:cmx, extension:ml, file:parse.cmx, file:parse.ml, implem, native, ocaml, quiet, traverse }
-ocamlfind ocamlopt -c -w +a-4 -package llvm -package llvm.analysis -o parse.cmx parse.ml
-+ ocamlfind ocamlopt -c -w +a-4 -package llvm -package llvm.analysis -o parse.cmx parse.ml
-File "parse.mly", line 61, characters 24-40:
-Error: This expression has type 'a * 'b * 'c
-       but an expression was expected of type
-         Ast.program = Ast.func_decl list
+ocamlfind ocamlc -c -w +a-4 -package llvm -package llvm.analysis -o scanner.cmo scanner.ml # cached
+# Target: semant.ml.depends, tags: { package(llvm), package(llvm.analysis), warn(+a-4), extension:ml, file:semant.ml, ocaml, ocamldep, quiet, traverse }
+ocamlfind ocamldep -package llvm -package llvm.analysis -modules semant.ml > semant.ml.depends
+# Target: semant.cmo, tags: { package(llvm), package(llvm.analysis), warn(+a-4), byte, compile, extension:cmo, extension:ml, file:semant.cmo, file:semant.ml, implem, ocaml, quiet, traverse }
+ocamlfind ocamlc -c -w +a-4 -package llvm -package llvm.analysis -o semant.cmo semant.ml
++ ocamlfind ocamlc -c -w +a-4 -package llvm -package llvm.analysis -o semant.cmo semant.ml
+File "semant.ml", line 24, characters 18-22:
+Warning 42: this use of None relies on type-directed disambiguation,
+it will not compile with OCaml 4.00 or earlier.
+File "semant.ml", line 25, characters 17-21:
+Warning 42: this use of None relies on type-directed disambiguation,
+it will not compile with OCaml 4.00 or earlier.
+File "semant.ml", line 89, characters 14-26:
+Error: This expression has type Ast.typ option
+       but an expression was expected of type Ast.typ
 Command exited with code 2.
 # Compilation unsuccessful.

@@ -35,12 +35,14 @@ let translate (functions) =
      and i1_t       = L.i1_type     context
      and float_t    = L.double_type context
      and string_t   = L.pointer_type (L.i8_type context)
-
+	
      (*
      (* should we have these as actual data types in scanner/ parser?*)
      and none_t     = L.void_type   context
-     
      *)
+     
+     and void_t     = L.void_type context
+	
 in
 
 (* Return the LLVM type for a AHOD type *)
@@ -48,11 +50,12 @@ let ltype_of_typ = function
   A.Int   -> i32_t
   | A.Bool  -> i1_t
   | A.Float -> float_t
-  (* | A.typ -> typ *)
-  (*| A.None  -> none_t
   | A.String -> string_t
-  | A.Seriesliteral(t) -> L.pointer_type (ltype_of_typ t)
-  *)
+  | _ -> void_t
+  (*| A.None  -> none_t*)
+  (*| A.ClassID -> string_t*)
+  (*| A.typ -> typ *)
+  (*| A.TemplateClass -> string_t typ*)
 
 in
 

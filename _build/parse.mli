@@ -17,6 +17,7 @@ type token =
   | MOD
   | POWER
   | FLOOR
+  | DOT
   | DOTDOT
   | DOTDOTDOT
   | NEWLINE
@@ -44,6 +45,7 @@ type token =
   | RANGE
   | WHEN
   | DO
+  | EXTERNAL
   | LET
   | BE
   | WITH

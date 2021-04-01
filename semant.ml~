@@ -73,8 +73,8 @@ let check (functions) =
     in *)
 
     let rec expr = function
-	| ActionCall(aname, args) as call -> 
-          let fd = find_func aname in (*whether function is defined*)
+	| ActionCall(fname, args) as call -> 
+          let fd = find_func fname in (*whether function is defined*)
           let param_length = List.length fd.aparams in
           if List.length args != param_length then (*checking # of args*)
             raise (Failure ("expecting " ^ string_of_int param_length ^ 
@@ -86,7 +86,7 @@ let check (functions) =
             in (check_assign ft et err, e')
           in 
           let args' = List.map2 check_call fd.aparams args
-          in (fd.entitytyp, SActionCall(aname, args'))
+          in (fd.typ, SActionCall(aname, args'))
     in
 
      (* Return a semantically-checked statement i.e. containing sexprs *)
