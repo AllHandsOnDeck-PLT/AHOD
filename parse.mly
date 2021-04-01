@@ -17,8 +17,8 @@ let trd (_,_,c) = c;;
 %token <string> ID ACTIONID CLASSID FLIT SLIT
 %token EOF
 
-%start program
-%type <Ast.program> program
+%start stmt
+%type <Ast.stmt> stmt
 
 
 %nonassoc FOR IN

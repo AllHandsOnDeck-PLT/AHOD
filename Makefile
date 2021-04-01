@@ -44,6 +44,17 @@ parse.output : parse.mly
 	ocamlyacc -v parse.mly
 ##############################
 
+printing : parse.cmo scanner.cmo printing.cmo
+	ocamlc -o printing $^
+
+printing.out : printing printing.tb
+	./printing < printing.tb > printing.out
+
+printing.cmo : scanner.cmo parse.cmi ast.cmi
+printing.cmx : scanner.cmx parse.cmx ast.cmi
+
+##############################
+
 #TARFILES = README Makefile \
 #	scanner.mll ast.mli parse.mly test.ml 
 

@@ -30,6 +30,7 @@ type action_decl = {
 }
 
 type program = stmt * action_decl
+
 (*type program = 
 {
   main : stmt;
@@ -41,60 +42,3 @@ type program = stmt * action_decl
   String.concat "" (List.map string_of_vdecl vars) ^ "\n" ^
   String.concat "\n" (List.map string_of_fdecl funcs) *)
 
-(*  Pretty-printing functions *)
-let string_of_op = function
-    Add -> "+"
-  | Sub -> "-"
-  | Mult -> "*"
-  | Div -> "/"
-  | Equal -> "=="
-  | Neq -> "!="
-  | Less -> "<"
-  | Leq -> "<="
-  | Greater -> ">"
-  | Geq -> ">="
-  | And -> "and"
-  | Or -> "or"
-  | Mod -> "%"
-  | Power -> "**"
-  | Floor -> "//"
-
-let string_of_uop = function
-    Neg -> "-"
-  | Not -> "!"
-
-
-  let rec string_of_expr = function
-  | ActionCall(f, el) ->
-      "do " ^ f ^ "(" ^ String.concat ", " (List.map string_of_expr el) ^ ")"
-  | ExprActionCall(e, f, el) -> (* most likely wrong format *)
-      string_of_expr e ^ "do " ^ f ^ "(" ^ String.concat ", " (List.map string_of_expr el) ^ ")"
-  | Noexpr -> ""
-  | Sliteral(s) -> s
-
-
-let rec string_of_typ = function
-    Int -> "int"
-  | Bool -> "bool"
-  | Float -> "float"
-  | String -> "string"
-  | None -> "none"
-  | ClassID -> "classid"
-  | TemplateClass(s, t) -> s ^ string_of_typ t 
-
-let rec string_of_stmt = function
-    Block(stmts) ->
-      "{\n" ^ String.concat "" (List.map string_of_stmt stmts) ^ "}\n"
-  | Expr(expr) -> string_of_expr expr ^ ";\n";
-
-
-
-(*let string_of_action_decl adecl =
-  "when" ^ adecl.entitytyp ^ adecl.entityid ^ *)
-(*
-let _ =
-  let lexbuf = Lexing.from_channel stdin in
-  let expr = Parse.expr Scanner.tokenize lexbuf in
-  let result = eval expr in
-  print_endline (string_of_int result)
-*)
