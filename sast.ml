@@ -16,8 +16,8 @@ type sstmt =
   | SNoexpr
 
 type saction_decl = {
-  sentitytyp : typ option;
-  sentityid : string option;
+  sentitytyp : typ;
+  sentityid : string;
   saname : string;
   saparams : bind list;
   sabody: sstmt;

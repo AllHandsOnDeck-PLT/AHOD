@@ -64,7 +64,7 @@ action_decl:
     WHEN DO ACTIONID COLON stmt_block             
     {{ 
       entitytyp = None;
-      entityid = None;
+      entityid = "";
       aname = $3;
       aparams = [];
       abody = $5 }}
@@ -72,23 +72,23 @@ action_decl:
     | WHEN DO ACTIONID LPAREN params_list RPAREN COLON stmt_block          
     {{ 
       entitytyp = None;
-      entityid = None;
+      entityid = "";
       aname = $3;
       aparams = $5;
       abody = $8 }}
 
     | WHEN typ ID DO ACTIONID COLON stmt_block               
     {{ 
-      entitytyp = Some $2;
-      entityid = Some $3;
+      entitytyp = $2;
+      entityid = $3;
       aname = $5;
       aparams = [];
       abody = $7 }}
 
     | WHEN typ ID DO ACTIONID LPAREN params_list RPAREN COLON stmt_block   
     {{ 
-      entitytyp = Some $2;
-      entityid = Some $3;
+      entitytyp = $2;
+      entityid = $3;
       aname = $5;
       aparams = $7;
       abody = $10 }}

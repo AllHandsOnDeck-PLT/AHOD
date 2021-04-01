@@ -22,7 +22,7 @@ let check (functions) =
   let built_in_decls = 
     let add_bind map (name, ty) = StringMap.add name {
       entitytyp = None;
-      entityid = None; 
+      entityid = ""; 
       aname = name;
       aparams = [(ty, "x")]; 
       abody = Block([]) } map
@@ -102,8 +102,8 @@ let check (functions) =
 	       follows any Return statement.  Nested blocks are flattened. *)
       | Block sl -> 
           let rec check_stmt_list = function
-              [Return _ as s] -> [check_stmt s]
-            | Return _ :: _   -> raise (Failure "nothing may follow a return")
+           (*   [Return _ as s] -> [check_stmt s]
+            | Return _ :: _   -> raise (Failure "nothing may follow a return")*)
             | Block sl :: ss  -> check_stmt_list (sl @ ss) (* Flatten blocks *)
             | s :: ss         -> check_stmt s :: check_stmt_list ss
             | []              -> []

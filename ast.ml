@@ -22,8 +22,8 @@ type stmt =
   | Noexpr
 
 type action_decl = {
-  entitytyp : typ option;
-  entityid : string option;
+  entitytyp : typ;
+  entityid : string;
   aname : string;
   aparams : bind list;
   abody: stmt;
@@ -82,6 +82,15 @@ let rec string_of_typ = function
   | ClassID -> "classid"
   | TemplateClass(s, t) -> s ^ string_of_typ t 
 
+let rec string_of_stmt = function
+    Block(stmts) ->
+      "{\n" ^ String.concat "" (List.map string_of_stmt stmts) ^ "}\n"
+  | Expr(expr) -> string_of_expr expr ^ ";\n";
+
+
+
+(*let string_of_action_decl adecl =
+  "when" ^ adecl.entitytyp ^ adecl.entityid ^ *)
 (*
 let _ =
   let lexbuf = Lexing.from_channel stdin in
