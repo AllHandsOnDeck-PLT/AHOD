@@ -1,0 +1,7 @@
+main:
+  {
+  do PRINT(1 + 2)
+  do PRINT(1 - 2)
+  do PRINT(1 * 2)
+  do PRINT(1.0 / 2.0)
+  }

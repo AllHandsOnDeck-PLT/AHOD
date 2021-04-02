@@ -1,3 +1,6 @@
+type op = Add | Sub | Mult | Div | Equal | Neq | Less | Leq | Greater | Geq |
+          And | Or 
+
 type typ = Int | Float | Bool | String 
 
 type bind = typ * string
@@ -8,6 +11,9 @@ type expr =
   | Bliteral of bool
   | Sliteral of string
   | ActionCall of string * expr list
+  | Id of string
+  | Assign of string * expr
+  | Binop of expr * op * expr
 
 type stmt =
   | Block of stmt list

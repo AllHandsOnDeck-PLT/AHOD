@@ -8,6 +8,9 @@ and sx =
   | SBliteral of bool
   | SSliteral of string
   | SActionCall of string * sexpr list
+  | SId of string
+  | SAssign of string * sexpr
+  | SBinop of sexpr * op * sexpr
 
 type sstmt =
   | SBlock of sstmt list

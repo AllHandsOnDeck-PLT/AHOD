@@ -1,4 +1,4 @@
 main:
   {
-  	do PRINT(0)
+  	do PRINT(5)
   }
