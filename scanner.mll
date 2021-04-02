@@ -65,7 +65,10 @@ rule token = parse
 | digits as lxm { ILIT(int_of_string lxm) }
 | ['-']? (digits '.'  digit* ( ['e' 'E'] ['+' '-']? digits )?) as lxm { FLIT(lxm) }
 (*| [('"' _* '"') (''' _* ''')] as  lxm { SLIT(lxm) }*)
+
 | '"' (['a'-'z']* as lxm) '"' { SLIT(lxm) }
+
+
 (*| '"' [' '-'!' '#'-'&' '('-'[' ']'-'~' 't' 'r' 'n' '\'' '"' '\\']* as lxm '"' { SLIT(lxm) }*)
 (* how to represent single apostrophe?*)
 | ['a'-'z']['a'-'z' '0'-'9' '_']*                     as lxm { ID(lxm) } 

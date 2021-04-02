@@ -37,7 +37,11 @@ stmt:
 
 expr:
     | call_action      { $1 } 
+    | ILIT             { Iliteral($1) } 
+    | FLIT             { Fliteral($1) } 
+    | BLIT             { Bliteral($1) } 
     | SLIT 	       { Sliteral($1) }
+    
 
 args_list_opt:
     /*nothing */                  { [] }

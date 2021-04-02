@@ -6,8 +6,10 @@ let check (main_stmt, action_decls) =
 	let rec check_expr = function
 		(*need to figure out typ, if name is defined*)
 		ActionCall(aname, aparams) -> (String, SActionCall(aname, List.map check_expr aparams))
-
 		| Sliteral s -> (String, SSliteral(s))
+		| Iliteral i -> (Int, SIliteral(i))
+		| Fliteral f -> (Float, SFliteral(f))
+		| Bliteral b -> (Bool, SBliteral(b))
 
 	in
 

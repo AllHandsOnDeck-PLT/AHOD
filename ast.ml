@@ -1,8 +1,11 @@
-type typ = String 
+type typ = Int | Float | Bool | String 
 
 type bind = typ * string
 
 type expr =
+  | Iliteral of int
+  | Fliteral of string
+  | Bliteral of bool
   | Sliteral of string
   | ActionCall of string * expr list
 
