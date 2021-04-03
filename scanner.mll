@@ -6,16 +6,16 @@ let digits = digit+
 
 rule token = parse
   [' ' '\t' '\r' ] { token lexbuf } (* Whitespace *)
-| '#'     { comment lexbuf }           (* Comments *)
+| "#"    { comment lexbuf }           (* Comments *)
 | "\n"	   { NEWLINE }
-| '('      { LPAREN }
-| ')'      { RPAREN }
+| "("      { LPAREN }
+| ")"      { RPAREN }
 | '{'      { LBRACE }
 | '}'      { RBRACE }
 | '['      { LSQUARE }
 | ']'      { RSQUARE }
-| '<'      { LBRACK }
-| '>'      { RBRACK }
+(*| '<'      { LBRACK }*)
+(*| '>'      { RBRACK }*)
 | ':'      { COLON }
 | ','      { COMMA }
 | '+'      { PLUS }
@@ -30,9 +30,9 @@ rule token = parse
 | '='      { ASSIGN }
 | "=="     { EQ }
 | "!="     { NEQ }
-| '<'      { LT }
-| "<="     { LEQ }
+| "<"      { LT }
 | ">"      { GT }
+| "<="     { LEQ }
 | ">="     { GEQ }
 | "//"     { FLOOR }		
 | "and"    { AND }
