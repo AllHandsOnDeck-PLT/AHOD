@@ -2,6 +2,8 @@ module L = Llvm
 module A = Ast
 open Sast 
 
+module StringMap = Map.Make(String)
+
 let translate (main_stmt, action_decls) =
 	 let context    = L.global_context () in
 
@@ -26,18 +28,39 @@ let ltype_of_typ = function
   | A.String -> string_t
 in
 
-let printf_t : L.lltype = 
-      L.var_arg_function_type i32_t [| L.pointer_type i8_t |] in
-  let printf_func : L.llvalue = 
-      L.declare_function "printf" printf_t the_module in
+let build_function_body fdecl =
+  let builder = L.builder_at_end context (main_stmt action_decls) in
 
+(* Construct the function's "locals": formal arguments and locally
+       declared variables.  Allocate each on the stack, initialize their
+       value, if appropriate, and remember their values in the "locals" map *)
+  let local_vars =
+      let add_formal m (t, n) p = 
+        L.set_value_name n p;
+        let local = L.build_alloca (ltype_of_typ t) n builder in
+            ignore (L.build_store p local builder);
+        StringMap.add n local m
 
+      (* Allocate space for any locally declared variables and add the
+       * resulting registers to our map *)
+      and add_local m (t, n) =
+        let local_var = L.build_alloca (ltype_of_typ t) n builder
+       in StringMap.add n local_var m in
+     
+      let formals = List.fold_left2 add_formal StringMap.empty fdecl.sformals
+               (Array.to_list (L.params the_function)) in
+      List.fold_left add_local formals fdecl.slocals in
 
+(* Return the value for a variable or formal argument.
+    Check local names first, then global names *)
+  let lookup n = StringMap.find n local_vars in
 
 let rec expr builder ((_, e) : sexpr) = match e with
 	SSliteral s -> L.define_global "str" (L.const_stringz context s) the_module
 	| SBliteral b  -> L.const_int i1_t (if b then 1 else 0)
-	| SIliteral i -> L.const_int i32_t i 
+  | SIliteral i -> L.const_int i32_t i 
+  | SAssign (s, e) -> let e' = expr builder e in
+                          ignore(L.build_store e' (lookup s) builder); e'
 	| SFliteral f -> L.const_float_of_string float_t f
 	| SActionCall("PRINT", [e]) ->
 		(match fst e with 
@@ -92,7 +115,6 @@ let rec stmt builder = function
 	| SExpr e -> ignore(expr builder e); builder
 in
 
-
 let main_func = 
 	let ftype = L.function_type i32_t [| |]
 	in
@@ -100,10 +122,7 @@ let main_func =
 in
 
 let builder = L.builder_at_end context (L.entry_block main_func) in
-
-
 let builder = stmt builder main_stmt in 
 
 let _ = L.build_ret (L.const_int i32_t 0) (builder) in
-
 the_module

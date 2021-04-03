@@ -15,3 +15,4 @@ main:
   do PRINT(1 >= 2)
   do PRINT(3 >= 2)
   }
+  

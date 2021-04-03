@@ -41,7 +41,7 @@ main_decl:
       MAIN COLON stmt_block { $3 } 
 
 stmt_block:
-    NEWLINE LBRACE NEWLINE stmt_list RBRACE NEWLINE             { Block(List.rev $4) }
+    NEWLINE LBRACE NEWLINE stmt_list RBRACE NEWLINE              { Block(List.rev $4) }
 
 stmt_list: 
     stmt                                  { [$1] }

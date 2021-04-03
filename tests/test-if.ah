@@ -1,0 +1,5 @@
+main:
+{
+    if 3<5 :
+        do PRINT("true")
+}

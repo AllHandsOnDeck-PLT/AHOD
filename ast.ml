@@ -29,3 +29,8 @@ type action_decl = {
 
 type program = stmt * action_decl list 
 
+let string_of_typ = function
+    Int -> "int"
+  | Bool -> "bool"
+  | Float -> "float"
+  | String -> "string"
