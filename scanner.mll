@@ -6,16 +6,16 @@ let digits = digit+
 
 rule token = parse
   [' ' '\t' '\r' ] { token lexbuf } (* Whitespace *)
-| '#'     { comment lexbuf }           (* Comments *)
+| "#"    { comment lexbuf }           (* Comments *)
 | "\n"	   { NEWLINE }
-| '('      { LPAREN }
-| ')'      { RPAREN }
+| "("      { LPAREN }
+| ")"      { RPAREN }
 | '{'      { LBRACE }
 | '}'      { RBRACE }
 | '['      { LSQUARE }
 | ']'      { RSQUARE }
-| '<'      { LBRACK }
-| '>'      { RBRACK }
+(*| '<'      { LBRACK }*)
+(*| '>'      { RBRACK }*)
 | ':'      { COLON }
 | ','      { COMMA }
 | '+'      { PLUS }
@@ -24,14 +24,15 @@ rule token = parse
 | '/'      { DIVIDE }
 | '%'      { MOD }
 | "**"     { POWER }
+| '.'      { DOT }
 | ".."     { DOTDOT }
-| "..."     { DOTDOTDOT }
+| "..."    { DOTDOTDOT }
 | '='      { ASSIGN }
 | "=="     { EQ }
 | "!="     { NEQ }
-| '<'      { LT }
-| "<="     { LEQ }
+| "<"      { LT }
 | ">"      { GT }
+| "<="     { LEQ }
 | ">="     { GEQ }
 | "//"     { FLOOR }		
 | "and"    { AND }
@@ -57,13 +58,18 @@ rule token = parse
 | "string" { STRING }
 | "float"  { FLOAT }
 | "None"   { NONE }
+| "external" { EXTERNAL }
 | "True"   { BLIT(true)  }
 | "False"  { BLIT(false) }
 | "main"   { MAIN }
 | digits as lxm { ILIT(int_of_string lxm) }
 | ['-']? (digits '.'  digit* ( ['e' 'E'] ['+' '-']? digits )?) as lxm { FLIT(lxm) }
 (*| [('"' _* '"') (''' _* ''')] as  lxm { SLIT(lxm) }*)
-| '\"' [' '-'!' '#'-'&' '('-'[' ']'-'~' 't' 'r' 'n' '\'' '\"' '\\']* as lxm '\"' { SLIT(lxm) }
+
+| '"' (['a'-'z']* as lxm) '"' { SLIT(lxm) }
+
+
+(*| '"' [' '-'!' '#'-'&' '('-'[' ']'-'~' 't' 'r' 'n' '\'' '"' '\\']* as lxm '"' { SLIT(lxm) }*)
 (* how to represent single apostrophe?*)
 | ['a'-'z']['a'-'z' '0'-'9' '_']*                     as lxm { ID(lxm) } 
 | ['A'-'Z']['A'-'Z' '0'-'9' '_']*                     as actionID { ACTIONID(actionID) }

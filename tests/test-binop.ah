@@ -1,0 +1,17 @@
+main:
+  {
+  do PRINT(1 > 2)
+  do PRINT(2 > 1)
+  do PRINT(1 < 2)
+  do PRINT(2 < 1)
+  do PRINT(1 + 2)
+  do PRINT(1 - 2)
+  do PRINT(1 * 2)
+  do PRINT(1.0 / 2.0)
+  do PRINT(1 == 2)
+  do PRINT(1 == 1)
+  do PRINT(1 <= 2)
+  do PRINT(3 <= 2)
+  do PRINT(1 >= 2)
+  do PRINT(3 >= 2)
+  }

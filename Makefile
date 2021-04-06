@@ -1,46 +1,29 @@
-# "ocamlbuild test.native" will also build 
+# "make test" Compiles everything and runs the regression tests
 
-test : parse.cmo scanner.cmo ast.cmo sast.cmo # test.cmo
-	ocamlc -o test $^
+.PHONY : test
+test : all testall.sh
+	./testall.sh
 
-%.cmo : %.ml
-	ocamlc -c $<
+# "make all" builds the executable as well as the "printbig" library designed
+# to test linking external code
 
-%.cmi : %.mli
-	ocamlc -c $<
+.PHONY : all
+all : AHOD.native 
 
-scanner.ml : scanner.mll
-	ocamllex $^
+# "make microc.native" compiles the compiler
+#
+# The _tags file controls the operation of ocamlbuild, e.g., by including
+# packages, enabling warnings
+#
+# See https://github.com/ocaml/ocamlbuild/blob/master/manual/manual.adoc
 
-parse.ml parse.mli : parse.mly
-	ocamlyacc $^
+AHOD.native :
+	opam config exec -- \
+	ocamlbuild -use-ocamlfind AHOD.native
 
-# Depedencies from ocamldep
-test.cmo : scanner.cmo parse.cmi ast.cmi
-test.cmx : scanner.cmx parse.cmx ast.cmi
-
-parse.cmo : ast.cmo parse.cmi
-parse.cmx : ast.cmo parse.cmi
-scanner.cmo : parse.cmi
-scanner.cmx : parse.cmx
-
-sast.cmo : ast.cmo sast.ml 
-	ocamlc -c $^
-
-sast.cmi : ast.cmi sast.ml
-	ocamlc -c $^
-
-parse.output : parse.mly
-	ocamlyacc -v parse.mly
-##############################
-
-#TARFILES = README Makefile \
-#	scanner.mll ast.mli parse.mly test.ml 
-
-#hw1.tar.gz : $(TARFILES)
-#	cd .. && tar zcf hw1/hw1.tar.gz $(TARFILES:%=hw1/%)
+# "make clean" removes all generated files
 
 .PHONY : clean
 clean :
-	rm -rf \
-	*.cmi *.cmo parse.ml parse.mli parse.output scanner.ml a.out test 
+	ocamlbuild -clean
+	rm -rf testall.log ocamlllvm *.diff
