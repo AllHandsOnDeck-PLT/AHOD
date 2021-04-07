@@ -9,15 +9,13 @@ and sx =
   | SSliteral of string
   | SActionCall of string * sexpr list
   | SId of string
-  | SAssign of bind * sexpr
+  | SAssign of string * sexpr
   | SBinop of sexpr * op * sexpr
   | SClassCall of string * sexpr list
 
 type sstmt =
   | SBlock of sstmt list
   | SExpr of sexpr
-
-type sglobal_decl = bind
 
 type sattr_decl = 
   | SOneAdecl of typ * string * sexpr 
@@ -36,4 +34,4 @@ type saction_decl = {
   sabody: sstmt;
 }
 
-type sprogram = sstmt * sclass_decl
+type sprogram = sstmt * bind list * sclass_decl list

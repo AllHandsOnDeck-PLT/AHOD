@@ -38,7 +38,13 @@ let trd (_,_,c) = c;;
 
 program:
     /*main_decl decls EOF { ($1, fst $2, snd $2) }*/
-    main_decl class_decl EOF { ($1, $2) }
+    /*main_decl class_decl EOF { ($1, $2) } */
+    main_decl decls EOF { ($1, fst $2, snd $2) }
+
+decls:
+    /*nothing*/      { ([], []) }
+    | decls global_decl  { (List.rev ($2::fst $1), snd $1) }
+    | decls class_decl { (fst $1, List.rev ($2::snd $1)) }
 
 /*decls:
      nothing      { ([], []) }
@@ -59,6 +65,9 @@ class_decl:
 
 /*action_decl: */
     /* nothing            {[]} */
+
+global_decl:
+    typ ID NEWLINE { ($1, $2) }
 
 class_block:
     NEWLINE LBRACE class_decl_list RBRACE NEWLINE { $3 }
@@ -102,7 +111,7 @@ expr:
     | BLIT             { Bliteral($1) } 
     | SLIT 	           { Sliteral($1) }
     | ID               { Id($1) } 
-    | typ ID ASSIGN expr   { Assign($1, $2, $4) }
+    | ID ASSIGN expr   { Assign($1, $3) }
     | expr PLUS   expr { Binop($1, Add,     $3) } 
     | expr MINUS  expr { Binop($1, Sub,     $3) }
     | expr MULT   expr { Binop($1, Mult,    $3) }

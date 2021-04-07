@@ -12,15 +12,13 @@ type expr =
   | Sliteral of string
   | ActionCall of string * expr list
   | Id of string
-  | Assign of bind * expr
+  | Assign of string * expr
   | Binop of expr * op * expr
   | ClassCall of string * expr list
 
 type stmt =
   | Block of stmt list
   | Expr of expr
-
-type global_decl = bind
 
 type attr_decl = 
   | OneAdecl of typ * string * expr 
@@ -39,5 +37,5 @@ type action_decl = {
   abody: stmt;
 }
 
-type program = stmt * class_decl 
+type program = stmt * bind list * class_decl list
 
