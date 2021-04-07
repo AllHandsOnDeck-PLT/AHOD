@@ -1,0 +1,12 @@
+main:
+  {
+  player = Player("Bob")
+  print(player.name)
+  }
+
+
+let Player(string name) be:
+  {
+  	string name: name
+  }
+
