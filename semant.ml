@@ -1,15 +1,17 @@
 open Ast
 open Sast
 
-let check (main_stmt, action_decls) =
+module StringMap = Map.Make(String)
+
+let check (main_stmt, global_decls, class_decls) =
 
   let check_assign lvaluet rvaluet err =
        if lvaluet = rvaluet then lvaluet else raise (Failure err)
   in   
 
-  let symbols = List.fold_left (fun m (ty, name) -> StringMap.add name ty m)
+  (*let symbols = List.fold_left (fun m (ty, name) -> StringMap.add name ty m)
                   StringMap.empty (func.aparams)
-  in
+  in*)
 
 
 	let rec check_expr = function
