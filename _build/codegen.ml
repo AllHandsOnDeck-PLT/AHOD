@@ -1,6 +1,8 @@
 module L = Llvm
 module A = Ast
-open Sast 
+open Sast
+
+module StringMap = Map.Make(String)
 
 let translate (main_stmt, action_decls) =
 	 let context    = L.global_context () in
@@ -26,19 +28,45 @@ let ltype_of_typ = function
   | A.String -> string_t
 in
 
+let main_func = 
+	let ftype = L.function_type i32_t [| |]
+	in
+	L.define_function "main" ftype the_module
+in
+
+let builder = L.builder_at_end context (L.entry_block main_func) in
+
+(* Construct the function's "locals": formal arguments and locally
+       declared variables.  Allocate each on the stack, initialize their
+       value, if appropriate, and remember their values in the "locals" map *)
+
+(*
+let local_vars : L.llvalue StringMap.t =
+(* Function Locals *)
+  let add_local m (t,n) =  
+    let local_var = L.build_alloca (ltype_of_typ t) n builder in
+    StringMap.add n local m 
+ in
+*)
+ (* Variable Lookup *)
+ let lookup n m = StringMap.find n m
+in
+
+
 let printf_t : L.lltype = 
       L.var_arg_function_type i32_t [| L.pointer_type i8_t |] in
   let printf_func : L.llvalue = 
       L.declare_function "printf" printf_t the_module in
 
 
-
-
 let rec expr builder ((_, e) : sexpr) = match e with
 	SSliteral s -> L.define_global "str" (L.const_stringz context s) the_module
 	| SBliteral b  -> L.const_int i1_t (if b then 1 else 0)
 	| SIliteral i -> L.const_int i32_t i 
-	| SFliteral f -> L.const_float_of_string float_t f
+  | SFliteral f -> L.const_float_of_string float_t f
+  (*| SId s       -> L.build_load (lookup s) s builder
+  | SAssign (s, e) -> let e' = expr builder e in
+                          ignore(L.build_store e' (lookup s) builder); e'*)
 	| SActionCall("PRINT", [e]) ->
 		(match fst e with 
 		A.String -> L.build_call printf_func [| L.const_in_bounds_gep str_format_str [|L.const_int i32_t 0; L.const_int i32_t 0|] ; (expr builder e) |]
@@ -87,23 +115,40 @@ let rec expr builder ((_, e) : sexpr) = match e with
 		
 in
 
+(* LLVM insists each basic block end with exactly one "terminator" 
+    instruction that transfers control.  This function runs "instr builder"
+    if the current block does not already have a terminator.  Used,
+    e.g., to handle the "fall off the end of the function" case. *)
+    let add_terminal builder instr =
+    match L.block_terminator (L.insertion_block builder) with
+        Some _ -> ()
+      | None -> ignore (instr builder) in
+
 let rec stmt builder = function
 	| SBlock stmt_list -> List.fold_left stmt builder stmt_list 
-	| SExpr e -> ignore(expr builder e); builder
+  | SExpr e -> ignore(expr builder e); builder
+  | SIf (predicate, then_stmt, else_stmt) ->
+    let bool_val = expr builder predicate in
+    let merge_bb = L.append_block context "merge" main_func in
+    let build_br_merge = L.build_br merge_bb in (* partial function *)
+
+    let then_bb = L.append_block context "then" main_func in
+        add_terminal (stmt (L.builder_at_end context then_bb) then_stmt)
+        build_br_merge;
+
+    let else_bb = L.append_block context "else" main_func in
+        add_terminal (stmt (L.builder_at_end context else_bb) else_stmt)
+        build_br_merge;
+    ignore(L.build_cond_br bool_val then_bb else_bb builder);
+    L.builder_at_end context merge_bb
+
+
 in
 
 
-let main_func = 
-	let ftype = L.function_type i32_t [| |]
-	in
-	L.define_function "main" ftype the_module
+let builder = stmt builder main_stmt 
+in 
+
+let _ = L.build_ret (L.const_int i32_t 0) (builder) 
 in
-
-let builder = L.builder_at_end context (L.entry_block main_func) in
-
-
-let builder = stmt builder main_stmt in 
-
-let _ = L.build_ret (L.const_int i32_t 0) (builder) in
-
 the_module

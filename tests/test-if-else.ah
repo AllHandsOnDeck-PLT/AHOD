@@ -1,7 +1,11 @@
 main:
 {
     if 3>5 :
+    {
         do PRINT("true")
+    }
     else:
+    {
         do PRINT("false")
+    }
 }

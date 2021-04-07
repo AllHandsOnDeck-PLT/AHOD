@@ -66,7 +66,7 @@ rule token = parse
 | ['-']? (digits '.'  digit* ( ['e' 'E'] ['+' '-']? digits )?) as lxm { FLIT(lxm) }
 (*| [('"' _* '"') (''' _* ''')] as  lxm { SLIT(lxm) }*)
 
-| '"' (['a'-'z']* as lxm) '"' { SLIT(lxm) }
+| '"' (['a'-'z' 'A'-'Z']* as lxm) '"' { SLIT(lxm) }
 
 
 (*| '"' [' '-'!' '#'-'&' '('-'[' ']'-'~' 't' 'r' 'n' '\'' '"' '\\']* as lxm '"' { SLIT(lxm) }*)

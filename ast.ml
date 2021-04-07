@@ -14,10 +14,16 @@ type expr =
   | Id of string
   | Assign of string * expr
   | Binop of expr * op * expr
+  | Noexpr
 
 type stmt =
   | Block of stmt list
   | Expr of expr
+  | Return of expr
+  | If of expr * stmt * stmt 
+  | For of string * expr * stmt 
+  | While of expr * stmt
+  | Noexpr
 
 type action_decl = {
   entitytyp : typ;
@@ -27,7 +33,7 @@ type action_decl = {
   abody: stmt;
 }
 
-type program = stmt * action_decl list 
+type program = stmt  * bind list * action_decl list 
 
 let string_of_typ = function
     Int -> "int"

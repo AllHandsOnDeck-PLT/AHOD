@@ -1,5 +1,10 @@
 %{
-	open Ast
+open Ast
+
+let frst (a,_,_) = a;;
+let scnd (_,b,_) = b;;
+let trd (_,_,c) = c;;
+
 %}
 
 %token LPAREN RPAREN LBRACE RBRACE LSQUARE RSQUARE COLON COMMA PLUS MINUS MULT DIVIDE ASSIGN MOD POWER FLOOR DOT DOTDOT DOTDOTDOT NEWLINE
@@ -32,11 +37,18 @@
 %%
 
 program:
-    main_decl action_decls EOF { ($1,$2) }
+    main_decl decls EOF { ($1, fst $2, snd $2) }
 
 action_decls:
 	/* nothing */			{[]} 
 
+decls:
+    /*nothing*/      { ([], []) }
+    | decls global_decl  { (List.rev ($2::fst $1), snd $1) }
+
+global_decl:
+    typ ID NEWLINE { ($1, $2) }
+    
 main_decl:
       MAIN COLON stmt_block { $3 } 
 
@@ -50,6 +62,32 @@ stmt_list:
 stmt:
     | stmt_block                            { $1 }
     | expr NEWLINE                          { Expr $1 } 
+    // | PASS NEWLINE                       { }
+    | RETURN expr_opt NEWLINE               { Return $2 }
+    | if_stmt                               { $1 }
+    | FOR ID IN expr COLON stmt_block       { For($2, $4, $6) } 
+    | WHILE expr COLON stmt_block          { While($2, $4) } 
+
+if_stmt:
+    | IF expr COLON stmt_block elif_stmt        { If($2, $4, $5) }
+    | IF expr COLON stmt_block else_block_opt   { If($2, $4, $5) }
+
+elif_stmt:
+    | ELIF expr COLON stmt_block elif_stmt          { If($2, $4, $5) }
+    | ELIF expr COLON stmt_block else_block_opt     { If($2, $4, $5) }
+
+else_block_opt:
+      /* nothing */      { Block([]) }
+      | else_block       { $1 }
+
+else_block:
+      ELSE COLON stmt_block     { $3 }
+
+typ:
+    | INT               { Int    }
+    | BOOL              { Bool   }
+    | FLOAT             { Float  }
+    | NONE              { None   }
 
 expr:
     | call_action      { $1 } 
@@ -83,5 +121,8 @@ args_list:
     | args_list COMMA expr          { $3 :: $1 }
 
 call_action:
-    | DO ACTIONID LPAREN args_list_opt RPAREN        { ActionCall($2, $4) } 
-  
+    | DO ACTIONID LPAREN args_list_opt RPAREN        { ActionCall($2, $4) }
+
+expr_opt:
+    /* nothing */      { Noexpr }
+    | expr             { $1 }

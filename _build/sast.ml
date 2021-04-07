@@ -11,10 +11,16 @@ and sx =
   | SId of string
   | SAssign of string * sexpr
   | SBinop of sexpr * op * sexpr
+  | SNoexpr
 
 type sstmt =
   | SBlock of sstmt list
   | SExpr of sexpr
+  | SReturn of sexpr
+  | SIf of sexpr * sstmt * sstmt 
+  | SFor of string * sexpr * sstmt 
+  | SWhile of sexpr * sstmt
+  | SNoexprexpr
 
 type saction_decl = {
   sentitytyp : typ;
@@ -24,4 +30,4 @@ type saction_decl = {
   sabody: sstmt;
 }
 
-type sprogram = sstmt * saction_decl list
+type sprogram = sstmt * bind list * saction_decl list
