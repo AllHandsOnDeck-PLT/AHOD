@@ -73,7 +73,7 @@ class_block:
     NEWLINE LBRACE class_decl_list RBRACE NEWLINE { $3 }
 
 class_decl_list:
-  | attr_decl                       { [$1]) }
+  | attr_decl                       { [$1] }
   | class_decl_list attr_decl       { List.rev ($2::$1) }
 
 params_list:
