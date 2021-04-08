@@ -7,7 +7,7 @@ let digits = digit+
 rule token = parse
   [' ' '\t' '\r' ] { token lexbuf } (* Whitespace *)
 | '#'     { comment lexbuf }           (* Comments *)
-| "\n"	   { NEWLINE }
+| ('\n' [' ']*)+	   { NEWLINE }
 | '('      { LPAREN }
 | ')'      { RPAREN }
 | '{'      { LBRACE }
@@ -67,10 +67,6 @@ rule token = parse
 (*| [('"' _* '"') (''' _* ''')] as  lxm { SLIT(lxm) }*)
 
 | '"' (['a'-'z']* as lxm) '"' { SLIT(lxm) }
-
-
-(*| '"' [' '-'!' '#'-'&' '('-'[' ']'-'~' 't' 'r' 'n' '\'' '"' '\\']* as lxm '"' { SLIT(lxm) }*)
-(* how to represent single apostrophe?*)
 | ['a'-'z']['a'-'z' '0'-'9' '_']*                     as lxm { ID(lxm) } 
 | ['A'-'Z']['A'-'Z' '0'-'9' '_']*                     as actionID { ACTIONID(actionID) }
 | ['A'-'Z']['a'-'z' 'A'-'Z' '0'-'9']*                     as classID { CLASSID(classID) } 
@@ -80,6 +76,12 @@ rule token = parse
 and comment = parse
   '\n' { token lexbuf }
 | _    { comment lexbuf }
+
+(*| '"' [' '-'!' '#'-'&' '('-'[' ']'-'~' 't' 'r' 'n' '\'' '"' '\\']* as lxm '"' { SLIT(lxm) }*)
+(* how to represent single apostrophe?*)
+
+
+
 
 (* THINGS TO IMPLEMENT
 - String Literals

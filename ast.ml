@@ -11,10 +11,12 @@ type expr =
   | Bliteral of bool
   | Sliteral of string
   | ActionCall of string * expr list
+  | ExprActionCall of expr * string * expr list
   | Id of string
   | Assign of string * expr
   | Binop of expr * op * expr
   | ClassCall of string * expr list
+  | AttrCall of string * string 
 
 type stmt =
   | Block of stmt list
@@ -23,11 +25,11 @@ type stmt =
 type attr_decl = 
   | OneAdecl of typ * string * expr 
 
-type class_decl = {
+(*type class_decl = {
   cname : string;
   cparams : bind list;
   attributes : attr_decl list;
-}
+}*)
 
 type action_decl = {
   entitytyp : typ;
@@ -35,6 +37,13 @@ type action_decl = {
   aname : string;
   aparams : bind list;
   abody: stmt;
+}
+
+type class_decl = {
+  cname : string;
+  cparams : bind list;
+  actions : action_decl list;
+  attributes : attr_decl list;
 }
 
 type program = stmt * bind list * class_decl list

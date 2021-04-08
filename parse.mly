@@ -57,24 +57,42 @@ main_decl:
     MAIN COLON stmt_block { $3 } 
 
 class_decl:
-    LET CLASSID LPAREN params_list RPAREN BE COLON class_block        
+    LET CLASSID LPAREN params_list RPAREN BE COLON class_block     
+    {{
+      cname = $2;
+      cparams = $4; 
+      actions = fst $8;
+      attributes = snd $8 }}
+
+    /*LET CLASSID LPAREN params_list RPAREN BE COLON class_block        
     {{ 
       cname = $2;
       cparams = $4;
-      attributes = $8 }}
+      attributes = $8 }}*/
 
-/*action_decl: */
-    /* nothing            {[]} */
+action_decl: 
+    WHEN DO ACTIONID LPAREN params_list RPAREN COLON stmt_block          
+    {{ 
+      entitytyp = None;
+      entityid = "";
+      aname = $3;
+      aparams = $5;
+      abody = $8 }}
 
 global_decl:
     typ ID NEWLINE { ($1, $2) }
 
 class_block:
-    NEWLINE LBRACE class_decl_list RBRACE NEWLINE { $3 }
+    NEWLINE LBRACE NEWLINE class_decl_list RBRACE NEWLINE { $4 }
 
 class_decl_list:
+  | action_decl                     { ([$1], []) }
+  | attr_decl                       { ([], [$1]) }
+  | class_decl_list action_decl     { (List.rev ($2::fst $1), snd $1) }
+  | class_decl_list attr_decl       { (fst $1, List.rev ($2::snd $1)) }
+  /*
   | attr_decl                       { [$1] }
-  | class_decl_list attr_decl       { List.rev ($2::$1) }
+  | class_decl_list attr_decl       { List.rev ($2::$1) }*/
 
 params_list:
     param                        { [$1] } 
@@ -102,6 +120,7 @@ typ:
     | BOOL              { Bool   }
     | FLOAT             { Float  }
     | NONE              { None   }
+    | STRING            { String }
     | CLASSID           { ClassID } 
 
 expr:
@@ -127,6 +146,7 @@ expr:
     | expr GEQ    expr { Binop($1, Geq,     $3) }
 
     | call_class       { $1 }
+    | call_attr        { $1 }
     
 
 args_list_opt:
@@ -139,8 +159,12 @@ args_list:
 
 call_action:
     | DO ACTIONID LPAREN args_list_opt RPAREN        { ActionCall($2, $4) } 
+    | expr DO ACTIONID LPAREN args_list_opt RPAREN   { ExprActionCall($1, $3, $5) } 
+
 
 call_class: 
      CLASSID LPAREN args_list_opt RPAREN            { ClassCall($1, $3) } 
 
+call_attr:
+    ID DOT ID      { AttrCall($1, $3) }
   

@@ -1,12 +1,19 @@
 main:
   {
-  player = Player("Bob")
-  print(player.name)
+
+  player = Player("bob")
+
+  do PRINT(player.name)
+  player do PLAY(3)
   }
 
+Player player
 
 let Player(string name) be:
   {
-  	string name: name
+  string name: name
+  when do PLAY(int number):
+  {
+  	do PRINT(number)
   }
-
+  }
