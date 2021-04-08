@@ -1,7 +1,7 @@
 type op = Add | Sub | Mult | Div | Equal | Neq | Less | Leq | Greater | Geq |
           And | Or 
 
-type typ = Int | Float | Bool | String 
+type typ = Int | Float | Bool | String | None
 
 type bind = typ * string
 

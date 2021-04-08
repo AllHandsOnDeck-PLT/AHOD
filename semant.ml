@@ -3,7 +3,7 @@ open Sast
 
 module StringMap = Map.Make(String)
 
-let check (main_stmt, action_decls) =
+let check (main_stmt, globals, action_decls) =
 
   (**** Check global variables ****)
 
@@ -65,6 +65,6 @@ let check (main_stmt, action_decls) =
     in
 
 
-	(check_stmt main_stmt, [])
+	(check_stmt main_stmt, [], [])
 
 

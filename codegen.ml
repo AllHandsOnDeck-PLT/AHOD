@@ -4,7 +4,7 @@ open Sast
 
 module StringMap = Map.Make(String)
 
-let translate (main_stmt, action_decls) =
+let translate (main_stmt, globals, action_decls) =
 	 let context    = L.global_context () in
 
 	 let the_module = L.create_module context "AHOD" in

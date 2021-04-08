@@ -39,18 +39,32 @@ let trd (_,_,c) = c;;
 program:
     main_decl decls EOF { ($1, fst $2, snd $2) }
 
-action_decls:
-	/* nothing */			{[]} 
+action_decl:
+    WHEN DO ACTIONID LPAREN params_list RPAREN COLON stmt_block          
+    {{ 
+      entitytyp = None;
+      entityid = "";
+      aname = $3;
+      aparams = $5;
+      abody = $8 }}
 
 decls:
     /*nothing*/      { ([], []) }
     | decls global_decl  { (List.rev ($2::fst $1), snd $1) }
+    | decls action_decl  { (fst $1, List.rev ($2::snd $1)) }
 
 global_decl:
     typ ID NEWLINE { ($1, $2) }
     
 main_decl:
       MAIN COLON stmt_block { $3 } 
+
+params_list:
+    param                        { [$1] } 
+    | params_list COMMA param      { $3::$1 }
+
+param:
+      typ ID                       { $1, $2 }
 
 stmt_block:
     NEWLINE LBRACE NEWLINE stmt_list RBRACE NEWLINE              { Block(List.rev $4) }
