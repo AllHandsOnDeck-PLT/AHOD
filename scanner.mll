@@ -14,8 +14,8 @@ rule token = parse
 | '}'      { RBRACE }
 | '['      { LSQUARE }
 | ']'      { RSQUARE }
-| '<'      { LBRACK }
-| '>'      { RBRACK }
+(*| '<'      { LBRACK }*)
+(*| '>'      { RBRACK }*)
 | ':'      { COLON }
 | ','      { COMMA }
 | '+'      { PLUS }
@@ -30,9 +30,9 @@ rule token = parse
 | '='      { ASSIGN }
 | "=="     { EQ }
 | "!="     { NEQ }
-| '<'      { LT }
-| "<="     { LEQ }
+| "<"      { LT }
 | ">"      { GT }
+| "<="     { LEQ }
 | ">="     { GEQ }
 | "//"     { FLOOR }		
 | "and"    { AND }
@@ -65,8 +65,8 @@ rule token = parse
 | digits as lxm { ILIT(int_of_string lxm) }
 | ['-']? (digits '.'  digit* ( ['e' 'E'] ['+' '-']? digits )?) as lxm { FLIT(lxm) }
 (*| [('"' _* '"') (''' _* ''')] as  lxm { SLIT(lxm) }*)
-
 | '"' ([' '-'!' '#'-'&' '('-'[' ']'-'~' 'a'-'z'' ' 'A'-'Z' '0'-'9']* as lxm) '"' { SLIT(lxm) }
+
 | ['a'-'z']['a'-'z' '0'-'9' '_']*                     as lxm { ID(lxm) } 
 | ['A'-'Z']['A'-'Z' '0'-'9' '_']*                     as actionID { ACTIONID(actionID) }
 | ['A'-'Z']['a'-'z' '0'-'9']*                     as classID { CLASSID(classID) } 
@@ -77,6 +77,8 @@ and comment = parse
   '\n' { token lexbuf }
 | _    { comment lexbuf }
 
+(*| '"' [' '-'!' '#'-'&' '('-'[' ']'-'~' 't' 'r' 'n' '\'' '"' '\\']* as lxm '"' { SLIT(lxm) }*)
+(* how to represent single apostrophe?*)
 (*| '"' [' '-'!' '#'-'&' '('-'[' ']'-'~' 't' 'r' 'n' '\'' '"' '\\']* as lxm '"' { SLIT(lxm) }*)
 (* how to represent single apostrophe?*)
 

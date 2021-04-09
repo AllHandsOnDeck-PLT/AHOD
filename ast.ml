@@ -17,10 +17,15 @@ type expr =
   | Binop of expr * op * expr
   | ClassCall of string * expr list
   | AttrCall of string * string 
+  | Noexpr
 
 type stmt =
   | Block of stmt list
   | Expr of expr
+  | Return of expr
+  | If of expr * stmt * stmt 
+  | For of string * expr * stmt 
+  | While of expr * stmt
 
 type attr_decl = 
   | OneAdecl of typ * string * expr 
@@ -46,5 +51,10 @@ type class_decl = {
   attributes : attr_decl list;
 }
 
-type program = stmt * bind list * class_decl list
+type program = bind list * class_decl list * stmt
 
+let string_of_typ = function
+    Int -> "int"
+  | Bool -> "bool"
+  | Float -> "float"
+  | String -> "string"

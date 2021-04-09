@@ -14,10 +14,15 @@ and sx =
   | SBinop of sexpr * op * sexpr
   | SClassCall of string * sexpr list
   | SAttrCall of string * string 
+  | SNoexpr
 
 type sstmt =
   | SBlock of sstmt list
   | SExpr of sexpr
+  | SReturn of sexpr
+  | SIf of sexpr * sstmt * sstmt 
+  | SFor of string * sexpr * sstmt 
+  | SWhile of sexpr * sstmt
 
 type sattr_decl = 
   | SOneAdecl of typ * string * sexpr 
@@ -37,4 +42,4 @@ type sclass_decl = {
   sattributes : sattr_decl list;
 }
 
-type sprogram = sstmt * bind list * sclass_decl list
+type sprogram = bind list * sclass_decl list * sstmt 
