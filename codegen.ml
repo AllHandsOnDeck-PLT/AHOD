@@ -166,6 +166,25 @@ let rec stmt builder = function
         build_br_merge;
     ignore(L.build_cond_br bool_val then_bb else_bb builder);
     L.builder_at_end context merge_bb
+    | SWhile (predicate, body) ->
+      let pred_bb = L.append_block context "while" main_func in
+      ignore(L.build_br pred_bb builder);
+  
+      let body_bb = L.append_block context "while_body" main_func in
+      add_terminal (stmt (L.builder_at_end context body_bb) body)
+        (L.build_br pred_bb);
+  
+      let pred_builder = L.builder_at_end context pred_bb in
+      let bool_val = expr pred_builder predicate in
+  
+      let merge_bb = L.append_block context "merge" main_func in
+      ignore(L.build_cond_br bool_val body_bb merge_bb pred_builder);
+      L.builder_at_end context merge_bb
+    
+   (*) (* Implement for loops as while loops *)
+    | SFor (e1, e2, e3, body) -> stmt builder
+    ( SBlock [SExpr e1 ; SWhile (e2, SBlock [body ; SExpr e3]) ] )*)
+
 
 
 in

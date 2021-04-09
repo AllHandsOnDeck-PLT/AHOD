@@ -1,5 +1,5 @@
 type op = Add | Sub | Mult | Div | Equal | Neq | Less | Leq | Greater | Geq |
-          And | Or 
+          And | Or | Mod
 
 type typ = Int | Float | Bool | String | None
 
@@ -39,3 +39,20 @@ let string_of_typ = function
   | Bool -> "bool"
   | Float -> "float"
   | String -> "string"
+
+(*  Pretty-printing functions *)
+let string_of_op = function
+    Add -> "+"
+  | Sub -> "-"
+  | Mult -> "*"
+  | Div -> "/"
+  | Equal -> "=="
+  | Neq -> "!="
+  | Less -> "<"
+  | Leq -> "<="
+  | Greater -> ">"
+  | Geq -> ">="
+  | And -> "and"
+  | Or -> "or"
+  | Mod -> "%"
+
