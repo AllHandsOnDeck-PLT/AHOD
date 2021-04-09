@@ -3,6 +3,19 @@ open Sast
 
 module StringMap = Map.Make(String)
 
+let classIndices: (string, int) Hashtbl.t = Hashtbl.create 10
+
+let createClassIndices class_decls =
+  let classHandler index class_decl = 
+  Hashtbl.add classIndices class_decl.cname index in 
+  List.iteri classHandler class_decls 
+
+(*look up in map, information for type. Shortcut: rather than lookup in map, 
+will always return particular information for type
+
+built in struct, generate and try to access that 
+*)
+
 let check (globals, class_decls, main_stmt) =
 
   (**** Check global variables ****)
@@ -26,7 +39,8 @@ let check (globals, class_decls, main_stmt) =
 	let rec check_expr = function
 		(*need to figure out typ, if name is defined*)
 		  ActionCall(aname, aparams) -> (String, SActionCall(aname, List.map check_expr aparams))
-		| Sliteral s -> (String, SSliteral(s))
+		| ClassCall(cname, cparams) -> (String, SClassCall(cname, List.map check_expr cparams))
+    | Sliteral s -> (String, SSliteral(s))
 		| Iliteral i -> (Int, SIliteral(i))
 		| Fliteral f -> (Float, SFliteral(f))
     | Bliteral b -> (Bool, SBliteral(b))

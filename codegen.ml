@@ -19,7 +19,9 @@ let translate (globals, action_decls, main_stmt) =
 	 and i1_t       = L.i1_type     context
 	 and float_t    = L.double_type context
 	 and string_t   = L.pointer_type (L.i8_type context)
-in
+   (*and class_t = L.struct_type context [|L.pointer_type i8_t; L.i32_type context |]*)
+
+  in
 
 let ltype_of_typ = function
 	| A.Int   -> i32_t
