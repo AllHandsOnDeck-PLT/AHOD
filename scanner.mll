@@ -66,10 +66,10 @@ rule token = parse
 | ['-']? (digits '.'  digit* ( ['e' 'E'] ['+' '-']? digits )?) as lxm { FLIT(lxm) }
 (*| [('"' _* '"') (''' _* ''')] as  lxm { SLIT(lxm) }*)
 
-| '"' (['a'-'z']* as lxm) '"' { SLIT(lxm) }
+| '"' ([' '-'!' '#'-'&' '('-'[' ']'-'~' 'a'-'z'' ' 'A'-'Z' '0'-'9']* as lxm) '"' { SLIT(lxm) }
 | ['a'-'z']['a'-'z' '0'-'9' '_']*                     as lxm { ID(lxm) } 
 | ['A'-'Z']['A'-'Z' '0'-'9' '_']*                     as actionID { ACTIONID(actionID) }
-| ['A'-'Z']['a'-'z' 'A'-'Z' '0'-'9']*                     as classID { CLASSID(classID) } 
+| ['A'-'Z']['a'-'z' '0'-'9']*                     as classID { CLASSID(classID) } 
 | eof { EOF }
 | _ as char { raise (Failure("illegal character " ^ Char.escaped char)) }
 
