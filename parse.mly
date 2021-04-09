@@ -78,13 +78,15 @@ stmt:
     | expr NEWLINE                          { Expr $1 } 
     // | PASS NEWLINE                       { }
     | RETURN expr_opt NEWLINE               { Return $2 }
-    | if_stmt                               { $1 }
-    | FOR ID IN expr COLON stmt_block       { For($2, $4, $6) } 
-    | WHILE expr COLON stmt_block          { While($2, $4) } 
-
-if_stmt:
     | IF expr COLON stmt_block elif_stmt        { If($2, $4, $5) }
     | IF expr COLON stmt_block else_block_opt   { If($2, $4, $5) }
+    | ELIF expr COLON stmt_block elif_stmt          { If($2, $4, $5) }
+    | ELIF expr COLON stmt_block else_block_opt     { If($2, $4, $5) }
+    | ELSE COLON stmt_block                         { $3 }
+    | FOR ID IN expr COLON stmt_block       { For($2, $4, $6) } 
+    | WHILE expr COLON stmt_block           { While($2, $4) } 
+
+
 
 elif_stmt:
     | ELIF expr COLON stmt_block elif_stmt          { If($2, $4, $5) }

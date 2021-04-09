@@ -57,10 +57,14 @@ let check (main_stmt, globals, action_decls) =
 	in
 
 	let rec check_stmt = function
-		Expr e -> SExpr (check_expr e) 
-
-		| Block sl -> 
+      Expr e -> SExpr (check_expr e) 
+    | If(p, b1, b2) -> SIf(check_expr p, check_stmt b1, check_stmt b2)
+    | While(p, s) -> SWhile(check_expr p, check_stmt s)
+    | Block sl -> 
          SBlock(List.map check_stmt sl)
+    
+         
+
 
     in
 

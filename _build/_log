@@ -1,0 +1,312 @@
+### Starting build.
+# Target: AHOD.ml.depends, tags: { package(llvm), package(llvm.analysis), warn(+a-4), extension:ml, file:AHOD.ml, ocaml, ocamldep, quiet, traverse }
+ocamlfind ocamldep -package llvm -package llvm.analysis -modules AHOD.ml > AHOD.ml.depends
+# Target: codegen.ml.depends, tags: { package(llvm), package(llvm.analysis), warn(+a-4), extension:ml, file:codegen.ml, ocaml, ocamldep, quiet, traverse }
+ocamlfind ocamldep -package llvm -package llvm.analysis -modules codegen.ml > codegen.ml.depends
+# Target: ast.ml.depends, tags: { package(llvm), package(llvm.analysis), warn(+a-4), extension:ml, file:ast.ml, ocaml, ocamldep, quiet, traverse }
+ocamlfind ocamldep -package llvm -package llvm.analysis -modules ast.ml > ast.ml.depends
+# Target: sast.ml.depends, tags: { package(llvm), package(llvm.analysis), warn(+a-4), extension:ml, file:sast.ml, ocaml, ocamldep, quiet, traverse }
+ocamlfind ocamldep -package llvm -package llvm.analysis -modules sast.ml > sast.ml.depends
+# Target: ast.cmo, tags: { package(llvm), package(llvm.analysis), warn(+a-4), byte, compile, extension:cmo, extension:ml, file:ast.cmo, file:ast.ml, implem, ocaml, quiet, traverse }
+ocamlfind ocamlc -c -w +a-4 -package llvm -package llvm.analysis -o ast.cmo ast.ml
++ ocamlfind ocamlc -c -w +a-4 -package llvm -package llvm.analysis -o ast.cmo ast.ml
+File "ast.ml", lines 38-42, characters 20-22:
+38 | ....................function
+39 |     Int -> "int"
+40 |   | Bool -> "bool"
+41 |   | Float -> "float"
+42 |   | String -> "string"
+Warning 8 [partial-match]: this pattern-matching is not exhaustive.
+Here is an example of a case that is not matched:
+None
+# Target: sast.cmo, tags: { package(llvm), package(llvm.analysis), warn(+a-4), byte, compile, extension:cmo, extension:ml, file:sast.cmo, file:sast.ml, implem, ocaml, quiet, traverse }
+ocamlfind ocamlc -c -w +a-4 -package llvm -package llvm.analysis -o sast.cmo sast.ml
+# Target: parse.mly, tags: { package(llvm), package(llvm.analysis), warn(+a-4), extension:mly, file:parse.mly, infer, ocaml, ocamlyacc, parser, quiet, traverse }
+/Users/maradimofte/.opam/default/bin/ocamlyacc parse.mly
++ /Users/maradimofte/.opam/default/bin/ocamlyacc parse.mly
+6 shift/reduce conflicts.
+# Target: parse.mli.depends, tags: { package(llvm), package(llvm.analysis), warn(+a-4), extension:mli, file:parse.mli, ocaml, ocamldep, quiet, traverse }
+ocamlfind ocamldep -package llvm -package llvm.analysis -modules parse.mli > parse.mli.depends
+# Target: scanner.mll, tags: { package(llvm), package(llvm.analysis), warn(+a-4), extension:mll, file:scanner.mll, lexer, ocaml, ocamllex, quiet, traverse }
+/Users/maradimofte/.opam/default/bin/ocamllex.opt -q scanner.mll
+# Target: scanner.ml.depends, tags: { package(llvm), package(llvm.analysis), warn(+a-4), extension:ml, file:scanner.ml, ocaml, ocamldep, quiet, traverse }
+ocamlfind ocamldep -package llvm -package llvm.analysis -modules scanner.ml > scanner.ml.depends
+# Target: parse.cmi, tags: { package(llvm), package(llvm.analysis), warn(+a-4), byte, compile, extension:mli, file:parse.mli, interf, ocaml, quiet, traverse }
+ocamlfind ocamlc -c -w +a-4 -package llvm -package llvm.analysis -o parse.cmi parse.mli
+# Target: semant.ml.depends, tags: { package(llvm), package(llvm.analysis), warn(+a-4), extension:ml, file:semant.ml, ocaml, ocamldep, quiet, traverse }
+ocamlfind ocamldep -package llvm -package llvm.analysis -modules semant.ml > semant.ml.depends
+# Target: codegen.cmo, tags: { package(llvm), package(llvm.analysis), warn(+a-4), byte, compile, extension:cmo, extension:ml, file:codegen.cmo, file:codegen.ml, implem, ocaml, quiet, traverse }
+ocamlfind ocamlc -c -w +a-4 -package llvm -package llvm.analysis -o codegen.cmo codegen.ml
++ ocamlfind ocamlc -c -w +a-4 -package llvm -package llvm.analysis -o codegen.cmo codegen.ml
+File "codegen.ml", lines 24-28, characters 19-24:
+24 | ...................function
+25 | 	| A.Int   -> i32_t
+26 | 	| A.Bool  -> i1_t
+27 | 	| A.Float -> float_t
+28 |   | A.String -> string_t
+Warning 8 [partial-match]: this pattern-matching is not exhaustive.
+Here is an example of a case that is not matched:
+None
+File "codegen.ml", lines 71-80, characters 2-3:
+71 | ..(match fst e with 
+72 | 		A.String -> L.build_call printf_func [| L.const_in_bounds_gep str_format_str [|L.const_int i32_t 0; L.const_int i32_t 0|] ; (expr builder e) |]
+73 | 		"printf" builder
+74 | 		| A.Int -> L.build_call printf_func [| L.const_in_bounds_gep int_format_str [|L.const_int i32_t 0; L.const_int i32_t 0|]  ; (expr builder e) |]
+75 | 		"printf" builder
+76 | 		| A.Float -> L.build_call printf_func [| L.const_in_bounds_gep float_format_str [|L.const_int i32_t 0; L.const_int i32_t 0|]  ; (expr builder e) |]
+77 | 		"printf" builder
+78 | 		| A.Bool -> L.build_call printf_func [| L.const_in_bounds_gep bool_format_str [|L.const_int i32_t 0; L.const_int i32_t 0|]  ; (expr builder e) |]
+79 | 		"printf" builder
+80 | 		)...
+Warning 8 [partial-match]: this pattern-matching is not exhaustive.
+Here is an example of a case that is not matched:
+None
+File "codegen.ml", lines 62-114, characters 40-27:
+ 62 | ........................................match e with
+ 63 | 	SSliteral s -> L.define_global "str" (L.const_stringz context s) the_module
+ 64 | 	| SBliteral b  -> L.const_int i1_t (if b then 1 else 0)
+ 65 | 	| SIliteral i -> L.const_int i32_t i 
+ 66 |   | SFliteral f -> L.const_float_of_string float_t f
+...
+111 |     | A.Leq     -> L.build_icmp L.Icmp.Sle
+112 |     | A.Greater -> L.build_icmp L.Icmp.Sgt
+113 |     | A.Geq     -> L.build_icmp L.Icmp.Sge
+114 |     ) e1' e2' "tmp" builder
+Warning 8 [partial-match]: this pattern-matching is not exhaustive.
+Here is an example of a case that is not matched:
+SActionCall ("PRINT", _::_::_)
+File "codegen.ml", lines 127-157, characters 23-39:
+127 | .......................function
+128 | 	| SBlock stmt_list -> List.fold_left stmt builder stmt_list 
+129 |   | SExpr e -> ignore(expr builder e); builder
+130 |   | SIf (predicate, then_stmt, else_stmt) ->
+131 |     let bool_val = expr builder predicate in
+...
+154 |   
+155 |       let merge_bb = L.append_block context "merge" main_func in
+156 |       ignore(L.build_cond_br bool_val body_bb merge_bb pred_builder);
+157 |       L.builder_at_end context merge_bb
+Warning 8 [partial-match]: this pattern-matching is not exhaustive.
+Here is an example of a case that is not matched:
+(SNoexprexpr|SReturn _|SFor (_, _, _))
+File "codegen.ml", line 7, characters 26-33:
+7 | let translate (main_stmt, globals, action_decls) =
+                              ^^^^^^^
+Warning 27 [unused-var-strict]: unused variable globals.
+File "codegen.ml", line 7, characters 35-47:
+7 | let translate (main_stmt, globals, action_decls) =
+                                       ^^^^^^^^^^^^
+Warning 27 [unused-var-strict]: unused variable action_decls.
+File "codegen.ml", line 24, characters 4-16:
+24 | let ltype_of_typ = function
+         ^^^^^^^^^^^^
+Warning 26 [unused-var]: unused variable ltype_of_typ.
+File "codegen.ml", line 52, characters 5-11:
+52 |  let lookup n m = StringMap.find n m
+          ^^^^^^
+Warning 26 [unused-var]: unused variable lookup.
+# Target: scanner.cmo, tags: { package(llvm), package(llvm.analysis), warn(+a-4), byte, compile, extension:cmo, extension:ml, file:scanner.cmo, file:scanner.ml, implem, ocaml, quiet, traverse }
+ocamlfind ocamlc -c -w +a-4 -package llvm -package llvm.analysis -o scanner.cmo scanner.ml
+# Target: semant.cmo, tags: { package(llvm), package(llvm.analysis), warn(+a-4), byte, compile, extension:cmo, extension:ml, file:semant.cmo, file:semant.ml, implem, ocaml, quiet, traverse }
+ocamlfind ocamlc -c -w +a-4 -package llvm -package llvm.analysis -o semant.cmo semant.ml
++ ocamlfind ocamlc -c -w +a-4 -package llvm -package llvm.analysis -o semant.cmo semant.ml
+File "semant.ml", lines 27-55, characters 22-51:
+27 | ......................function
+28 | 		(*need to figure out typ, if name is defined*)
+29 | 		  ActionCall(aname, aparams) -> (String, SActionCall(aname, List.map check_expr aparams))
+30 | 		| Sliteral s -> (String, SSliteral(s))
+31 | 		| Iliteral i -> (Int, SIliteral(i))
+...
+52 |           | And | Or when same && t1 = Bool -> Bool
+53 |           | _ -> raise (
+54 |         Failure ("illegal binary operator " ))
+55 |           in (ty, SBinop((t1, e1'), op, (t2, e2')))
+Warning 8 [partial-match]: this pattern-matching is not exhaustive.
+Here is an example of a case that is not matched:
+(Noexpr|Id _|Assign (_, _))
+File "semant.ml", lines 59-64, characters 22-39:
+59 | ......................function
+60 |       Expr e -> SExpr (check_expr e) 
+61 |     | If(p, b1, b2) -> SIf(check_expr p, check_stmt b1, check_stmt b2)
+62 |     | While(p, s) -> SWhile(check_expr p, check_stmt s)
+63 |     | Block sl -> 
+64 |          SBlock(List.map check_stmt sl)
+Warning 8 [partial-match]: this pattern-matching is not exhaustive.
+Here is an example of a case that is not matched:
+(Noexpr|Return _|For (_, _, _))
+File "semant.ml", line 6, characters 22-29:
+6 | let check (main_stmt, globals, action_decls) =
+                          ^^^^^^^
+Warning 27 [unused-var-strict]: unused variable globals.
+File "semant.ml", line 6, characters 31-43:
+6 | let check (main_stmt, globals, action_decls) =
+                                   ^^^^^^^^^^^^
+Warning 27 [unused-var-strict]: unused variable action_decls.
+File "semant.ml", line 12, characters 6-18:
+12 |   let check_assign lvaluet rvaluet err =
+           ^^^^^^^^^^^^
+Warning 26 [unused-var]: unused variable check_assign.
+File "semant.ml", line 17, characters 6-13:
+17 |   let symbols = List.fold_left (fun m (ty, name) -> StringMap.add name ty m)
+           ^^^^^^^
+Warning 26 [unused-var]: unused variable symbols.
+File "semant.ml", line 40, characters 6-28:
+40 |     | Binop(e1, op, e2) as e -> 
+           ^^^^^^^^^^^^^^^^^^^^^^
+Warning 26 [unused-var]: unused variable e.
+# Target: AHOD.cmo, tags: { package(llvm), package(llvm.analysis), warn(+a-4), byte, compile, extension:cmo, extension:ml, file:AHOD.cmo, file:AHOD.ml, implem, ocaml, quiet, traverse }
+ocamlfind ocamlc -c -w +a-4 -package llvm -package llvm.analysis -o AHOD.cmo AHOD.ml
+# Target: ast.cmx, tags: { package(llvm), package(llvm.analysis), warn(+a-4), compile, extension:cmx, extension:ml, file:ast.cmx, file:ast.ml, implem, native, ocaml, quiet, traverse }
+ocamlfind ocamlopt -c -w +a-4 -package llvm -package llvm.analysis -o ast.cmx ast.ml
++ ocamlfind ocamlopt -c -w +a-4 -package llvm -package llvm.analysis -o ast.cmx ast.ml
+File "ast.ml", lines 38-42, characters 20-22:
+38 | ....................function
+39 |     Int -> "int"
+40 |   | Bool -> "bool"
+41 |   | Float -> "float"
+42 |   | String -> "string"
+Warning 8 [partial-match]: this pattern-matching is not exhaustive.
+Here is an example of a case that is not matched:
+None
+# Target: sast.cmx, tags: { package(llvm), package(llvm.analysis), warn(+a-4), compile, extension:cmx, extension:ml, file:sast.cmx, file:sast.ml, implem, native, ocaml, quiet, traverse }
+ocamlfind ocamlopt -c -w +a-4 -package llvm -package llvm.analysis -o sast.cmx sast.ml
+# Target: parse.ml.depends, tags: { package(llvm), package(llvm.analysis), warn(+a-4), extension:ml, file:parse.ml, ocaml, ocamldep, quiet, traverse }
+ocamlfind ocamldep -package llvm -package llvm.analysis -modules parse.ml > parse.ml.depends
+# Target: parse.cmx, tags: { package(llvm), package(llvm.analysis), warn(+a-4), compile, extension:cmx, extension:ml, file:parse.cmx, file:parse.ml, implem, native, ocaml, quiet, traverse }
+ocamlfind ocamlopt -c -w +a-4 -package llvm -package llvm.analysis -o parse.cmx parse.ml
++ ocamlfind ocamlopt -c -w +a-4 -package llvm -package llvm.analysis -o parse.cmx parse.ml
+File "parse.mly", line 2, characters 0-8:
+Warning 45 [open-shadow-label-constructor]: this open statement shadows the constructor None (which is later used)
+File "parse.mly", line 143, characters 25-31:
+Warning 42 [disambiguated-name]: this use of Noexpr relies on type-directed disambiguation,
+it will not compile with OCaml 4.00 or earlier.
+File "parse.mly", line 4, characters 4-8:
+Warning 32 [unused-value-declaration]: unused value frst.
+File "parse.mly", line 5, characters 4-8:
+Warning 32 [unused-value-declaration]: unused value scnd.
+File "parse.mly", line 6, characters 4-7:
+Warning 32 [unused-value-declaration]: unused value trd.
+# Target: codegen.cmx, tags: { package(llvm), package(llvm.analysis), warn(+a-4), compile, extension:cmx, extension:ml, file:codegen.cmx, file:codegen.ml, implem, native, ocaml, quiet, traverse }
+ocamlfind ocamlopt -c -w +a-4 -package llvm -package llvm.analysis -o codegen.cmx codegen.ml
++ ocamlfind ocamlopt -c -w +a-4 -package llvm -package llvm.analysis -o codegen.cmx codegen.ml
+File "codegen.ml", lines 24-28, characters 19-24:
+24 | ...................function
+25 | 	| A.Int   -> i32_t
+26 | 	| A.Bool  -> i1_t
+27 | 	| A.Float -> float_t
+28 |   | A.String -> string_t
+Warning 8 [partial-match]: this pattern-matching is not exhaustive.
+Here is an example of a case that is not matched:
+None
+File "codegen.ml", lines 71-80, characters 2-3:
+71 | ..(match fst e with 
+72 | 		A.String -> L.build_call printf_func [| L.const_in_bounds_gep str_format_str [|L.const_int i32_t 0; L.const_int i32_t 0|] ; (expr builder e) |]
+73 | 		"printf" builder
+74 | 		| A.Int -> L.build_call printf_func [| L.const_in_bounds_gep int_format_str [|L.const_int i32_t 0; L.const_int i32_t 0|]  ; (expr builder e) |]
+75 | 		"printf" builder
+76 | 		| A.Float -> L.build_call printf_func [| L.const_in_bounds_gep float_format_str [|L.const_int i32_t 0; L.const_int i32_t 0|]  ; (expr builder e) |]
+77 | 		"printf" builder
+78 | 		| A.Bool -> L.build_call printf_func [| L.const_in_bounds_gep bool_format_str [|L.const_int i32_t 0; L.const_int i32_t 0|]  ; (expr builder e) |]
+79 | 		"printf" builder
+80 | 		)...
+Warning 8 [partial-match]: this pattern-matching is not exhaustive.
+Here is an example of a case that is not matched:
+None
+File "codegen.ml", lines 62-114, characters 40-27:
+ 62 | ........................................match e with
+ 63 | 	SSliteral s -> L.define_global "str" (L.const_stringz context s) the_module
+ 64 | 	| SBliteral b  -> L.const_int i1_t (if b then 1 else 0)
+ 65 | 	| SIliteral i -> L.const_int i32_t i 
+ 66 |   | SFliteral f -> L.const_float_of_string float_t f
+...
+111 |     | A.Leq     -> L.build_icmp L.Icmp.Sle
+112 |     | A.Greater -> L.build_icmp L.Icmp.Sgt
+113 |     | A.Geq     -> L.build_icmp L.Icmp.Sge
+114 |     ) e1' e2' "tmp" builder
+Warning 8 [partial-match]: this pattern-matching is not exhaustive.
+Here is an example of a case that is not matched:
+SActionCall ("PRINT", _::_::_)
+File "codegen.ml", lines 127-157, characters 23-39:
+127 | .......................function
+128 | 	| SBlock stmt_list -> List.fold_left stmt builder stmt_list 
+129 |   | SExpr e -> ignore(expr builder e); builder
+130 |   | SIf (predicate, then_stmt, else_stmt) ->
+131 |     let bool_val = expr builder predicate in
+...
+154 |   
+155 |       let merge_bb = L.append_block context "merge" main_func in
+156 |       ignore(L.build_cond_br bool_val body_bb merge_bb pred_builder);
+157 |       L.builder_at_end context merge_bb
+Warning 8 [partial-match]: this pattern-matching is not exhaustive.
+Here is an example of a case that is not matched:
+(SNoexprexpr|SReturn _|SFor (_, _, _))
+File "codegen.ml", line 7, characters 26-33:
+7 | let translate (main_stmt, globals, action_decls) =
+                              ^^^^^^^
+Warning 27 [unused-var-strict]: unused variable globals.
+File "codegen.ml", line 7, characters 35-47:
+7 | let translate (main_stmt, globals, action_decls) =
+                                       ^^^^^^^^^^^^
+Warning 27 [unused-var-strict]: unused variable action_decls.
+File "codegen.ml", line 24, characters 4-16:
+24 | let ltype_of_typ = function
+         ^^^^^^^^^^^^
+Warning 26 [unused-var]: unused variable ltype_of_typ.
+File "codegen.ml", line 52, characters 5-11:
+52 |  let lookup n m = StringMap.find n m
+          ^^^^^^
+Warning 26 [unused-var]: unused variable lookup.
+# Target: scanner.cmx, tags: { package(llvm), package(llvm.analysis), warn(+a-4), compile, extension:cmx, extension:ml, file:scanner.cmx, file:scanner.ml, implem, native, ocaml, quiet, traverse }
+ocamlfind ocamlopt -c -w +a-4 -package llvm -package llvm.analysis -o scanner.cmx scanner.ml
+# Target: semant.cmx, tags: { package(llvm), package(llvm.analysis), warn(+a-4), compile, extension:cmx, extension:ml, file:semant.cmx, file:semant.ml, implem, native, ocaml, quiet, traverse }
+ocamlfind ocamlopt -c -w +a-4 -package llvm -package llvm.analysis -o semant.cmx semant.ml
++ ocamlfind ocamlopt -c -w +a-4 -package llvm -package llvm.analysis -o semant.cmx semant.ml
+File "semant.ml", lines 27-55, characters 22-51:
+27 | ......................function
+28 | 		(*need to figure out typ, if name is defined*)
+29 | 		  ActionCall(aname, aparams) -> (String, SActionCall(aname, List.map check_expr aparams))
+30 | 		| Sliteral s -> (String, SSliteral(s))
+31 | 		| Iliteral i -> (Int, SIliteral(i))
+...
+52 |           | And | Or when same && t1 = Bool -> Bool
+53 |           | _ -> raise (
+54 |         Failure ("illegal binary operator " ))
+55 |           in (ty, SBinop((t1, e1'), op, (t2, e2')))
+Warning 8 [partial-match]: this pattern-matching is not exhaustive.
+Here is an example of a case that is not matched:
+(Noexpr|Id _|Assign (_, _))
+File "semant.ml", lines 59-64, characters 22-39:
+59 | ......................function
+60 |       Expr e -> SExpr (check_expr e) 
+61 |     | If(p, b1, b2) -> SIf(check_expr p, check_stmt b1, check_stmt b2)
+62 |     | While(p, s) -> SWhile(check_expr p, check_stmt s)
+63 |     | Block sl -> 
+64 |          SBlock(List.map check_stmt sl)
+Warning 8 [partial-match]: this pattern-matching is not exhaustive.
+Here is an example of a case that is not matched:
+(Noexpr|Return _|For (_, _, _))
+File "semant.ml", line 6, characters 22-29:
+6 | let check (main_stmt, globals, action_decls) =
+                          ^^^^^^^
+Warning 27 [unused-var-strict]: unused variable globals.
+File "semant.ml", line 6, characters 31-43:
+6 | let check (main_stmt, globals, action_decls) =
+                                   ^^^^^^^^^^^^
+Warning 27 [unused-var-strict]: unused variable action_decls.
+File "semant.ml", line 12, characters 6-18:
+12 |   let check_assign lvaluet rvaluet err =
+           ^^^^^^^^^^^^
+Warning 26 [unused-var]: unused variable check_assign.
+File "semant.ml", line 17, characters 6-13:
+17 |   let symbols = List.fold_left (fun m (ty, name) -> StringMap.add name ty m)
+           ^^^^^^^
+Warning 26 [unused-var]: unused variable symbols.
+File "semant.ml", line 40, characters 6-28:
+40 |     | Binop(e1, op, e2) as e -> 
+           ^^^^^^^^^^^^^^^^^^^^^^
+Warning 26 [unused-var]: unused variable e.
+# Target: AHOD.cmx, tags: { package(llvm), package(llvm.analysis), warn(+a-4), compile, extension:cmx, extension:ml, file:AHOD.cmx, file:AHOD.ml, implem, native, ocaml, quiet, traverse }
+ocamlfind ocamlopt -c -w +a-4 -package llvm -package llvm.analysis -o AHOD.cmx AHOD.ml
+# Target: AHOD.native, tags: { package(llvm), package(llvm.analysis), warn(+a-4), dont_link_with, extension:native, file:AHOD.native, link, native, ocaml, program, quiet, traverse }
+ocamlfind ocamlopt -linkpkg -package llvm -package llvm.analysis ast.cmx sast.cmx codegen.cmx parse.cmx scanner.cmx semant.cmx AHOD.cmx -o AHOD.native
+# Compilation successful.

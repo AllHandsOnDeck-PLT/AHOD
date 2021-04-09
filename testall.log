@@ -1,0 +1,58 @@
+/usr/local/opt/llvm/bin/lli
+
+###### Testing test-assign
+./AHOD.native tests/test-assign.ah > test-assign.ll
+Fatal error: exception Stdlib.Parsing.Parse_error
+###### FAILED
+
+###### Testing test-binop
+./AHOD.native tests/test-binop.ah > test-binop.ll
+llc -relocation-model=pic test-binop.ll > test-binop.s
+cc -o test-binop.exe test-binop.s
+./test-binop.exe
+diff -b test-binop.out tests/test-binop.out > test-binop.diff
+###### SUCCESS
+
+###### Testing test-helloworld
+./AHOD.native tests/test-helloworld.ah > test-helloworld.ll
+llc -relocation-model=pic test-helloworld.ll > test-helloworld.s
+cc -o test-helloworld.exe test-helloworld.s
+./test-helloworld.exe
+diff -b test-helloworld.out tests/test-helloworld.out > test-helloworld.diff
+###### SUCCESS
+
+###### Testing test-if-else
+./AHOD.native tests/test-if-else.ah > test-if-else.ll
+llc -relocation-model=pic test-if-else.ll > test-if-else.s
+cc -o test-if-else.exe test-if-else.s
+./test-if-else.exe
+diff -b test-if-else.out tests/test-if-else.out > test-if-else.diff
+###### SUCCESS
+
+###### Testing test-if
+./AHOD.native tests/test-if.ah > test-if.ll
+llc -relocation-model=pic test-if.ll > test-if.s
+cc -o test-if.exe test-if.s
+./test-if.exe
+diff -b test-if.out tests/test-if.out > test-if.diff
+###### SUCCESS
+
+###### Testing test-printint
+./AHOD.native tests/test-printint.ah > test-printint.ll
+llc -relocation-model=pic test-printint.ll > test-printint.s
+cc -o test-printint.exe test-printint.s
+./test-printint.exe
+diff -b test-printint.out tests/test-printint.out > test-printint.diff
+###### SUCCESS
+
+###### Testing test-while1
+./AHOD.native tests/test-while1.ah > test-while1.ll
+Fatal error: exception Stdlib.Parsing.Parse_error
+###### FAILED
+
+###### Testing fail-*
+./AHOD.native < tests/fail-*.ah 2> fail-*.err >> testall.log
+./testall.sh: line 73: tests/fail-*.ah: No such file or directory
+diff -b fail-*.err tests/fail-*.err > fail-*.diff
+FAILED fail-*.err differs from tests/fail-*.err
+###### FAILED

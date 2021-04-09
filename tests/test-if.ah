@@ -1,8 +1,7 @@
 main:
 {
     if 3<5 :
-
-    {   do PRINT("true")
+    {  
+    do PRINT("true")
     }
-    
 }

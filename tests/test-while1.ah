@@ -1,0 +1,9 @@
+main:
+{
+    while 3>5:
+    {
+    do PRINT("true")
+    }
+
+    do PRINT("false")
+}
