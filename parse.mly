@@ -37,7 +37,7 @@ let trd (_,_,c) = c;;
 %%
 
 program:
-    main_decl decls EOF { ($1, fst $2, snd $2) }
+    decls main_decl EOF { (fst $1, snd $1, $2) }
 
 action_decl:
     WHEN DO ACTIONID LPAREN params_list RPAREN COLON stmt_block          

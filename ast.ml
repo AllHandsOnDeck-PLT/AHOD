@@ -23,7 +23,6 @@ type stmt =
   | If of expr * stmt * stmt 
   | For of string * expr * stmt 
   | While of expr * stmt
-  | Noexpr
 
 type action_decl = {
   entitytyp : typ;
@@ -33,7 +32,7 @@ type action_decl = {
   abody: stmt;
 }
 
-type program = stmt  * bind list * action_decl list 
+type program = bind list * action_decl list * stmt
 
 let string_of_typ = function
     Int -> "int"
