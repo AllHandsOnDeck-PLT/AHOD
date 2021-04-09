@@ -52,15 +52,6 @@ decls:
     | decls action_decl { (fst $1, List.rev ($2::snd $1)) }
 */
  
-action_decl:
-    WHEN DO ACTIONID LPAREN params_list RPAREN COLON stmt_block          
-    {{ 
-      entitytyp = None;
-      entityid = "";
-      aname = $3;
-      aparams = $5;
-      abody = $8 }}
-
 global_decl:
     typ ID NEWLINE { ($1, $2) }
     
@@ -90,9 +81,6 @@ action_decl:
       aparams = $5;
       abody = $8 }}
 
-global_decl:
-    typ ID NEWLINE { ($1, $2) }
-
 class_block:
     NEWLINE LBRACE NEWLINE class_decl_list RBRACE NEWLINE { $4 }
 
@@ -104,13 +92,6 @@ class_decl_list:
   /*
   | attr_decl                       { [$1] }
   | class_decl_list attr_decl       { List.rev ($2::$1) }*/
-
-params_list:
-    param                        { [$1] } 
-    | params_list COMMA param      { $3::$1 }
-
-param:
-      typ ID                       { $1, $2 }
 
 attr_decl:
     | typ ID COLON expr NEWLINE { OneAdecl($1, $2, $4)}
