@@ -66,8 +66,7 @@ rule token = parse
 | ['-']? (digits '.'  digit* ( ['e' 'E'] ['+' '-']? digits )?) as lxm { FLIT(lxm) }
 (*| [('"' _* '"') (''' _* ''')] as  lxm { SLIT(lxm) }*)
 
-| '"' (['a'-'z' 'A'-'Z']* as lxm) '"' { SLIT(lxm) }
-
+| '"' (['a'-'z' 'A'-'Z' '0'-'9']* as lxm) '"' { SLIT(lxm) }
 
 (*| '"' [' '-'!' '#'-'&' '('-'[' ']'-'~' 't' 'r' 'n' '\'' '"' '\\']* as lxm '"' { SLIT(lxm) }*)
 (* how to represent single apostrophe?*)
@@ -80,12 +79,3 @@ rule token = parse
 and comment = parse
   '\n' { token lexbuf }
 | _    { comment lexbuf }
-
-(* THINGS TO IMPLEMENT
-- String Literals
-- Figure out if other "ID"s are needed i.e. other IDs in general..?
-  - Class ID: Start w/ capital, everything else lower. Doesn't have under_score
-- Should have a series literal i.e. []
-  - This detection may be specified in the AST
-
-*)

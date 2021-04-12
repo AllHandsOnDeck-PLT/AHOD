@@ -26,7 +26,7 @@ let check (globals, action_decls, main_stmt) =
 
 	let rec check_expr = function
 		(*need to figure out typ, if name is defined*)
-		  ActionCall(aname, aparams) -> (String, SActionCall(aname, List.map check_expr aparams))
+		| ActionCall(aname, aparams) -> (String, SActionCall(aname, List.map check_expr aparams))
 		| Sliteral s -> (String, SSliteral(s))
 		| Iliteral i -> (Int, SIliteral(i))
 		| Fliteral f -> (Float, SFliteral(f))
@@ -55,7 +55,12 @@ let check (globals, action_decls, main_stmt) =
           | _ -> raise (
         Failure ("illegal binary operator " ))
           in (ty, SBinop((t1, e1'), op, (t2, e2')))
-
+    | Seriesliteral vals ->
+         let (t', _) = check_expr (List.hd vals) in
+         let map_func lit = check_expr lit in
+         let vals' = List.map map_func vals in
+         (* TODO: check that all vals are of the same type *)
+         (List t', SSeriesliteral(t', vals'))
 	in
 
 	let rec check_stmt = function
