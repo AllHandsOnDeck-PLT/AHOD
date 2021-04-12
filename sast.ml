@@ -7,6 +7,7 @@ and sx =
   | SFliteral of string
   | SBliteral of bool
   | SSliteral of string
+  | SSeriesliteral of typ * sexpr list
   | SActionCall of string * sexpr list
   | SId of string
   | SAssign of string * sexpr
