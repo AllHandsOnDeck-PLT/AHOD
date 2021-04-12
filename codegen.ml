@@ -90,11 +90,6 @@ let local_vars =
 
 let printf_t : L.lltype = 
       L.var_arg_function_type i32_t [| L.pointer_type i8_t |] in
-<<<<<<< HEAD
-  let printf_func : L.llvalue = 
-      L.declare_function "printf" printf_t the_module in
-
-=======
 let printf_func : L.llvalue = 
     L.declare_function "printf" printf_t the_module in
   
@@ -135,7 +130,6 @@ let list_push : L.llvalue StringMap.t =
     let _ = L.build_ret_void build in
     StringMap.add def_name def m in 
 List.fold_left list_push_ty StringMap.empty [ A.Bool; A.Int; A.Float; A.String ] in
->>>>>>> series
 
 let rec expr builder ((_, e) : sexpr) = match e with
 	SSliteral s -> L.define_global "str" (L.const_stringz context s) the_module
