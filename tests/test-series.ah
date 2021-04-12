@@ -1,6 +1,7 @@
+series<int> a
 main:
   {
-    do PRINT(1)
-  	do PRINT([1])
+    a = [1]
+  	do PRINT(1)
   }
   

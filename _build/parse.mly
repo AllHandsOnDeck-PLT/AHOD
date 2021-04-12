@@ -7,7 +7,7 @@ let trd (_,_,c) = c;;
 
 %}
 
-%token LPAREN RPAREN LBRACE RBRACE LSQUARE RSQUARE COLON COMMA PLUS MINUS MULT DIVIDE ASSIGN MOD POWER FLOOR DOT DOTDOT DOTDOTDOT NEWLINE
+%token LPAREN RPAREN LBRACE RBRACE LSQUARE RSQUARE SERIESADD SERIES COLON COMMA PLUS MINUS MULT DIVIDE ASSIGN MOD POWER FLOOR DOT DOTDOT DOTDOTDOT NEWLINE
 %token NOT EQ NEQ LT LEQ GT GEQ AND OR IN
 %token RETURN IF ELIF ELSE FOR WHILE INT BOOL FLOAT NONE STRING RANGE WHEN DO EXTERNAL LET BE WITH PASS MAIN TIMES CONST
 %token <int> ILIT
@@ -80,7 +80,8 @@ stmt:
     | RETURN expr_opt NEWLINE               { Return $2 }
     | if_stmt                               { $1 }
     | FOR ID IN expr COLON stmt_block       { For($2, $4, $6) } 
-    | WHILE expr COLON stmt_block          { While($2, $4) } 
+    | WHILE expr COLON stmt_block           { While($2, $4) } 
+    | ID DOT SERIESADD LPAREN expr RPAREN   { SeriesAdd($1, $5)}
 
 if_stmt:
     | IF expr COLON stmt_block elif_stmt        { If($2, $4, $5) }
@@ -98,10 +99,12 @@ else_block:
       ELSE COLON stmt_block     { $3 }
 
 typ:
-    | INT               { Int    }
-    | BOOL              { Bool   }
-    | FLOAT             { Float  }
-    | NONE              { None   }
+    | INT               { Int       }
+    | BOOL              { Bool      }
+    | FLOAT             { Float     }
+    | STRING            { String    }
+    | NONE              { None      }
+    | SERIES LT typ GT  { Series($3)}
 
 expr:
     | call_action                    { $1 } 
@@ -110,6 +113,7 @@ expr:
     | BLIT                           { Bliteral($1) } 
     | SLIT 	                         { Sliteral($1) }
     | LSQUARE args_list_opt RSQUARE  { Seriesliteral($2) }
+    | ID LSQUARE expr RSQUARE        { SeriesGet($1, $3) }
     | ID                             { Id($1) } 
     | ID ASSIGN expr                 { Assign($1, $3) }
     | expr PLUS   expr               { Binop($1, Add,     $3) } 
@@ -124,7 +128,6 @@ expr:
     | expr LEQ    expr               { Binop($1, Leq,     $3) }
     | expr GT     expr               { Binop($1, Greater, $3) }
     | expr GEQ    expr               { Binop($1, Geq,     $3) }
-    
 
 args_list_opt:
     /*nothing */                  { [] }
@@ -135,12 +138,8 @@ args_list:
     | args_list COMMA expr          { $3 :: $1 }
 
 call_action:
-<<<<<<< HEAD
     | DO ACTIONID LPAREN args_list_opt RPAREN        { ActionCall($2, $4) }
 
 expr_opt:
     /* nothing */      { Noexpr }
     | expr             { $1 }
-=======
-    | DO ACTIONID LPAREN args_list_opt RPAREN        { ActionCall($2, $4) } 
->>>>>>> series

@@ -29,7 +29,7 @@ let translate (globals, action_decls, main_stmt) =
     | A.Float -> float_t
     | A.String -> string_t
     | A.None -> void_t
-    | A.List t -> list_t (ltype_of_typ t)
+    | A.Series t -> list_t (ltype_of_typ t)
     in
     let type_str t = match t with
         A.Int -> "int"
@@ -93,7 +93,7 @@ let printf_t : L.lltype =
 let printf_func : L.llvalue = 
     L.declare_function "printf" printf_t the_module in
   
-let init_list builder list_ptr list_type = 
+let init_series builder list_ptr list_type = 
   (* initialize size to 0 *)
   let sizePtrPtr = L.build_struct_gep list_ptr 0 "list_size_ptr" builder in 
       let sizePtr = L.build_alloca i32_t "list_size" builder in
@@ -106,11 +106,11 @@ let init_list builder list_ptr list_type =
     ignore(L.build_store p list_array_ptr builder);
 in
 
-let list_push : L.llvalue StringMap.t = 
-  let list_push_ty m typ =
+let series_add : L.llvalue StringMap.t = 
+  let series_add_ty m typ =
     let ltype = (ltype_of_typ typ) in 
     let def_name = (type_str typ) in
-    let def = L.define_function ("list_push" ^ def_name) (L.function_type void_t [| L.pointer_type (list_t ltype); ltype |]) the_module in
+    let def = L.define_function ("series_add" ^ def_name) (L.function_type void_t [| L.pointer_type (list_t ltype); ltype |]) the_module in
     let build = L.builder_at_end context (L.entry_block def) in
     let list_ptr = L.build_alloca (L.pointer_type (list_t ltype)) "list_ptr_alloc" build in
     ignore(L.build_store (L.param def 0) list_ptr build);
@@ -129,7 +129,27 @@ let list_push : L.llvalue StringMap.t =
     let _ = L.build_store (L.build_load valPtr "val" build) next_element_ptr build in
     let _ = L.build_ret_void build in
     StringMap.add def_name def m in 
-List.fold_left list_push_ty StringMap.empty [ A.Bool; A.Int; A.Float; A.String ] in
+List.fold_left series_add_ty StringMap.empty [ A.Bool; A.Int; A.Float; A.String ] in
+
+let series_get : L.llvalue StringMap.t = 
+  let series_get_ty m typ = 
+      let ltype = (ltype_of_typ typ) in 
+      let def_name = (type_str typ) in
+      let def = L.define_function ("series_get" ^ def_name) (L.function_type ltype [| L.pointer_type (list_t ltype); i32_t |]) the_module in
+      let build = L.builder_at_end context (L.entry_block def) in
+      let list_ptr = L.build_alloca (L.pointer_type (list_t ltype)) "list_ptr_alloc" build in
+      let _ = L.build_store (L.param def 0) list_ptr build in
+      let idx_ptr = L.build_alloca i32_t "idx_alloc" build in
+      let _ = L.build_store (L.param def 1) idx_ptr build in
+      let list_load = L.build_load list_ptr "list_load" build in
+      let list_array_ptr = L.build_struct_gep list_load 1 "list_array_ptr" build in
+      let list_array_load = L.build_load list_array_ptr "array_load" build in
+      let idx = L.build_load idx_ptr "idx_load" build in
+      let list_array_element_ptr = L.build_gep list_array_load [| idx |] "list_arry_element_ptr" build in
+      let element_val = L.build_load list_array_element_ptr "list_array_element_ptr" build in
+      let _ = L.build_ret element_val build in
+      StringMap.add def_name def m in
+List.fold_left series_get_ty StringMap.empty [ A.Bool; A.Int; A.Float; A.String ] in
 
 let rec expr builder ((_, e) : sexpr) = match e with
 	SSliteral s -> L.define_global "str" (L.const_stringz context s) the_module
@@ -137,6 +157,7 @@ let rec expr builder ((_, e) : sexpr) = match e with
 	| SIliteral i -> L.const_int i32_t i 
   | SFliteral f -> L.const_float_of_string float_t f
   | SId s       -> L.build_load (lookup s) s builder
+  | SNoexpr     -> L.const_int i32_t 0
   | SAssign (s, e) -> let e' = expr builder e in
                           ignore(L.build_store e' (lookup s) builder); e'
 	| SActionCall("PRINT", [e]) ->
@@ -186,13 +207,16 @@ let rec expr builder ((_, e) : sexpr) = match e with
     ) e1' e2' "tmp" builder
   | SSeriesliteral (list_type, literals) ->
     let ltype = (ltype_of_typ list_type) in
-    let new_list_ptr = L.build_alloca (list_t ltype) "new_list_ptr" builder in
-    let _ = init_list builder new_list_ptr list_type in
+    L.build_alloca (list_t ltype) "new_series_ptr" builder (*error caused here *)
+    (* let new_list_ptr = L.build_alloca (list_t ltype) "new_series_ptr" builder in
+    let _ = init_series builder new_list_ptr list_type in
     let map_func literal = 
-       ignore(L.build_call (StringMap.find (type_str list_type) list_push) [| new_list_ptr; (expr builder literal) |] "" builder);
+       ignore(L.build_call (StringMap.find (type_str list_type) series_add) [| new_list_ptr; (expr builder literal) |] "" builder);
     in
     let _ = List.rev (List.map map_func literals) in
-    L.build_load new_list_ptr "new_list" builder
+    L.build_load new_list_ptr "new_series" builder *)
+  | SSeriesGet (list_type, id, e) ->
+      L.build_call (StringMap.find (type_str list_type) series_get) [| (lookup id); (expr builder e) |] "series_get" builder
 		
 in
 
@@ -208,6 +232,8 @@ in
 let rec stmt builder = function
 	| SBlock stmt_list -> List.fold_left stmt builder stmt_list 
   | SExpr e -> ignore(expr builder e); builder
+  | SSeriesAdd (id, e) -> 
+      ignore(L.build_call (StringMap.find (type_str (fst e)) series_add) [| (lookup id); (expr builder e) |] "" builder); builder 
   | SIf (predicate, then_stmt, else_stmt) ->
     let bool_val = expr builder predicate in
     let merge_bb = L.append_block context "merge" main_func in
@@ -222,21 +248,21 @@ let rec stmt builder = function
         build_br_merge;
     ignore(L.build_cond_br bool_val then_bb else_bb builder);
     L.builder_at_end context merge_bb
-    | SWhile (predicate, body) ->
-      let pred_bb = L.append_block context "while" main_func in
-      ignore(L.build_br pred_bb builder);
-  
-      let body_bb = L.append_block context "while_body" main_func in
-      add_terminal (stmt (L.builder_at_end context body_bb) body)
-        (L.build_br pred_bb);
-  
-      let pred_builder = L.builder_at_end context pred_bb in
-      let bool_val = expr pred_builder predicate in
-  
-      let merge_bb = L.append_block context "merge" main_func in
-      ignore(L.build_cond_br bool_val body_bb merge_bb pred_builder);
-      L.builder_at_end context merge_bb
-    
+  | SWhile (predicate, body) ->
+    let pred_bb = L.append_block context "while" main_func in
+    ignore(L.build_br pred_bb builder);
+
+    let body_bb = L.append_block context "while_body" main_func in
+    add_terminal (stmt (L.builder_at_end context body_bb) body)
+      (L.build_br pred_bb);
+
+    let pred_builder = L.builder_at_end context pred_bb in
+    let bool_val = expr pred_builder predicate in
+
+    let merge_bb = L.append_block context "merge" main_func in
+    ignore(L.build_cond_br bool_val body_bb merge_bb pred_builder);
+    L.builder_at_end context merge_bb
+
    (*) (* Implement for loops as while loops *)
     | SFor (e1, e2, e3, body) -> stmt builder
     ( SBlock [SExpr e1 ; SWhile (e2, SBlock [body ; SExpr e3]) ] )*)

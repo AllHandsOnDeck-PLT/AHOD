@@ -1,7 +1,7 @@
 type op = Add | Sub | Mult | Div | Equal | Neq | Less | Leq | Greater | Geq |
           And | Or | Mod
 
-type typ = Int | Float | Bool | String | None | List of typ
+type typ = Int | Float | Bool | String | None | Series of typ
 
 type bind = typ * string
 
@@ -14,7 +14,8 @@ type expr =
   | ActionCall of string * expr list
   | Id of string
   | Assign of string * expr
-  | Binop of expr * op * expr
+  | Binop of expr * op * expr (*need to add binop*)
+  | SeriesGet of string * expr
   | Noexpr
 
   type stmt =
@@ -24,6 +25,8 @@ type expr =
     | If of expr * stmt * stmt 
     | For of string * expr * stmt 
     | While of expr * stmt
+    | SeriesAdd of string * expr 
+
 type action_decl = {
   entitytyp : typ;
   entityid : string;
@@ -33,12 +36,6 @@ type action_decl = {
 }
 
 type program = bind list * action_decl list * stmt
-
-let string_of_typ = function
-    Int -> "int"
-  | Bool -> "bool"
-  | Float -> "float"
-  | String -> "string"
 
 (*  Pretty-printing functions *)
 let string_of_op = function
@@ -55,3 +52,27 @@ let string_of_op = function
   | And -> "and"
   | Or -> "or"
   | Mod -> "%"
+
+let rec string_of_typ = function
+    Int -> "int"
+  | Bool -> "bool"
+  | Float -> "float"
+  | String -> "string"
+  | None -> "none"
+  | Series x -> "series<" ^ (string_of_typ x) ^ ">"
+
+let rec string_of_expr = function
+    Iliteral(l) -> string_of_int l
+  | Fliteral(l) -> l
+  | Bliteral(true) -> "true"
+  | Bliteral(false) -> "false"
+  | Sliteral(l) -> l
+  | SeriesGet(id, e) ->  id ^ "[" ^ (string_of_expr e) ^ "]"
+  | Seriesliteral(_) -> "series_literal"
+  | Id(s) -> s
+  | Binop(e1, o, e2) ->
+      string_of_expr e1 ^ " " ^ string_of_op o ^ " " ^ string_of_expr e2
+  | Assign(v, e) -> v ^ " = " ^ string_of_expr e
+  | ActionCall(f, el) ->
+    "do " ^ f ^ "(" ^ String.concat ", " (List.map string_of_expr el) ^ ")"
+  | Noexpr -> ""
