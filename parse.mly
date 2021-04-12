@@ -135,12 +135,8 @@ args_list:
     | args_list COMMA expr          { $3 :: $1 }
 
 call_action:
-<<<<<<< HEAD
     | DO ACTIONID LPAREN args_list_opt RPAREN        { ActionCall($2, $4) }
 
 expr_opt:
     /* nothing */      { Noexpr }
     | expr             { $1 }
-=======
-    | DO ACTIONID LPAREN args_list_opt RPAREN        { ActionCall($2, $4) } 
->>>>>>> series

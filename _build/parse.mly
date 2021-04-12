@@ -104,26 +104,26 @@ typ:
     | NONE              { None   }
 
 expr:
-    | call_action      { $1 } 
-    | ILIT             { Iliteral($1) } 
-    | FLIT             { Fliteral($1) } 
-    | BLIT             { Bliteral($1) } 
-    | SLIT 	           { Sliteral($1) }
-    | ID               { Id($1) } 
-    | ID ASSIGN expr   { Assign($1, $3) }
-    | expr PLUS   expr { Binop($1, Add,     $3) } 
-    | expr MINUS  expr { Binop($1, Sub,     $3) }
-    | expr MULT   expr { Binop($1, Mult,    $3) }
-    | expr DIVIDE expr { Binop($1, Div,     $3) }
-    | expr AND    expr { Binop($1, And,     $3) }
-    | expr OR     expr { Binop($1, Or,      $3) }
-
-    | expr EQ     expr { Binop($1, Equal,   $3) }
-    | expr NEQ    expr { Binop($1, Neq,   $3) }
-    | expr LT     expr { Binop($1, Less,    $3) }
-    | expr LEQ    expr { Binop($1, Leq,     $3) }
-    | expr GT     expr { Binop($1, Greater, $3) }
-    | expr GEQ    expr { Binop($1, Geq,     $3) }
+    | call_action                    { $1 } 
+    | ILIT                           { Iliteral($1) } 
+    | FLIT                           { Fliteral($1) } 
+    | BLIT                           { Bliteral($1) } 
+    | SLIT 	                         { Sliteral($1) }
+    | LSQUARE args_list_opt RSQUARE  { Seriesliteral($2) }
+    | ID                             { Id($1) } 
+    | ID ASSIGN expr                 { Assign($1, $3) }
+    | expr PLUS   expr               { Binop($1, Add,     $3) } 
+    | expr MINUS  expr               { Binop($1, Sub,     $3) }
+    | expr MULT   expr               { Binop($1, Mult,    $3) }
+    | expr DIVIDE expr               { Binop($1, Div,     $3) }
+    | expr AND    expr               { Binop($1, And,     $3) }
+    | expr OR     expr               { Binop($1, Or,      $3) }
+    | expr EQ     expr               { Binop($1, Equal,   $3) }
+    | expr NEQ    expr               { Binop($1, Neq,   $3) }
+    | expr LT     expr               { Binop($1, Less,    $3) }
+    | expr LEQ    expr               { Binop($1, Leq,     $3) }
+    | expr GT     expr               { Binop($1, Greater, $3) }
+    | expr GEQ    expr               { Binop($1, Geq,     $3) }
     
 
 args_list_opt:
@@ -135,8 +135,12 @@ args_list:
     | args_list COMMA expr          { $3 :: $1 }
 
 call_action:
+<<<<<<< HEAD
     | DO ACTIONID LPAREN args_list_opt RPAREN        { ActionCall($2, $4) }
 
 expr_opt:
     /* nothing */      { Noexpr }
     | expr             { $1 }
+=======
+    | DO ACTIONID LPAREN args_list_opt RPAREN        { ActionCall($2, $4) } 
+>>>>>>> series
