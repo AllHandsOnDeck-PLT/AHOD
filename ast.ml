@@ -40,6 +40,7 @@ type action_decl = {
   entitytyp : typ;
   entityid : string;
   aname : string;
+  typ : typ; 
   aparams : bind list;
   abody: stmt;
 }
@@ -51,7 +52,8 @@ type class_decl = {
   attributes : attr_decl list;
 }
 
-type program = bind list * class_decl list * stmt
+(* type program = bind list * class_decl list * stmt *)
+type program = bind list * action_decl list * stmt
 
 let string_of_typ = function
     Int -> "int"

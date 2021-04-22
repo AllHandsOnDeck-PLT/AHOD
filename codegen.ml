@@ -45,6 +45,16 @@ in
         | _ -> L.const_int (ltype_of_typ t) 0
       in StringMap.add n (L.define_global n init the_module) m in
     List.fold_left global_var StringMap.empty globals in
+(*Define action (just with arguments)*)
+(* let action_decls : (L.llvalue * saction_decl) StringMap.t = 
+  let action_decl m adecl = 
+    let name = adecl.saname 
+    and param_types = 
+Array.of_list (List.map (fun (t,_) -> ltype_of_typ t) adecl.saparams)
+  in let atype = L.function_type (ltype_of_typ None) param_types in (*actually pass in adecl.satyp*)
+  StringMap.add name (L.define_function name atype the_module, adecl) m in
+List.fold_left action_decl StringMap.empty action_decls in *)
+
 
 let main_func = 
 	let ftype = L.function_type i32_t [| |]

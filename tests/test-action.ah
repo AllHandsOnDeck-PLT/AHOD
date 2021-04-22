@@ -1,0 +1,10 @@
+int x
+when do PLAY():
+  {
+  	do PRINT("no params from this action")
+  }
+main:
+  {
+  do PLAY()
+  }
+

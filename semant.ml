@@ -16,7 +16,7 @@ will always return particular information for type
 built in struct, generate and try to access that 
 *)
 
-let check (globals, class_decls, main_stmt) =
+let check (globals, action_decls, main_stmt) = (*changed from class_decls to action_decls*)
 
   (**** Check global variables ****)
 
@@ -80,7 +80,7 @@ let check (globals, class_decls, main_stmt) =
     in
 
 (*(check_stmt main_stmt, list.map check_func action_decl) *)
-
-	(globals, [], check_stmt main_stmt)
+(globals, action_decls, check_stmt main_stmt)
+	(* (globals, [], check_stmt main_stmt) <- in case w/classes*)
 
 

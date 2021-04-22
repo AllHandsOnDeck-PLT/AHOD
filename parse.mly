@@ -9,7 +9,7 @@ let trd (_,_,c) = c;;
 
 %token LPAREN RPAREN LBRACE RBRACE LSQUARE RSQUARE COLON COMMA PLUS MINUS MULT DIVIDE ASSIGN MOD POWER FLOOR DOT DOTDOT DOTDOTDOT NEWLINE
 %token NOT EQ NEQ LT LEQ GT GEQ AND OR IN
-%token RETURN IF ELIF ELSE FOR WHILE INT BOOL FLOAT NONE STRING RANGE WHEN DO EXTERNAL LET BE WITH PASS MAIN TIMES CONST
+%token RETURN IF ELIF ELSE FOR WHILE INT BOOL FLOAT NONE STRING RANGE WHEN DO WHENDO EXTERNAL LET BE WITH PASS MAIN TIMES CONST
 %token <int> ILIT
 %token <bool> BLIT
 %token <string> ID ACTIONID CLASSID FLIT SLIT
@@ -43,7 +43,9 @@ program:
 decls:
     /*nothing*/      { ([], []) }
     | decls global_decl  { (List.rev ($2::fst $1), snd $1) }
-    | decls class_decl { (fst $1, List.rev ($2::snd $1)) }
+    // | decls class_decl { (fst $1, List.rev ($2::snd $1)) }
+    | decls action_decl { (fst $1, List.rev ($2::snd $1)) }
+
 
 /*decls:
      nothing      { ([], []) }
@@ -73,13 +75,25 @@ class_decl:
       attributes = $8 }}*/
 
 action_decl: 
-    WHEN DO ACTIONID LPAREN params_list RPAREN COLON stmt_block          
+    WHEN DO ACTIONID LPAREN params_list_opt RPAREN COLON stmt_block     
     {{ 
       entitytyp = None;
       entityid = "";
       aname = $3;
-      aparams = $5;
+      typ = None;
+      aparams = $5 ; 
       abody = $8 }}
+// Block([]) 
+// action_decl: 
+//     WHENDO ACTIONID LPAREN params_list RPAREN COLON stmt_block          
+//     {{ 
+//       entitytyp = None;
+//       entityid = "";
+//       aname = $2;
+//       typ = None;
+//       aparams = $4;
+//       abody = $7 }}
+      
 /*add locals into action _decl and main */
 class_block:
     NEWLINE LBRACE NEWLINE class_decl_list RBRACE NEWLINE { $4 }
@@ -95,6 +109,10 @@ class_decl_list:
 
 attr_decl:
     | typ ID COLON expr NEWLINE { OneAdecl($1, $2, $4)}
+params_list_opt: 
+    |params_list    {$1}
+    | /*Nothing*/   {[]}
+
 
 params_list:
     param                        { [$1] } 

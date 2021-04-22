@@ -31,6 +31,7 @@ type saction_decl = {
   sentitytyp : typ;
   sentityid : string;
   saname : string;
+  satyp : typ; 
   saparams : bind list;
   sabody: sstmt;
 }
@@ -42,4 +43,5 @@ type sclass_decl = {
   sattributes : sattr_decl list;
 }
 
-type sprogram = bind list * sclass_decl list * sstmt 
+(* type sprogram = bind list * sclass_decl list * sstmt  *)
+type sprogram = bind list * saction_decl list * sstmt 
