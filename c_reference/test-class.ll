@@ -11,12 +11,16 @@ target triple = "x86_64-pc-linux-gnu"
 ; Function Attrs: noinline nounwind optnone uwtable
 define dso_local i32 @main() #0 {
   %1 = alloca i32, align 4
-  %2 = alloca %struct.Player, align 8
+  %2 = alloca %struct.Player, align 8 (* allocated on the stack for automatic variables *)
   store i32 0, i32* %1, align 4
-  %3 = getelementptr inbounds %struct.Player, %struct.Player* %2, i32 0, i32 0
+
+
+  %3 = getelementptr inbounds %struct.Player, %struct.Player* %2, i32 0, i32 0 (*correspond to ln 12*)
   store i8* getelementptr inbounds ([4 x i8], [4 x i8]* @.str, i64 0, i64 0), i8** %3, align 8
-  %4 = getelementptr inbounds %struct.Player, %struct.Player* %2, i32 0, i32 1
+  
+  %4 = getelementptr inbounds %struct.Player, %struct.Player* %2, i32 0, i32 1 (*1: field 1 of the struct *)
   store i32 1, i32* %4, align 8
+  
   %5 = getelementptr inbounds %struct.Player, %struct.Player* %2, i32 0, i32 0
   %6 = load i8*, i8** %5, align 8
   %7 = getelementptr inbounds %struct.Player, %struct.Player* %2, i32 0, i32 1

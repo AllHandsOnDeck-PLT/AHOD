@@ -19,7 +19,13 @@ let translate (globals, action_decls, main_stmt) =
 	 and i1_t       = L.i1_type     context
 	 and float_t    = L.double_type context
 	 and string_t   = L.pointer_type (L.i8_type context)
+   and none_t     = L.void_type context  
+  (*rather than storing type specifically, add to StringMap*)
+
    (*and class_t = L.struct_type context [|L.pointer_type i8_t; L.i32_type context |]*)
+  (* add definition uf classes [for user defined classes] that would also work for our built in ones*)
+  (* note: ltype_oftyp AST type, what ll type should you get. For typ of class, what does that type look like, 
+  pull out of StringMap, get struct type that you get for that*)
 
   in
 
@@ -28,6 +34,8 @@ let ltype_of_typ = function
 	| A.Bool  -> i1_t
 	| A.Float -> float_t
   | A.String -> string_t
+  | A.None -> none_t 
+  (* with named class, ensure lookup from StringMap to get llvm type generated above*)
 in
 
  let global_vars : L.llvalue StringMap.t =

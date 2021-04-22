@@ -80,7 +80,7 @@ action_decl:
       aname = $3;
       aparams = $5;
       abody = $8 }}
-
+/*add locals into action _decl and main */
 class_block:
     NEWLINE LBRACE NEWLINE class_decl_list RBRACE NEWLINE { $4 }
 
