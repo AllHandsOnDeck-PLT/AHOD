@@ -39,6 +39,26 @@ let check_list_type id =
    | t -> raise (Failure ("check list type error, typ: " ^ string_of_typ t))
 in
 
+(* let add_action map ad = 
+  let built_in_err = "function " ^ ad.aname ^ " may not be defined"
+  and dup_err = "duplicate function " ^ ad.aname
+  and make_err er = raise (Failure er)
+  and n = ad.aname (* Name of the function *)
+  in match ad with (* No duplicate functions or redefinitions of built-ins *)
+       (* _ when StringMap.mem n built_in_decls -> make_err built_in_err *)
+     | _ when StringMap.mem n map -> make_err dup_err  
+     | _ ->  StringMap.add n ad map 
+in
+
+(* Collect all function names into one symbol table *)
+let action_decls_map = List.fold_left add_action action_decls (* built_in_decls*)
+in
+
+let find_act s = 
+  try StringMap.find s action_decls_map
+  with Not_found -> raise (Failure ("unrecognized action " ^ s))
+in *)
+
 let rec check_expr = function
   (*need to figure out typ, if name is defined*)
 		(* | ActionCall(aname, aparams) -> (String, SActionCall(aname, List.map check_expr aparams)) *)
@@ -123,10 +143,27 @@ let rec check_expr = function
   in  SBlock(List.map check_stmt sl)
 in
 
+let add_action map ad = 
+  let built_in_err = "action " ^ ad.aname ^ " may not be defined"
+  and dup_err = "duplicate action " ^ ad.aname
+  and make_err er = raise (Failure er)
+  and n = ad.aname (* Name of the function *)
+  in match ad with (* No duplicate functions or redefinitions of built-ins *)
+       (* _ when StringMap.mem n built_in_decls -> make_err built_in_err *)
+     | _ when StringMap.mem n map -> make_err dup_err  
+     | _ ->  StringMap.add n ad map 
+in
+
+(* Collect all function names into one symbol table *)
+let action_decls_map = List.fold_left add_action action_decls (* built_in_decls*)
+in
+
 let find_act s = 
-  try StringMap.find s action_decls
+  try StringMap.find s action_decls_map
   with Not_found -> raise (Failure ("unrecognized action " ^ s))
 in
+
+
 
   let check_action act =
       { sentitytyp = act.entitytyp;
