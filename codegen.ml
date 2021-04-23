@@ -274,7 +274,7 @@ in
       | None -> ignore (instr builder) in
 
 let rec stmt builder = function
-	| SBlock (bind_list,stmt_list) -> List.fold_left stmt builder stmt_list 
+	| SBlock (stmt_list) -> List.fold_left stmt builder stmt_list 
   | SExpr e -> ignore(expr builder e); builder
   | SSeriesAdd (id, e) -> 
       ignore(L.build_call (StringMap.find (type_str (fst e)) series_add) [| (lookup id); (expr builder e) |] "" builder); builder 
