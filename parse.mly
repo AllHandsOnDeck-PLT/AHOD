@@ -75,7 +75,7 @@ class_decl:
       attributes = $8 }}*/
 
 action_decl: 
-    WHEN DO typ ACTIONID LPAREN params_list_opt RPAREN COLON stmt     
+    WHEN DO typ ACTIONID LPAREN params_list_opt RPAREN COLON stmt_block      
     {{ 
       entitytyp = None;
       entityid = "";

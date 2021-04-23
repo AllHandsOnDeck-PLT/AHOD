@@ -33,7 +33,7 @@ type saction_decl = {
   saname : string;
   satyp : typ; 
   saparams : bind list;
-  sabody: sstmt;
+  sabody: sstmt list;
 }
 
 type sclass_decl = {

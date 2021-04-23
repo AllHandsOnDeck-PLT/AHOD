@@ -42,7 +42,7 @@ type action_decl = {
   aname : string;
   atyp : typ; 
   aparams : bind list;
-  abody: stmt;
+  abody: stmt list;
 }
 
 type class_decl = {
