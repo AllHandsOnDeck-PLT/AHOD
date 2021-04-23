@@ -1,8 +1,9 @@
 series<int> a
+int i
 main:
 {
     a = [1,2,3]
-    for  (i=0; i<2, i++):
+    for  (i=0; i<3; i = i+1):
     {
     do PRINT(a[i])
     }
