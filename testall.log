@@ -50,10 +50,11 @@ diff -b test-printint.out tests/test-printint.out > test-printint.diff
 
 ###### Testing test-series
 ./AHOD.native tests/test-series.ah > test-series.ll
-Stored value type does not match pointer operand type!
-  store { i32*, i32* }* %new_series_ptr, i5* @a
- i5LLVM ERROR: Broken module found, compilation aborted!
-###### FAILED
+llc -relocation-model=pic test-series.ll > test-series.s
+cc -o test-series.exe test-series.s
+./test-series.exe
+diff -b test-series.out tests/test-series.out > test-series.diff
+###### SUCCESS
 
 ###### Testing test-while1
 ./AHOD.native tests/test-while1.ah > test-while1.ll
