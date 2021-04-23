@@ -21,7 +21,8 @@ type stmt =
   | Expr of expr
   | Return of expr
   | If of expr * stmt * stmt 
-  | For of string * expr * stmt 
+  | For of expr * expr * expr * stmt
+  | ForLit of string * expr * stmt 
   | While of expr * stmt
 
 type action_decl = {

@@ -18,7 +18,8 @@ type sstmt =
   | SExpr of sexpr
   | SReturn of sexpr
   | SIf of sexpr * sstmt * sstmt 
-  | SFor of string * sexpr * sstmt 
+  | SFor of sexpr * sexpr * sexpr * sstmt
+  | SForLit of string * sexpr * sstmt 
   | SWhile of sexpr * sstmt
 
 type saction_decl = {

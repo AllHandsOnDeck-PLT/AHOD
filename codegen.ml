@@ -44,39 +44,41 @@ in
 
 let builder = L.builder_at_end context (L.entry_block main_func) in
 
-(* Construct the function's "locals": formal arguments and locally
-       declared variables.  Allocate each on the stack, initialize their
-       value, if appropriate, and remember their values in the "locals" map *)
 
-
-(*let local_vars : L.llvalue StringMap.t =
+(*
+let local_vars : L.llvalue StringMap.t =
 (* Function Locals *)
   let add_local m (t,n) =  
     let local_var = L.build_alloca (ltype_of_typ t) n builder in
-    StringMap.add n local m 
+    StringMap.add n local m  
  in*)
+
+
 
  (* Variable Lookup *)
  (*let lookup n m = StringMap.find n m
 in*)
 (*
 let local_vars =
-
       (* Allocate space for any locally declared variables and add the
        * resulting registers to our map *)
       let add_local m (t, n) =
   let local_var = L.build_alloca (ltype_of_typ t) n builder
   in StringMap.add n local_var m 
       in
-
       List.fold_left add_local formals fdecl.slocals 
     in
 *)
     (* Return the value for a variable or formal argument.
        Check local names first, then global names *)
-    let lookup n = StringMap.find n global_vars
-    in
+       
+       (*let lookup n = try StringMap.find n local_vars
+            with Not_found -> StringMap.find n global_vars
+       in*)
 
+       let lookup n = StringMap.find n global_vars
+       in
+  
 
 let printf_t : L.lltype = 
       L.var_arg_function_type i32_t [| L.pointer_type i8_t |] in
@@ -181,13 +183,13 @@ let rec stmt builder = function
       ignore(L.build_cond_br bool_val body_bb merge_bb pred_builder);
       L.builder_at_end context merge_bb
     
-   (*) (* Implement for loops as while loops *)
-    | SFor (e1, e2, e3, body) -> stmt builder
-    ( SBlock [SExpr e1 ; SWhile (e2, SBlock [body ; SExpr e3]) ] )*)
 
-
-
-in
+      (* Implement for loops as while loops *)
+      | SFor (e1, e2, e3, body) -> stmt builder
+      ( SBlock [SExpr e1 ; SWhile (e2, SBlock [body ; SExpr e3]) ] )
+      (*| SForLit ( e1, e2, body) -> stmt builder
+	    ( SBlock [SExpr e1 ; SWhile (e2, SBlock [body ; SExpr e]) ] )*)
+    in
 
 
 let builder = stmt builder main_stmt 

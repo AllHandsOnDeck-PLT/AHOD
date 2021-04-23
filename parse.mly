@@ -7,7 +7,7 @@ let trd (_,_,c) = c;;
 
 %}
 
-%token LPAREN RPAREN LBRACE RBRACE LSQUARE RSQUARE COLON COMMA PLUS MINUS MULT DIVIDE ASSIGN MOD POWER FLOOR DOT DOTDOT DOTDOTDOT NEWLINE
+%token LPAREN RPAREN LBRACE RBRACE LSQUARE RSQUARE COLON SEMI COMMA PLUS MINUS MULT DIVIDE ASSIGN MOD POWER FLOOR DOT DOTDOT DOTDOTDOT NEWLINE
 %token NOT EQ NEQ LT LEQ GT GEQ AND OR IN
 %token RETURN IF ELIF ELSE FOR WHILE INT BOOL FLOAT NONE STRING RANGE WHEN DO EXTERNAL LET BE WITH PASS MAIN TIMES CONST
 %token <int> ILIT
@@ -79,7 +79,8 @@ stmt:
     // | PASS NEWLINE                       { }
     | RETURN expr_opt NEWLINE               { Return $2 }
     | if_stmt                               { $1 }
-    | FOR ID IN expr COLON stmt_block       { For($2, $4, $6) } 
+    | FOR LPAREN expr SEMI expr SEMI expr RPAREN COLON stmt_block  { For($3, $5, $7, $10)   }
+    | FOR ID IN expr COLON stmt_block       { ForLit($2, $4, $6) } 
     | WHILE expr COLON stmt_block          { While($2, $4) } 
 
 if_stmt:
