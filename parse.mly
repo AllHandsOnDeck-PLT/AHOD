@@ -128,6 +128,9 @@ param:
 /*stmt_block:
     NEWLINE LBRACE NEWLINE locals_list stmt_list RBRACE NEWLINE              { Block(List.rev $4, List.rev $5) }
 */
+stmt_block:
+    NEWLINE LBRACE NEWLINE stmt_list RBRACE NEWLINE              { Block(List.rev $4) }
+
 
 locals_list:
     global_decl                           { [$1] }
@@ -138,8 +141,8 @@ stmt_list:
     | stmt_list stmt                         { $2 :: $1 }
 
 stmt:
-    /*| stmt_block                            { $1 }*/
-    NEWLINE LBRACE NEWLINE stmt_list RBRACE NEWLINE  { Block(List.rev $4) }
+    | stmt_block                            { $1 }
+    //| NEWLINE LBRACE NEWLINE stmt_list RBRACE NEWLINE  { Block(List.rev $4) }
     | expr NEWLINE                          { Expr $1 } 
     // | PASS NEWLINE                       { }
     | RETURN expr_opt NEWLINE               { Return $2 }
@@ -155,15 +158,15 @@ stmt:
     | ID DOT SERIESADD LPAREN expr RPAREN   { SeriesAdd($1, $5)}
 
 if_stmt:
-    | IF expr COLON stmt elif_stmt        { If($2, $4, $5) }
-    | IF expr COLON stmt else_block_opt   { If($2, $4, $5) }
+    | IF expr COLON stmt_block elif_stmt        { If($2, $4, $5) }
+    | IF expr COLON stmt_block else_block_opt   { If($2, $4, $5) }
     /*| IF expr COLON stmt_block elif_stmt        { If($2, $4, $5) }*/
     /*| IF expr COLON stmt_block else_block_opt   { If($2, $4, $5) }*/
 
 elif_stmt:
-    | ELIF expr COLON stmt elif_stmt          { If($2, $4, $5) }
-    | ELIF expr COLON stmt else_block         { If($2, $4, $5) }
-    | ELIF expr COLON stmt %prec NOELSE                   { If($2, $4, Block([])) }
+    | ELIF expr COLON stmt_block elif_stmt          { If($2, $4, $5) }
+    | ELIF expr COLON stmt_block else_block         { If($2, $4, $5) }
+    | ELIF expr COLON stmt_block %prec NOELSE                   { If($2, $4, Block([])) }
     /*| ELIF expr COLON stmt_block elif_stmt          { If($2, $4, $5) }*/
     /*| ELIF expr COLON stmt_block else_block_opt     { If($2, $4, $5) }*/
 
