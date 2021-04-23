@@ -14,9 +14,12 @@ rule token = parse
 | '}'      { RBRACE }
 | '['      { LSQUARE }
 | ']'      { RSQUARE }
+| "add"    { SERIESADD }
+| "series" { SERIES }
 (*| '<'      { LBRACK }*)
 (*| '>'      { RBRACK }*)
 | ':'      { COLON }
+| ';'      { SEMI }
 | ','      { COMMA }
 | '+'      { PLUS }
 | '-'      { MINUS }
@@ -59,14 +62,16 @@ rule token = parse
 | "float"  { FLOAT }
 | "None"   { NONE }
 | "external" { EXTERNAL }
-| "True"   { BLIT(true)  }
-| "False"  { BLIT(false) }
+| "true"   { BLIT(true)  }
+| "false"  { BLIT(false) }
 | "main"   { MAIN }
 | digits as lxm { ILIT(int_of_string lxm) }
 | ['-']? (digits '.'  digit* ( ['e' 'E'] ['+' '-']? digits )?) as lxm { FLIT(lxm) }
 (*| [('"' _* '"') (''' _* ''')] as  lxm { SLIT(lxm) }*)
 | '"' ([' '-'!' '#'-'&' '('-'[' ']'-'~' 'a'-'z'' ' 'A'-'Z' '0'-'9']* as lxm) '"' { SLIT(lxm) }
-
+(* | '"' (['a'-'z' 'A'-'Z' '0'-'9']* as lxm) '"' { SLIT(lxm) } *)
+(*| '"' [' '-'!' '#'-'&' '('-'[' ']'-'~' 't' 'r' 'n' '\'' '"' '\\']* as lxm '"' { SLIT(lxm) }*)
+(* how to represent single apostrophe?*)
 | ['a'-'z']['a'-'z' '0'-'9' '_']*                     as lxm { ID(lxm) } 
 | ['A'-'Z']['A'-'Z' '0'-'9' '_']*                     as actionID { ACTIONID(actionID) }
 | ['A'-'Z']['a'-'z' '0'-'9']*                     as classID { CLASSID(classID) } 
@@ -76,20 +81,3 @@ rule token = parse
 and comment = parse
   '\n' { token lexbuf }
 | _    { comment lexbuf }
-
-(*| '"' [' '-'!' '#'-'&' '('-'[' ']'-'~' 't' 'r' 'n' '\'' '"' '\\']* as lxm '"' { SLIT(lxm) }*)
-(* how to represent single apostrophe?*)
-(*| '"' [' '-'!' '#'-'&' '('-'[' ']'-'~' 't' 'r' 'n' '\'' '"' '\\']* as lxm '"' { SLIT(lxm) }*)
-(* how to represent single apostrophe?*)
-
-
-
-
-(* THINGS TO IMPLEMENT
-- String Literals
-- Figure out if other "ID"s are needed i.e. other IDs in general..?
-  - Class ID: Start w/ capital, everything else lower. Doesn't have under_score
-- Should have a series literal i.e. []
-  - This detection may be specified in the AST
-
-*)

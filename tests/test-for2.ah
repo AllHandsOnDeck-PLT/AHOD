@@ -1,0 +1,9 @@
+series<int> a
+main:
+{
+    a = [1,2,3]
+    for  (i=0; i<2, i++):
+    {
+    do PRINT(a[i])
+    }
+}

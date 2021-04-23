@@ -1,0 +1,7 @@
+series<int> a
+main:
+  {
+    a = [1,3]
+  	do PRINT(a[1])
+  }
+  
