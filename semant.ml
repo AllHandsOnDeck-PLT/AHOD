@@ -3,36 +3,44 @@ open Sast
 
 module StringMap = Map.Make(String)
 
-let check (globals, action_decls, main_stmt) =
+let classIndices: (string, int) Hashtbl.t = Hashtbl.create 10
+
+let createClassIndices class_decls =
+  let classHandler index class_decl = 
+  Hashtbl.add classIndices class_decl.cname index in 
+  List.iteri classHandler class_decls 
+
+(*look up in map, information for type. Shortcut: rather than lookup in map, 
+will always return particular information for type
+
+built in struct, generate and try to access that 
+*)
+
+let check (globals, action_decls, main_stmt) = (*changed from class_decls to action_decls*)
 
   (**** Check global variables ****)
-
-  
-
   let check_assign lvaluet rvaluet err =
-       if lvaluet = rvaluet then lvaluet else raise (Failure err)
-  in   
+    if lvaluet = rvaluet then lvaluet else raise (Failure err)
+in   
 
-  (* Build local symbol table of variables for this function *)
-  let symbols = List.fold_left (fun m (ty, name) -> StringMap.add name ty m)
-    StringMap.empty (globals)
-  in
+(* Build local symbol table of variables for this function *)
+let symbols = List.fold_left (fun m (ty, name) -> StringMap.add name ty m)
+  StringMap.empty (globals)
+in
 
-  (* Return a variable from our local symbol table *)
-  let type_of_identifier s =
-    try StringMap.find s symbols
-    with Not_found -> raise (Failure ("undeclared identifier " ^ s))
-  in
+(* Return a variable from our local symbol table *)
+let type_of_identifier s =
+  try StringMap.find s symbols
+  with Not_found -> raise (Failure ("undeclared identifier " ^ s))
+in
+let check_list_type id = 
+  match (type_of_identifier id) with 
+     Series t -> t
+   | t -> raise (Failure ("check list type error, typ: " ^ string_of_typ t))
+in
 
-  (* Check if id is a list and return list type *)
-  let check_list_type id = 
-    match (type_of_identifier id) with 
-       Series t -> t
-     | t -> raise (Failure ("check list type error, typ: " ^ string_of_typ t))
-  in
-
-	let rec check_expr = function
-		(*need to figure out typ, if name is defined*)
+let rec check_expr = function
+  (*need to figure out typ, if name is defined*)
 		| ActionCall(aname, aparams) -> (String, SActionCall(aname, List.map check_expr aparams))
 		| Sliteral s -> (String, SSliteral(s))
 		| Iliteral i -> (Int, SIliteral(i))
@@ -91,11 +99,33 @@ let check (globals, action_decls, main_stmt) =
     | While(p, s) -> SWhile(check_expr p, check_stmt s)
     | For(e1, e2, e3, st) ->
       SFor(check_expr e1, check_expr e2, check_expr e3, check_stmt st)
-    | Block sl -> 
-         SBlock(List.map check_stmt sl)
-    in
-
-
-	(globals, [], check_stmt main_stmt)
+  | Block sl -> 
+    let rec check_stmt_list = function
+        [Return _ as s] -> [check_stmt s]
+      | Return _ :: _   -> raise (Failure "nothing may follow a return")
+      | Block sl :: ss  -> check_stmt_list (sl @ ss) (* Flatten blocks *)
+      | s :: ss         -> check_stmt s :: check_stmt_list ss
+      | []              -> []
+  in  SBlock(List.map check_stmt sl)
+in
+  let check_action act =
+      { sentitytyp = act.entitytyp;
+        sentityid  = act.entityid;
+        saname = act.aname; 
+        satyp = act.atyp;
+        saparams = act.aparams;
+        sabody = match check_stmt (Block act.abody) with
+        SBlock(sl) -> sl
+            | _ -> raise (Failure ("internal error: block didn't become a block?"))
+        (* let _ = List.map check_stmt (Block act.abody) in match (Block act.abody) with
+        SBlock(sl) -> sl
+        | _ -> raise (Failure ("internal error: block didn't become a block?")) *)
+        (* sabody = check_stmt (act.abody);  *)
+        
+    }
+  (*(check_stmt main_stmt, list.map check_func action_decl) *)
+   
+  in (globals, List.map check_action action_decls, check_stmt main_stmt)
+    (* (globals, [], check_stmt main_stmt) <- in case w/classes*)
 
 

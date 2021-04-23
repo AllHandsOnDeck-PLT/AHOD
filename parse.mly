@@ -38,26 +38,82 @@ let trd (_,_,c) = c;;
 
 program:
     decls main_decl EOF { (fst $1, snd $1, $2) }
-
-action_decl:
-    WHEN DO ACTIONID LPAREN params_list RPAREN COLON stmt_block          
-    {{ 
-      entitytyp = None;
-      entityid = "";
-      aname = $3;
-      aparams = $5;
-      abody = $8 }}
+    /*main_decl decls EOF { ($1, fst $2, snd $2) }*/
 
 decls:
     /*nothing*/      { ([], []) }
     | decls global_decl  { (List.rev ($2::fst $1), snd $1) }
-    | decls action_decl  { (fst $1, List.rev ($2::snd $1)) }
+    // | decls class_decl { (fst $1, List.rev ($2::snd $1)) }
+    | decls action_decl { (fst $1, List.rev ($2::snd $1)) }
 
+
+/*decls:
+     nothing      { ([], []) }
+    | decls global_decl { (List.rev ($2::frst $1), scnd $1, trd $1) }
+    | decls class_decl  { (List.rev ($2::fst $1), snd $1) }
+    | decls action_decl { (fst $1, List.rev ($2::snd $1)) }
+*/
+ 
 global_decl:
     typ ID NEWLINE { ($1, $2) }
     
 main_decl:
-      MAIN COLON stmt_block { $3 } 
+    MAIN COLON stmt_block { $3 } 
+
+class_decl:
+    LET CLASSID LPAREN params_list RPAREN BE COLON class_block     
+    {{
+      cname = $2;
+      cparams = $4; 
+      actions = fst $8;
+      attributes = snd $8 }}
+
+    /*LET CLASSID LPAREN params_list RPAREN BE COLON class_block        
+    {{ 
+      cname = $2;
+      cparams = $4;
+      attributes = $8 }}*/
+
+action_decl: 
+    WHEN DO typ ACTIONID LPAREN params_list_opt RPAREN COLON stmt_block      
+    {{ 
+      entitytyp = None;
+      entityid = "";
+      atyp = $3;
+      aname = $4;
+      aparams = $6 ; 
+      abody = [$9] }}
+
+// Block([]) 
+// action_decl: 
+//     WHENDO ACTIONID LPAREN params_list RPAREN COLON stmt_block          
+//     {{ 
+//       entitytyp = None;
+//       entityid = "";
+//       aname = $2;
+//       typ = None;
+//       aparams = $4;
+//       abody = $7 }}
+      
+/*add locals into action _decl and main */
+class_block:
+    NEWLINE LBRACE NEWLINE class_decl_list RBRACE NEWLINE { $4 }
+
+class_decl_list:
+  | action_decl                     { ([$1], []) }
+  | attr_decl                       { ([], [$1]) }
+  | class_decl_list action_decl     { (List.rev ($2::fst $1), snd $1) }
+  | class_decl_list attr_decl       { (fst $1, List.rev ($2::snd $1)) }
+  /*
+  | attr_decl                       { [$1] }
+  | class_decl_list attr_decl       { List.rev ($2::$1) }*/
+
+attr_decl:
+    | typ ID COLON expr NEWLINE { OneAdecl($1, $2, $4)}
+params_list_opt: 
+    |params_list    {$1}
+    | /*Nothing*/   {[]}
+
 
 params_list:
     param                        { [$1] } 
@@ -105,9 +161,12 @@ typ:
     | STRING            { String    }
     | NONE              { None      }
     | SERIES LT typ GT  { Series($3)}
+    | CLASSID           { ClassID } 
 
 expr:
     | call_action                    { $1 } 
+    | call_class       { $1 }
+    | call_attr        { $1 }
     | ILIT                           { Iliteral($1) } 
     | FLIT                           { Fliteral($1) } 
     | BLIT                           { Bliteral($1) } 
@@ -138,8 +197,15 @@ args_list:
     | args_list COMMA expr          { $3 :: $1 }
 
 call_action:
-    | DO ACTIONID LPAREN args_list_opt RPAREN        { ActionCall($2, $4) }
+    | DO ACTIONID LPAREN args_list_opt RPAREN        { ActionCall($2, $4) } 
+    | expr DO ACTIONID LPAREN args_list_opt RPAREN   { ExprActionCall($1, $3, $5) } 
 
+call_class: 
+     CLASSID LPAREN args_list_opt RPAREN            { ClassCall($1, $3) } 
+
+call_attr:
+    ID DOT ID      { AttrCall($1, $3) }
+  
 expr_opt:
     /* nothing */      { Noexpr }
     | expr             { $1 }

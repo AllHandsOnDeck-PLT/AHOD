@@ -1,7 +1,7 @@
 type op = Add | Sub | Mult | Div | Equal | Neq | Less | Leq | Greater | Geq |
           And | Or | Mod
 
-type typ = Int | Float | Bool | String | None | Series of typ
+type typ = Int | Float | Bool | String | None | ClassID | Series of typ
 
 type bind = typ * string
 
@@ -12,9 +12,12 @@ type expr =
   | Sliteral of string
   | Seriesliteral of expr list
   | ActionCall of string * expr list
+  | ExprActionCall of expr * string * expr list
   | Id of string
   | Assign of string * expr
   | Binop of expr * op * expr (*need to add binop*)
+  | ClassCall of string * expr list
+  | AttrCall of string * string 
   | SeriesGet of string * expr
   | Noexpr
 
@@ -28,14 +31,32 @@ type stmt =
   | While of expr * stmt
   | SeriesAdd of string * expr
 
+type attr_decl = 
+  | OneAdecl of typ * string * expr 
+
+(*type class_decl = {
+  cname : string;
+  cparams : bind list;
+  attributes : attr_decl list;
+}*)
+
 type action_decl = {
   entitytyp : typ;
   entityid : string;
+  atyp : typ; 
   aname : string;
   aparams : bind list;
-  abody: stmt;
+  abody: stmt list;
 }
 
+type class_decl = {
+  cname : string;
+  cparams : bind list;
+  actions : action_decl list;
+  attributes : attr_decl list;
+}
+
+(* type program = bind list * class_decl list * stmt *)
 type program = bind list * action_decl list * stmt
 
 (*  Pretty-printing functions *)

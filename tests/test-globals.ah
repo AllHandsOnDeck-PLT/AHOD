@@ -1,0 +1,7 @@
+main:
+  {
+  	print(current_score)
+  }
+
+int current_score = 1
+

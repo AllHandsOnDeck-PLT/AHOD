@@ -1,4 +1,5 @@
   main:
   {
-  	do PRINT("HelloWorld")
+  	do PRINT("Hello world!")
+  	do PRINT(":)")
   }
