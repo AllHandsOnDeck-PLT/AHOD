@@ -4,35 +4,22 @@ ocamlfind ocamldep -package llvm -package llvm.analysis -modules AHOD.ml > AHOD.
 # Target: codegen.ml.depends, tags: { package(llvm), package(llvm.analysis), warn(+a-4), extension:ml, file:codegen.ml, ocaml, ocamldep, quiet, traverse }
 ocamlfind ocamldep -package llvm -package llvm.analysis -modules codegen.ml > codegen.ml.depends
 + ocamlfind ocamldep -package llvm -package llvm.analysis -modules codegen.ml > codegen.ml.depends
-File "codegen.ml", line 184, characters 3-6:
-184 |    (*) (* Implement for loops as while loops *)
-         ^^^
-Warning 1 [comment-start]: this `(*' is the start of a comment.
-Hint: Did you forget spaces when writing the infix operator `( * )'?
+File "codegen.ml", line 266, characters 3-6:
+Warning 1: this is the start of a comment.
 # Target: ast.ml.depends, tags: { package(llvm), package(llvm.analysis), warn(+a-4), extension:ml, file:ast.ml, ocaml, ocamldep, quiet, traverse }
 ocamlfind ocamldep -package llvm -package llvm.analysis -modules ast.ml > ast.ml.depends
 # Target: sast.ml.depends, tags: { package(llvm), package(llvm.analysis), warn(+a-4), extension:ml, file:sast.ml, ocaml, ocamldep, quiet, traverse }
 ocamlfind ocamldep -package llvm -package llvm.analysis -modules sast.ml > sast.ml.depends
 # Target: ast.cmo, tags: { package(llvm), package(llvm.analysis), warn(+a-4), byte, compile, extension:cmo, extension:ml, file:ast.cmo, file:ast.ml, implem, ocaml, quiet, traverse }
 ocamlfind ocamlc -c -w +a-4 -package llvm -package llvm.analysis -o ast.cmo ast.ml
-+ ocamlfind ocamlc -c -w +a-4 -package llvm -package llvm.analysis -o ast.cmo ast.ml
-File "ast.ml", lines 37-41, characters 20-22:
-37 | ....................function
-38 |     Int -> "int"
-39 |   | Bool -> "bool"
-40 |   | Float -> "float"
-41 |   | String -> "string"
-Warning 8 [partial-match]: this pattern-matching is not exhaustive.
-Here is an example of a case that is not matched:
-None
 # Target: sast.cmo, tags: { package(llvm), package(llvm.analysis), warn(+a-4), byte, compile, extension:cmo, extension:ml, file:sast.cmo, file:sast.ml, implem, ocaml, quiet, traverse }
 ocamlfind ocamlc -c -w +a-4 -package llvm -package llvm.analysis -o sast.cmo sast.ml
 # Target: parse.mly, tags: { package(llvm), package(llvm.analysis), warn(+a-4), extension:mly, file:parse.mly, infer, ocaml, ocamlyacc, parser, quiet, traverse }
-/Users/maradimofte/.opam/default/bin/ocamlyacc parse.mly
+ocamlyacc parse.mly
 # Target: parse.mli.depends, tags: { package(llvm), package(llvm.analysis), warn(+a-4), extension:mli, file:parse.mli, ocaml, ocamldep, quiet, traverse }
 ocamlfind ocamldep -package llvm -package llvm.analysis -modules parse.mli > parse.mli.depends
 # Target: scanner.mll, tags: { package(llvm), package(llvm.analysis), warn(+a-4), extension:mll, file:scanner.mll, lexer, ocaml, ocamllex, quiet, traverse }
-/Users/maradimofte/.opam/default/bin/ocamllex.opt -q scanner.mll
+ocamllex.opt -q scanner.mll
 # Target: scanner.ml.depends, tags: { package(llvm), package(llvm.analysis), warn(+a-4), extension:ml, file:scanner.ml, ocaml, ocamldep, quiet, traverse }
 ocamlfind ocamldep -package llvm -package llvm.analysis -modules scanner.ml > scanner.ml.depends
 # Target: parse.cmi, tags: { package(llvm), package(llvm.analysis), warn(+a-4), byte, compile, extension:mli, file:parse.mli, interf, ocaml, quiet, traverse }
@@ -42,142 +29,56 @@ ocamlfind ocamldep -package llvm -package llvm.analysis -modules semant.ml > sem
 # Target: codegen.cmo, tags: { package(llvm), package(llvm.analysis), warn(+a-4), byte, compile, extension:cmo, extension:ml, file:codegen.cmo, file:codegen.ml, implem, ocaml, quiet, traverse }
 ocamlfind ocamlc -c -w +a-4 -package llvm -package llvm.analysis -o codegen.cmo codegen.ml
 + ocamlfind ocamlc -c -w +a-4 -package llvm -package llvm.analysis -o codegen.cmo codegen.ml
-File "codegen.ml", line 184, characters 3-6:
-184 |    (*) (* Implement for loops as while loops *)
-         ^^^
-Warning 1 [comment-start]: this `(*' is the start of a comment.
-Hint: Did you forget spaces when writing the infix operator `( * )'?
-File "codegen.ml", lines 24-28, characters 19-24:
-24 | ...................function
-25 | 	| A.Int   -> i32_t
-26 | 	| A.Bool  -> i1_t
-27 | 	| A.Float -> float_t
-28 |   | A.String -> string_t
-Warning 8 [partial-match]: this pattern-matching is not exhaustive.
+File "codegen.ml", line 266, characters 3-6:
+Warning 1: this is the start of a comment.
+File "codegen.ml", line 164, characters 2-690:
+Warning 8: this pattern-matching is not exhaustive.
 Here is an example of a case that is not matched:
-None
-File "codegen.ml", lines 96-105, characters 2-3:
- 96 | ..(match fst e with 
- 97 | 		A.String -> L.build_call printf_func [| L.const_in_bounds_gep str_format_str [|L.const_int i32_t 0; L.const_int i32_t 0|] ; (expr builder e) |]
- 98 | 		"printf" builder
- 99 | 		| A.Int -> L.build_call printf_func [| L.const_in_bounds_gep int_format_str [|L.const_int i32_t 0; L.const_int i32_t 0|]  ; (expr builder e) |]
-100 | 		"printf" builder
-101 | 		| A.Float -> L.build_call printf_func [| L.const_in_bounds_gep float_format_str [|L.const_int i32_t 0; L.const_int i32_t 0|]  ; (expr builder e) |]
-102 | 		"printf" builder
-103 | 		| A.Bool -> L.build_call printf_func [| L.const_in_bounds_gep bool_format_str [|L.const_int i32_t 0; L.const_int i32_t 0|]  ; (expr builder e) |]
-104 | 		"printf" builder
-105 | 		)...
-Warning 8 [partial-match]: this pattern-matching is not exhaustive.
-Here is an example of a case that is not matched:
-None
-File "codegen.ml", lines 109-122, characters 4-5:
-109 | ....(match op with 
-110 |       A.Add     -> L.build_fadd
-111 |     | A.Sub     -> L.build_fsub
-112 |     | A.Mult    -> L.build_fmul
-113 |     | A.Div     -> L.build_fdiv 
-...
-119 |     | A.Geq     -> L.build_fcmp L.Fcmp.Oge
-120 |     | A.And | A.Or ->
-121 |         raise (Failure "internal error: semant should have rejected and/or on float")
-122 |     )......................
-Warning 8 [partial-match]: this pattern-matching is not exhaustive.
+(None|Series _)
+File "codegen.ml", line 177, characters 4-520:
+Warning 8: this pattern-matching is not exhaustive.
 Here is an example of a case that is not matched:
 Mod
-File "codegen.ml", lines 126-139, characters 4-5:
-126 | ....(match op with
-127 |       A.Add     -> L.build_add
-128 |     | A.Sub     -> L.build_sub
-129 |     | A.Mult    -> L.build_mul
-130 |     | A.Div     -> L.build_sdiv
-...
-136 |     | A.Leq     -> L.build_icmp L.Icmp.Sle
-137 |     | A.Greater -> L.build_icmp L.Icmp.Sgt
-138 |     | A.Geq     -> L.build_icmp L.Icmp.Sge
-139 |     )......................
-Warning 8 [partial-match]: this pattern-matching is not exhaustive.
+File "codegen.ml", line 194, characters 4-466:
+Warning 8: this pattern-matching is not exhaustive.
 Here is an example of a case that is not matched:
 Mod
-File "codegen.ml", lines 87-139, characters 40-27:
- 87 | ........................................match e with
- 88 | 	SSliteral s -> L.define_global "str" (L.const_stringz context s) the_module
- 89 | 	| SBliteral b  -> L.const_int i1_t (if b then 1 else 0)
- 90 | 	| SIliteral i -> L.const_int i32_t i 
- 91 |   | SFliteral f -> L.const_float_of_string float_t f
-...
-136 |     | A.Leq     -> L.build_icmp L.Icmp.Sle
-137 |     | A.Greater -> L.build_icmp L.Icmp.Sgt
-138 |     | A.Geq     -> L.build_icmp L.Icmp.Sge
-139 |     ) e1' e2' "tmp" builder
-Warning 8 [partial-match]: this pattern-matching is not exhaustive.
+File "codegen.ml", line 154, characters 40-3192:
+Warning 8: this pattern-matching is not exhaustive.
 Here is an example of a case that is not matched:
-SActionCall ("PRINT", _::_::_)
-File "codegen.ml", lines 152-182, characters 23-39:
-152 | .......................function
-153 | 	| SBlock stmt_list -> List.fold_left stmt builder stmt_list 
-154 |   | SExpr e -> ignore(expr builder e); builder
-155 |   | SIf (predicate, then_stmt, else_stmt) ->
-156 |     let bool_val = expr builder predicate in
-...
-179 |   
-180 |       let merge_bb = L.append_block context "merge" main_func in
-181 |       ignore(L.build_cond_br bool_val body_bb merge_bb pred_builder);
-182 |       L.builder_at_end context merge_bb
-Warning 8 [partial-match]: this pattern-matching is not exhaustive.
+(SActionCall ("PRINT", _::_::_)|SActionCall ("PRINT", [])|
+SActionCall ("", _))
+File "codegen.ml", line 232, characters 23-1514:
+Warning 8: this pattern-matching is not exhaustive.
 Here is an example of a case that is not matched:
 (SReturn _|SFor (_, _, _))
 File "codegen.ml", line 7, characters 24-36:
-7 | let translate (globals, action_decls, main_stmt) =
-                            ^^^^^^^^^^^^
-Warning 27 [unused-var-strict]: unused variable action_decls.
+Warning 27: unused variable action_decls.
+File "codegen.ml", line 96, characters 4-15:
+Warning 26: unused variable init_series.
+File "codegen.ml", line 208, characters 31-39:
+Warning 27: unused variable literals.
 # Target: scanner.cmo, tags: { package(llvm), package(llvm.analysis), warn(+a-4), byte, compile, extension:cmo, extension:ml, file:scanner.cmo, file:scanner.ml, implem, ocaml, quiet, traverse }
 ocamlfind ocamlc -c -w +a-4 -package llvm -package llvm.analysis -o scanner.cmo scanner.ml
 # Target: semant.cmo, tags: { package(llvm), package(llvm.analysis), warn(+a-4), byte, compile, extension:cmo, extension:ml, file:semant.cmo, file:semant.ml, implem, ocaml, quiet, traverse }
 ocamlfind ocamlc -c -w +a-4 -package llvm -package llvm.analysis -o semant.cmo semant.ml
 + ocamlfind ocamlc -c -w +a-4 -package llvm -package llvm.analysis -o semant.cmo semant.ml
 File "semant.ml", line 1, characters 0-8:
-1 | open Ast
-    ^^^^^^^^
-Warning 45 [open-shadow-label-constructor]: this open statement shadows the constructor None (which is later used)
-File "semant.ml", lines 61-69, characters 22-39:
-61 | ......................function
-62 | 		Expr e -> SExpr (check_expr e) 
-63 | 
-64 |     | If(p, b1, b2) -> SIf(check_expr p, check_stmt b1, check_stmt b2)
-65 |     | While(p, s) -> SWhile(check_expr p, check_stmt s)
-66 |     (*| For(e1, e2, e3, st) ->
-67 |      SFor(expr e1, check_expr e2, expr e3, check_stmt st)*)
-68 |     | Block sl -> 
-69 |          SBlock(List.map check_stmt sl)
-Warning 8 [partial-match]: this pattern-matching is not exhaustive.
+Warning 45: this open statement shadows the constructor None (which is later used)
+File "semant.ml", line 85, characters 22-468:
+Warning 8: this pattern-matching is not exhaustive.
 Here is an example of a case that is not matched:
 (Return _|For (_, _, _))
 File "semant.ml", line 6, characters 20-32:
-6 | let check (globals, action_decls, main_stmt) =
-                        ^^^^^^^^^^^^
-Warning 27 [unused-var-strict]: unused variable action_decls.
-File "semant.ml", line 36, characters 6-26:
-36 |     | Assign(var, e) as ex -> 
-           ^^^^^^^^^^^^^^^^^^^^
-Warning 26 [unused-var]: unused variable ex.
-File "semant.ml", line 42, characters 6-28:
-42 |     | Binop(e1, op, e2) as e -> 
-           ^^^^^^^^^^^^^^^^^^^^^^
-Warning 26 [unused-var]: unused variable e.
+Warning 27: unused variable action_decls.
+File "semant.ml", line 43, characters 6-26:
+Warning 26: unused variable ex.
+File "semant.ml", line 49, characters 6-28:
+Warning 26: unused variable e.
 # Target: AHOD.cmo, tags: { package(llvm), package(llvm.analysis), warn(+a-4), byte, compile, extension:cmo, extension:ml, file:AHOD.cmo, file:AHOD.ml, implem, ocaml, quiet, traverse }
 ocamlfind ocamlc -c -w +a-4 -package llvm -package llvm.analysis -o AHOD.cmo AHOD.ml
 # Target: ast.cmx, tags: { package(llvm), package(llvm.analysis), warn(+a-4), compile, extension:cmx, extension:ml, file:ast.cmx, file:ast.ml, implem, native, ocaml, quiet, traverse }
 ocamlfind ocamlopt -c -w +a-4 -package llvm -package llvm.analysis -o ast.cmx ast.ml
-+ ocamlfind ocamlopt -c -w +a-4 -package llvm -package llvm.analysis -o ast.cmx ast.ml
-File "ast.ml", lines 37-41, characters 20-22:
-37 | ....................function
-38 |     Int -> "int"
-39 |   | Bool -> "bool"
-40 |   | Float -> "float"
-41 |   | String -> "string"
-Warning 8 [partial-match]: this pattern-matching is not exhaustive.
-Here is an example of a case that is not matched:
-None
 # Target: sast.cmx, tags: { package(llvm), package(llvm.analysis), warn(+a-4), compile, extension:cmx, extension:ml, file:sast.cmx, file:sast.ml, implem, native, ocaml, quiet, traverse }
 ocamlfind ocamlopt -c -w +a-4 -package llvm -package llvm.analysis -o sast.cmx sast.ml
 # Target: parse.ml.depends, tags: { package(llvm), package(llvm.analysis), warn(+a-4), extension:ml, file:parse.ml, ocaml, ocamldep, quiet, traverse }
@@ -186,138 +87,62 @@ ocamlfind ocamldep -package llvm -package llvm.analysis -modules parse.ml > pars
 ocamlfind ocamlopt -c -w +a-4 -package llvm -package llvm.analysis -o parse.cmx parse.ml
 + ocamlfind ocamlopt -c -w +a-4 -package llvm -package llvm.analysis -o parse.cmx parse.ml
 File "parse.mly", line 2, characters 0-8:
-Warning 45 [open-shadow-label-constructor]: this open statement shadows the constructor None (which is later used)
+Warning 45: this open statement shadows the constructor None (which is later used)
 File "parse.mly", line 4, characters 4-8:
-Warning 32 [unused-value-declaration]: unused value frst.
+Warning 32: unused value frst.
 File "parse.mly", line 5, characters 4-8:
-Warning 32 [unused-value-declaration]: unused value scnd.
+Warning 32: unused value scnd.
 File "parse.mly", line 6, characters 4-7:
-Warning 32 [unused-value-declaration]: unused value trd.
+Warning 32: unused value trd.
 # Target: codegen.cmx, tags: { package(llvm), package(llvm.analysis), warn(+a-4), compile, extension:cmx, extension:ml, file:codegen.cmx, file:codegen.ml, implem, native, ocaml, quiet, traverse }
 ocamlfind ocamlopt -c -w +a-4 -package llvm -package llvm.analysis -o codegen.cmx codegen.ml
 + ocamlfind ocamlopt -c -w +a-4 -package llvm -package llvm.analysis -o codegen.cmx codegen.ml
-File "codegen.ml", line 184, characters 3-6:
-184 |    (*) (* Implement for loops as while loops *)
-         ^^^
-Warning 1 [comment-start]: this `(*' is the start of a comment.
-Hint: Did you forget spaces when writing the infix operator `( * )'?
-File "codegen.ml", lines 24-28, characters 19-24:
-24 | ...................function
-25 | 	| A.Int   -> i32_t
-26 | 	| A.Bool  -> i1_t
-27 | 	| A.Float -> float_t
-28 |   | A.String -> string_t
-Warning 8 [partial-match]: this pattern-matching is not exhaustive.
+File "codegen.ml", line 266, characters 3-6:
+Warning 1: this is the start of a comment.
+File "codegen.ml", line 164, characters 2-690:
+Warning 8: this pattern-matching is not exhaustive.
 Here is an example of a case that is not matched:
-None
-File "codegen.ml", lines 96-105, characters 2-3:
- 96 | ..(match fst e with 
- 97 | 		A.String -> L.build_call printf_func [| L.const_in_bounds_gep str_format_str [|L.const_int i32_t 0; L.const_int i32_t 0|] ; (expr builder e) |]
- 98 | 		"printf" builder
- 99 | 		| A.Int -> L.build_call printf_func [| L.const_in_bounds_gep int_format_str [|L.const_int i32_t 0; L.const_int i32_t 0|]  ; (expr builder e) |]
-100 | 		"printf" builder
-101 | 		| A.Float -> L.build_call printf_func [| L.const_in_bounds_gep float_format_str [|L.const_int i32_t 0; L.const_int i32_t 0|]  ; (expr builder e) |]
-102 | 		"printf" builder
-103 | 		| A.Bool -> L.build_call printf_func [| L.const_in_bounds_gep bool_format_str [|L.const_int i32_t 0; L.const_int i32_t 0|]  ; (expr builder e) |]
-104 | 		"printf" builder
-105 | 		)...
-Warning 8 [partial-match]: this pattern-matching is not exhaustive.
-Here is an example of a case that is not matched:
-None
-File "codegen.ml", lines 109-122, characters 4-5:
-109 | ....(match op with 
-110 |       A.Add     -> L.build_fadd
-111 |     | A.Sub     -> L.build_fsub
-112 |     | A.Mult    -> L.build_fmul
-113 |     | A.Div     -> L.build_fdiv 
-...
-119 |     | A.Geq     -> L.build_fcmp L.Fcmp.Oge
-120 |     | A.And | A.Or ->
-121 |         raise (Failure "internal error: semant should have rejected and/or on float")
-122 |     )......................
-Warning 8 [partial-match]: this pattern-matching is not exhaustive.
+(None|Series _)
+File "codegen.ml", line 177, characters 4-520:
+Warning 8: this pattern-matching is not exhaustive.
 Here is an example of a case that is not matched:
 Mod
-File "codegen.ml", lines 126-139, characters 4-5:
-126 | ....(match op with
-127 |       A.Add     -> L.build_add
-128 |     | A.Sub     -> L.build_sub
-129 |     | A.Mult    -> L.build_mul
-130 |     | A.Div     -> L.build_sdiv
-...
-136 |     | A.Leq     -> L.build_icmp L.Icmp.Sle
-137 |     | A.Greater -> L.build_icmp L.Icmp.Sgt
-138 |     | A.Geq     -> L.build_icmp L.Icmp.Sge
-139 |     )......................
-Warning 8 [partial-match]: this pattern-matching is not exhaustive.
+File "codegen.ml", line 194, characters 4-466:
+Warning 8: this pattern-matching is not exhaustive.
 Here is an example of a case that is not matched:
 Mod
-File "codegen.ml", lines 87-139, characters 40-27:
- 87 | ........................................match e with
- 88 | 	SSliteral s -> L.define_global "str" (L.const_stringz context s) the_module
- 89 | 	| SBliteral b  -> L.const_int i1_t (if b then 1 else 0)
- 90 | 	| SIliteral i -> L.const_int i32_t i 
- 91 |   | SFliteral f -> L.const_float_of_string float_t f
-...
-136 |     | A.Leq     -> L.build_icmp L.Icmp.Sle
-137 |     | A.Greater -> L.build_icmp L.Icmp.Sgt
-138 |     | A.Geq     -> L.build_icmp L.Icmp.Sge
-139 |     ) e1' e2' "tmp" builder
-Warning 8 [partial-match]: this pattern-matching is not exhaustive.
+File "codegen.ml", line 154, characters 40-3192:
+Warning 8: this pattern-matching is not exhaustive.
 Here is an example of a case that is not matched:
-SActionCall ("PRINT", _::_::_)
-File "codegen.ml", lines 152-182, characters 23-39:
-152 | .......................function
-153 | 	| SBlock stmt_list -> List.fold_left stmt builder stmt_list 
-154 |   | SExpr e -> ignore(expr builder e); builder
-155 |   | SIf (predicate, then_stmt, else_stmt) ->
-156 |     let bool_val = expr builder predicate in
-...
-179 |   
-180 |       let merge_bb = L.append_block context "merge" main_func in
-181 |       ignore(L.build_cond_br bool_val body_bb merge_bb pred_builder);
-182 |       L.builder_at_end context merge_bb
-Warning 8 [partial-match]: this pattern-matching is not exhaustive.
+(SActionCall ("PRINT", _::_::_)|SActionCall ("PRINT", [])|
+SActionCall ("", _))
+File "codegen.ml", line 232, characters 23-1514:
+Warning 8: this pattern-matching is not exhaustive.
 Here is an example of a case that is not matched:
 (SReturn _|SFor (_, _, _))
 File "codegen.ml", line 7, characters 24-36:
-7 | let translate (globals, action_decls, main_stmt) =
-                            ^^^^^^^^^^^^
-Warning 27 [unused-var-strict]: unused variable action_decls.
+Warning 27: unused variable action_decls.
+File "codegen.ml", line 96, characters 4-15:
+Warning 26: unused variable init_series.
+File "codegen.ml", line 208, characters 31-39:
+Warning 27: unused variable literals.
 # Target: scanner.cmx, tags: { package(llvm), package(llvm.analysis), warn(+a-4), compile, extension:cmx, extension:ml, file:scanner.cmx, file:scanner.ml, implem, native, ocaml, quiet, traverse }
 ocamlfind ocamlopt -c -w +a-4 -package llvm -package llvm.analysis -o scanner.cmx scanner.ml
 # Target: semant.cmx, tags: { package(llvm), package(llvm.analysis), warn(+a-4), compile, extension:cmx, extension:ml, file:semant.cmx, file:semant.ml, implem, native, ocaml, quiet, traverse }
 ocamlfind ocamlopt -c -w +a-4 -package llvm -package llvm.analysis -o semant.cmx semant.ml
 + ocamlfind ocamlopt -c -w +a-4 -package llvm -package llvm.analysis -o semant.cmx semant.ml
 File "semant.ml", line 1, characters 0-8:
-1 | open Ast
-    ^^^^^^^^
-Warning 45 [open-shadow-label-constructor]: this open statement shadows the constructor None (which is later used)
-File "semant.ml", lines 61-69, characters 22-39:
-61 | ......................function
-62 | 		Expr e -> SExpr (check_expr e) 
-63 | 
-64 |     | If(p, b1, b2) -> SIf(check_expr p, check_stmt b1, check_stmt b2)
-65 |     | While(p, s) -> SWhile(check_expr p, check_stmt s)
-66 |     (*| For(e1, e2, e3, st) ->
-67 |      SFor(expr e1, check_expr e2, expr e3, check_stmt st)*)
-68 |     | Block sl -> 
-69 |          SBlock(List.map check_stmt sl)
-Warning 8 [partial-match]: this pattern-matching is not exhaustive.
+Warning 45: this open statement shadows the constructor None (which is later used)
+File "semant.ml", line 85, characters 22-468:
+Warning 8: this pattern-matching is not exhaustive.
 Here is an example of a case that is not matched:
 (Return _|For (_, _, _))
 File "semant.ml", line 6, characters 20-32:
-6 | let check (globals, action_decls, main_stmt) =
-                        ^^^^^^^^^^^^
-Warning 27 [unused-var-strict]: unused variable action_decls.
-File "semant.ml", line 36, characters 6-26:
-36 |     | Assign(var, e) as ex -> 
-           ^^^^^^^^^^^^^^^^^^^^
-Warning 26 [unused-var]: unused variable ex.
-File "semant.ml", line 42, characters 6-28:
-42 |     | Binop(e1, op, e2) as e -> 
-           ^^^^^^^^^^^^^^^^^^^^^^
-Warning 26 [unused-var]: unused variable e.
+Warning 27: unused variable action_decls.
+File "semant.ml", line 43, characters 6-26:
+Warning 26: unused variable ex.
+File "semant.ml", line 49, characters 6-28:
+Warning 26: unused variable e.
 # Target: AHOD.cmx, tags: { package(llvm), package(llvm.analysis), warn(+a-4), compile, extension:cmx, extension:ml, file:AHOD.cmx, file:AHOD.ml, implem, native, ocaml, quiet, traverse }
 ocamlfind ocamlopt -c -w +a-4 -package llvm -package llvm.analysis -o AHOD.cmx AHOD.ml
 # Target: AHOD.native, tags: { package(llvm), package(llvm.analysis), warn(+a-4), dont_link_with, extension:native, file:AHOD.native, link, native, ocaml, program, quiet, traverse }

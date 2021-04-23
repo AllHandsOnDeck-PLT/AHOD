@@ -5,6 +5,8 @@ type token =
   | RBRACE
   | LSQUARE
   | RSQUARE
+  | SERIESADD
+  | SERIES
   | COLON
   | COMMA
   | PLUS
