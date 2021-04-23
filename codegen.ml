@@ -56,15 +56,13 @@ in
 let builder = L.builder_at_end context (L.entry_block main_func) in
 
 
-(*
-let local_vars : L.llvalue StringMap.t =
+
+(*let local_vars : L.llvalue StringMap.t =
 (* Function Locals *)
   let add_local m (t,n) =  
     let local_var = L.build_alloca (ltype_of_typ t) n builder in
     StringMap.add n local m  
  in*)
-
-
 
  (* Variable Lookup *)
  (*let lookup n m = StringMap.find n m

@@ -55,38 +55,39 @@ in
 
 let builder = L.builder_at_end context (L.entry_block main_func) in
 
-(* Construct the function's "locals": formal arguments and locally
-       declared variables.  Allocate each on the stack, initialize their
-       value, if appropriate, and remember their values in the "locals" map *)
 
-(*let local_vars : L.llvalue StringMap.t =
+
+let local_vars : L.llvalue StringMap.t =
 (* Function Locals *)
   let add_local m (t,n) =  
     let local_var = L.build_alloca (ltype_of_typ t) n builder in
-    StringMap.add n local m 
- in*)
+    StringMap.add n local m  
+ in
 
  (* Variable Lookup *)
  (*let lookup n m = StringMap.find n m
 in*)
 (*
 let local_vars =
-
       (* Allocate space for any locally declared variables and add the
        * resulting registers to our map *)
       let add_local m (t, n) =
   let local_var = L.build_alloca (ltype_of_typ t) n builder
   in StringMap.add n local_var m 
       in
-
       List.fold_left add_local formals fdecl.slocals 
     in
 *)
     (* Return the value for a variable or formal argument.
        Check local names first, then global names *)
-    let lookup n = StringMap.find n global_vars
-    in
+       
+       (*let lookup n = try StringMap.find n local_vars
+            with Not_found -> StringMap.find n global_vars
+       in*)
 
+       let lookup n = StringMap.find n global_vars
+       in
+  
 
 let printf_t : L.lltype = 
       L.var_arg_function_type i32_t [| L.pointer_type i8_t |] in
@@ -248,28 +249,28 @@ let rec stmt builder = function
         build_br_merge;
     ignore(L.build_cond_br bool_val then_bb else_bb builder);
     L.builder_at_end context merge_bb
-  | SWhile (predicate, body) ->
-    let pred_bb = L.append_block context "while" main_func in
-    ignore(L.build_br pred_bb builder);
+    | SWhile (predicate, body) ->
+      let pred_bb = L.append_block context "while" main_func in
+      ignore(L.build_br pred_bb builder);
+  
+      let body_bb = L.append_block context "while_body" main_func in
+      add_terminal (stmt (L.builder_at_end context body_bb) body)
+        (L.build_br pred_bb);
+  
+      let pred_builder = L.builder_at_end context pred_bb in
+      let bool_val = expr pred_builder predicate in
+  
+      let merge_bb = L.append_block context "merge" main_func in
+      ignore(L.build_cond_br bool_val body_bb merge_bb pred_builder);
+      L.builder_at_end context merge_bb
+    
 
-    let body_bb = L.append_block context "while_body" main_func in
-    add_terminal (stmt (L.builder_at_end context body_bb) body)
-      (L.build_br pred_bb);
-
-    let pred_builder = L.builder_at_end context pred_bb in
-    let bool_val = expr pred_builder predicate in
-
-    let merge_bb = L.append_block context "merge" main_func in
-    ignore(L.build_cond_br bool_val body_bb merge_bb pred_builder);
-    L.builder_at_end context merge_bb
-
-   (*) (* Implement for loops as while loops *)
-    | SFor (e1, e2, e3, body) -> stmt builder
-    ( SBlock [SExpr e1 ; SWhile (e2, SBlock [body ; SExpr e3]) ] )*)
-
-
-
-in
+      (* Implement for loops as while loops *)
+      | SFor (e1, e2, e3, body) -> stmt builder
+      ( SBlock [SExpr e1 ; SWhile (e2, SBlock [body ; SExpr e3]) ] )
+      (*| SForLit ( e1, e2, body) -> stmt builder
+	    ( SBlock [SExpr e1 ; SWhile (e2, SBlock [body ; SExpr e]) ] )*)
+    in
 
 
 let builder = stmt builder main_stmt 
