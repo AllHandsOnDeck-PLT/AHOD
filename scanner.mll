@@ -46,7 +46,6 @@ rule token = parse
 | "while"  { WHILE }
 | "when"   { WHEN }
 | "do"     { DO }
-(* | "when do" {WHENDO} *)
 | "let"    { LET }
 | "be"     { BE }
 | "with"   { WITH }
