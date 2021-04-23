@@ -134,7 +134,7 @@ args_list_opt:
     | args_list                   { List.rev $1 }
 
 args_list:
-    expr                        { [$1] } 
+    expr                            { [$1] } 
     | args_list COMMA expr          { $3 :: $1 }
 
 call_action:
