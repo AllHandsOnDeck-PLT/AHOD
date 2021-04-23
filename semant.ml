@@ -41,7 +41,7 @@ in
 
 let rec check_expr = function
   (*need to figure out typ, if name is defined*)
-		| ActionCall(aname, aparams) -> (String, SActionCall(aname, List.map check_expr aparams))
+		(* | ActionCall(aname, aparams) -> (String, SActionCall(aname, List.map check_expr aparams)) *)
 		| Sliteral s -> (String, SSliteral(s))
 		| Iliteral i -> (Int, SIliteral(i))
 		| Fliteral f -> (Float, SFliteral(f))
@@ -70,6 +70,20 @@ let rec check_expr = function
           | _ -> raise (
         Failure ("illegal binary operator " ))
           in (ty, SBinop((t1, e1'), op, (t2, e2')))
+    | ActionCall(aname, args) as acall -> 
+      let ad = find_act aname in
+      let param_length = List.length ad.params in
+      if List.length args != param_length then
+        raise (Failure ("expecting " ^ string_of_int param_length ^ 
+                        " arguments in " ^ string_of_expr acall))
+      else let check_call (at, _) e = 
+        let (et, e') = expr e in 
+        let err = "illegal argument found " ^ string_of_typ et ^
+          " expected " ^ string_of_typ at ^ " in " ^ string_of_expr e
+        in (check_assign at et err, e')
+      in 
+      let args' = List.map2 check_call ad.params args
+      in (ad.typ, SActionCall(aname, args'))
     | Seriesliteral vals ->
          let (t', _) = check_expr (List.hd vals) in
          let map_func lit = check_expr lit in
@@ -108,6 +122,12 @@ let rec check_expr = function
       | []              -> []
   in  SBlock(List.map check_stmt sl)
 in
+
+let find_act s = 
+  try StringMap.find s action_decls
+  with Not_found -> raise (Failure ("unrecognized action " ^ s))
+in
+
   let check_action act =
       { sentitytyp = act.entitytyp;
         sentityid  = act.entityid;

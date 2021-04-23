@@ -32,8 +32,8 @@ type sattr_decl =
   | SOneAdecl of typ * string * sexpr 
 
 type saction_decl = {
-  sentitytyp : typ;
-  sentityid : string;
+  (* sentitytyp : typ;
+  sentityid : string; *)
   saname : string;
   satyp : typ; 
   saparams : bind list;
@@ -68,4 +68,10 @@ let rec string_of_sexpr (t, e) =
   | SActionCall(f, el) ->
     "do " ^f ^ "(" ^ String.concat ", " (List.map string_of_sexpr el) ^ ")"
   | SNoexpr -> ""
+  | SExprActionCall(exp, f, el) ->
+    string_of_sexpr exp ^ "do " ^ f ^ "(" ^ String.concat ", " (List.map string_of_sexpr el) ^ ")"
+  | SClassCall(f, el) ->
+      f ^ "(" ^ String.concat ", " (List.map string_of_sexpr el) ^ ")"
+  | SAttrCall(f, el) ->
+    f ^ "." ^ el
           ) ^ ")"  

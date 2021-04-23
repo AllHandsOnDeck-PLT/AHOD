@@ -41,8 +41,8 @@ type attr_decl =
 }*)
 
 type action_decl = {
-  entitytyp : typ;
-  entityid : string;
+  (* entitytyp : typ;
+  entityid : string; *)
   atyp : typ; 
   aname : string;
   aparams : bind list;
@@ -82,6 +82,7 @@ let rec string_of_typ = function
   | String -> "string"
   | None -> "none"
   | Series x -> "series<" ^ (string_of_typ x) ^ ">"
+  | ClassID -> "ClassID"
 
 let rec string_of_expr = function
     Iliteral(l) -> string_of_int l
@@ -98,3 +99,10 @@ let rec string_of_expr = function
   | ActionCall(f, el) ->
     "do " ^ f ^ "(" ^ String.concat ", " (List.map string_of_expr el) ^ ")"
   | Noexpr -> ""
+
+  | ExprActionCall(exp, f, el) ->
+    string_of_expr exp ^ "do " ^ f ^ "(" ^ String.concat ", " (List.map string_of_expr el) ^ ")"
+  | ClassCall(f, el) ->
+      f ^ "(" ^ String.concat ", " (List.map string_of_expr el) ^ ")"
+  | AttrCall(f, el) ->
+    f ^ "." ^ el

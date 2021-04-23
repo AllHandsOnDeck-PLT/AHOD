@@ -28,6 +28,7 @@ let translate (globals, action_decls, main_stmt) =
     | A.Bool  -> i1_t 
     | A.Float -> float_t
     | A.String -> string_t
+    | A.ClassID -> string_t
     | A.None -> void_t
     | A.Series t -> series_t (ltype_of_typ t)
     in
@@ -70,19 +71,26 @@ let translate (globals, action_decls, main_stmt) =
       | _ -> L.const_int (ltype_of_typ t) 0
     in StringMap.add n (L.define_global n init the_module) m in
   List.fold_left global_var StringMap.empty globals in
-  
-  let action_decls : (L.llvalue * saction_decl) StringMap.t =
+
+  let printf_t : L.lltype = 
+    L.var_arg_function_type i32_t [| L.pointer_type i8_t |] in
+let printf_func : L.llvalue = 
+  L.declare_function "printf" printf_t the_module in
+
+  let action_decls_map : (L.llvalue * saction_decl) StringMap.t =
     let action_decl m adecl =
       let name = adecl.saname
-      and param_types = 
-  Array.of_list (List.map (fun (t,_) -> ltype_of_typ t) adecl.saparams)
-      in let atype = L.function_type (ltype_of_typ adecl.satyp) param_types in
-      StringMap.add name (L.define_function name atype the_module, adecl) m in
-    List.fold_left action_decl StringMap.empty action_decls in
+      and param_types = Array.of_list (List.map (fun (t,_) -> ltype_of_typ t) adecl.saparams)
+      in let atype = L.function_type (ltype_of_typ adecl.satyp) param_types 
+      in StringMap.add name (L.define_function name atype the_module, adecl) m 
+    in List.fold_left action_decl StringMap.empty action_decls 
+  
+  in let build_action_body adecl =
+    let (the_action, _) = StringMap.find adecl.saname action_decls_map in
+    let builder = L.builder_at_end context (L.entry_block the_action) in
 
 
-
-(*
+(* COME BACK TO ADD IN LOCALS AND PARAMS 
 let local_vars : L.llvalue StringMap.t =
 (* Function Locals *)
   let add_local m (t,n) =  
@@ -115,12 +123,6 @@ let local_vars =
 
        let lookup n = StringMap.find n global_vars
        in
-  
-
-let printf_t : L.lltype = 
-      L.var_arg_function_type i32_t [| L.pointer_type i8_t |] in
-let printf_func : L.llvalue = 
-    L.declare_function "printf" printf_t the_module in
 
 let series_add : L.llvalue StringMap.t = 
   let series_add_ty m typ =
@@ -180,13 +182,35 @@ let rec expr builder ((_, e) : sexpr) = match e with
 		(match fst e with 
 		A.String -> L.build_call printf_func [| L.const_in_bounds_gep str_format_str [|L.const_int i32_t 0; L.const_int i32_t 0|] ; (expr builder e) |]
 		"printf" builder
-		| A.Int -> L.build_call printf_func [| L.const_in_bounds_gep int_format_str [|L.const_int i32_t 0; L.const_int i32_t 0|]  ; (expr builder e) |]
+		| A.Int | A.None -> L.build_call printf_func [| L.const_in_bounds_gep int_format_str [|L.const_int i32_t 0; L.const_int i32_t 0|]  ; (expr builder e) |]
 		"printf" builder
 		| A.Float -> L.build_call printf_func [| L.const_in_bounds_gep float_format_str [|L.const_int i32_t 0; L.const_int i32_t 0|]  ; (expr builder e) |]
 		"printf" builder
 		| A.Bool -> L.build_call printf_func [| L.const_in_bounds_gep bool_format_str [|L.const_int i32_t 0; L.const_int i32_t 0|]  ; (expr builder e) |]
 		"printf" builder
+    | _ -> raise (Failure "Print of this type is not supported") (* Potentially need to support Class, Series, and None cases *)
 		)
+  | SActionCall(a, args) ->
+    let (adef, adecl) = StringMap.find a action_decls_map in
+    let llargs = List.rev (List.map (expr builder) (List.rev args)) in
+    let result = (match adecl.satyp with 
+                         A.None -> ""
+                       | _ -> a ^ "_result") in
+          L.build_call adef (Array.of_list llargs) result builder
+  | SExprActionCall(exp, a, args) -> raise (Failure "Need to implement this class-dependent expression")
+  | SClassCall(a, args) -> raise (Failure "Need to implement this class-dependent expression")
+  | SAttrCall(a, args) -> raise (Failure "Need to implement this class-dependent expression")
+     (* in
+     
+     (* LLVM insists each basic block end with exactly one "terminator" 
+        instruction that transfers control.  This function runs "instr builder"
+        if the current block does not already have a terminator.  Used,
+        e.g., to handle the "fall off the end of the function" case. *)
+     let add_terminal builder instr =
+       match L.block_terminator (L.insertion_block builder) with
+   Some _ -> ()
+       | None -> ignore (instr builder)  *)
+      (* in *)
   | SBinop ((A.Float,_ ) as e1, op, e2) ->
     let e1' = expr builder e1
     and e2' = expr builder e2 in
@@ -201,6 +225,8 @@ let rec expr builder ((_, e) : sexpr) = match e with
     | A.Leq     -> L.build_fcmp L.Fcmp.Ole
     | A.Greater -> L.build_fcmp L.Fcmp.Ogt
     | A.Geq     -> L.build_fcmp L.Fcmp.Oge
+    | A.Mod ->
+      raise (Failure "Mod not implemented yet")
     | A.And | A.Or ->
         raise (Failure "internal error: semant should have rejected and/or on float")
     ) e1' e2' "tmp" builder
@@ -220,6 +246,8 @@ let rec expr builder ((_, e) : sexpr) = match e with
     | A.Leq     -> L.build_icmp L.Icmp.Sle
     | A.Greater -> L.build_icmp L.Icmp.Sgt
     | A.Geq     -> L.build_icmp L.Icmp.Sge
+    | A.Mod ->
+      raise (Failure "Mod not implemented yet")
     ) e1' e2' "tmp" builder
   | SSeriesliteral (series_type, literals) ->
     let ltype = (ltype_of_typ series_type) in (*gets type of elements in arr *) 
@@ -287,10 +315,19 @@ let rec stmt builder = function
 	    ( SBlock [SExpr e1 ; SWhile (e2, SBlock [body ; SExpr e]) ] )*)
     in
 
+(* let builder = stmt builder main_stmt  *)
+let builder = stmt builder (SBlock adecl.sabody) in 
+add_terminal builder (match adecl.satyp with
+        A.None -> L.build_ret_void
+      | A.Float -> L.build_ret (L.const_float float_t 0.0)
+      | t -> L.build_ret (L.const_int (ltype_of_typ t) 0)) 
 
-let builder = stmt builder main_stmt 
 in 
 
+(* let builder = stmt builder main_stmt
+  in 
+
 let _ = L.build_ret (L.const_int i32_t 0) (builder) 
-in
+in *)
+List.iter build_action_body action_decls;
 the_module
