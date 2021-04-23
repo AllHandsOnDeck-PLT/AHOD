@@ -17,6 +17,7 @@ type expr =
   | Binop of expr * op * expr (*need to add unop*)
   | SeriesGet of string * expr
   | SeriesSize of string
+  | SeriesPop of string
   | Noexpr
 
 type stmt =
@@ -28,7 +29,6 @@ type stmt =
   | ForLit of string * expr * stmt 
   | While of expr * stmt
   | SeriesPush of string * expr
-  | SeriesPop of string * expr
 
 type action_decl = {
   entitytyp : typ;
@@ -73,6 +73,7 @@ let rec string_of_expr = function
   | SeriesGet(id, e) ->  id ^ "[" ^ (string_of_expr e) ^ "]"
   | Seriesliteral(_) -> "series_literal"
   | SeriesSize(id) -> "series_size " ^ id
+  | SeriesPop(id) -> "series_pop " ^ id
   | Id(s) -> s
   | Binop(e1, o, e2) ->
       string_of_expr e1 ^ " " ^ string_of_op o ^ " " ^ string_of_expr e2

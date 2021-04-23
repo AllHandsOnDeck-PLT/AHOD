@@ -2,8 +2,13 @@ int i
 series<int> a
 main:
 {
-    a = [1,2,3]
-    for  (i = 0; i < 3; i = i + 1):
+    a = [8,2,5]
+    for  (i = 0; i < a.size(); i = i + 1):
+    {
+    do PRINT(a[i])
+    }
+    a.pop()
+    for  (i = 0; i < a.size(); i = i + 1):
     {
     do PRINT(a[i])
     }

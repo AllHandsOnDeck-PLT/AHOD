@@ -100,23 +100,23 @@ let printf_t : L.lltype =
 let printf_func : L.llvalue = 
     L.declare_function "printf" printf_t the_module in
 
+(* let series_overlap_steps :  *)
 let init_series builder series_ptr series_type = (*referenced from ap++*)
-  (* initialize size to 0 *)
   let sizePtrPtr = L.build_struct_gep series_ptr 0 "series_size_ptr" builder in 
       let sizePtr = L.build_alloca i32_t "series_size" builder in
-      let _ = L.build_store (L.const_int i32_t 0) sizePtr builder in
+      ignore(L.build_store (L.const_int i32_t 0) sizePtr builder);
       ignore(L.build_store sizePtr sizePtrPtr builder);
   (* initialize array *)
-  let series_array_ptr = L.build_struct_gep series_ptr 1 "series.arry" builder in 
+  let series_arr_ptr = L.build_struct_gep series_ptr 1 "series.arry" builder in 
     (* TODO: allocate nothing and have series grow dynamically as necessary when pushing into the series *)
     let p = L.build_array_alloca (ltype_of_typ series_type) (L.const_int i32_t 1028) "p" builder in
-    ignore(L.build_store p series_array_ptr builder);
+    ignore(L.build_store p series_arr_ptr builder);
 in
 
 let series_push : L.llvalue StringMap.t = (*referenced from ap++*)
   let series_push_ty m typ =
-    let ltype = (ltype_of_typ typ) in 
-    let def_name = (type_str typ) in
+    let ltype = (ltype_of_typ typ) in (*converts to llvm type*)
+    let def_name = (type_str typ) in (*type in string format*)
     let def = L.define_function ("series_push" ^ def_name) (L.function_type void_t [| L.pointer_type (series_t ltype); ltype |]) the_module in
     let build = L.builder_at_end context (L.entry_block def) in
     let series_ptr = L.build_alloca (L.pointer_type (series_t ltype)) "series_ptr_alloc" build in
@@ -124,17 +124,17 @@ let series_push : L.llvalue StringMap.t = (*referenced from ap++*)
     let valPtr = L.build_alloca ltype "val_alloc" build in
     ignore(L.build_store (L.param def 1) valPtr build);
     let series_load = L.build_load series_ptr "series_load" build in
-    let series_array_ptr = L.build_struct_gep series_load 1 "series_array_ptr" build in
-    let series_array_load = L.build_load series_array_ptr "series_array_load" build in
+    let series_arr_ptr = L.build_struct_gep series_load 1 "series_arr_ptr" build in
+    let series_arr_load = L.build_load series_arr_ptr "series_arr_load" build in
     let series_size_ptr_ptr = L.build_struct_gep series_load 0 "series_size_ptr_ptr" build in 
     let series_size_ptr = L.build_load series_size_ptr_ptr "series_size_ptr" build in
     let series_size = L.build_load series_size_ptr "series_size" build in
     let next_index = series_size in
-    let next_element_ptr = L.build_gep series_array_load [| next_index |] "series_arry_next_element_ptr" build in
+    let next_element_ptr = L.build_gep series_arr_load [| next_index |] "series_arry_next_element_ptr" build in
     let next_size = L.build_add series_size (L.const_int i32_t 1) "inc_size" build in
-    let _ = L.build_store next_size series_size_ptr build in
-    let _ = L.build_store (L.build_load valPtr "val" build) next_element_ptr build in
-    let _ = L.build_ret_void build in
+    ignore(L.build_store next_size series_size_ptr build);
+    ignore(L.build_store (L.build_load valPtr "val" build) next_element_ptr build);
+    ignore(L.build_ret_void build);
     StringMap.add def_name def m in 
 List.fold_left series_push_ty StringMap.empty [ A.Bool; A.Int; A.Float; A.String ] in
 
@@ -145,20 +145,20 @@ let series_get : L.llvalue StringMap.t = (*referenced from ap++*)
       let def = L.define_function ("series_get" ^ def_name) (L.function_type ltype [| L.pointer_type (series_t ltype); i32_t |]) the_module in
       let build = L.builder_at_end context (L.entry_block def) in
       let series_ptr = L.build_alloca (L.pointer_type (series_t ltype)) "series_ptr_alloc" build in
-      let _ = L.build_store (L.param def 0) series_ptr build in
+      ignore(L.build_store (L.param def 0) series_ptr build);
       let idx_ptr = L.build_alloca i32_t "idx_alloc" build in
-      let _ = L.build_store (L.param def 1) idx_ptr build in
+      ignore(L.build_store (L.param def 1) idx_ptr build);
       let series_load = L.build_load series_ptr "series_load" build in
       let series_array_ptr = L.build_struct_gep series_load 1 "series_array_ptr" build in
       let series_array_load = L.build_load series_array_ptr "array_load" build in
       let idx = L.build_load idx_ptr "idx_load" build in
       let series_array_element_ptr = L.build_gep series_array_load [| idx |] "series_arry_element_ptr" build in
       let element_val = L.build_load series_array_element_ptr "series_array_element_ptr" build in
-      let _ = L.build_ret element_val build in
+      ignore(L.build_ret element_val build);
       StringMap.add def_name def m in
 List.fold_left series_get_ty StringMap.empty [ A.Bool; A.Int; A.Float; A.String ] in
 
-let series_size : L.llvalue StringMap.t = 
+let series_size : L.llvalue StringMap.t = (*referenced from ap++*)
   let series_size_ty m typ =
     let ltype = (ltype_of_typ typ) in 
     let def_name = (type_str typ) in
@@ -174,51 +174,27 @@ let series_size : L.llvalue StringMap.t =
     StringMap.add def_name def m in 
 List.fold_left series_size_ty StringMap.empty [ A.Bool; A.Int; A.Float; A.String ] in
 
-(* let series_pop : L.llvalue StringMap.t = 
+let series_pop : L.llvalue StringMap.t = (*referenced from ap++*)
   let series_pop_ty m typ =
-   let ltype = (ltype_of_typ typ) in 
-   let def_name = (type_str typ) in
-   let def = L.define_function ("series_pop" ^ def_name) (L.function_type void_t [| L.pointer_type (series_t ltype); ltype |]) the_module in
-   let build = L.builder_at_end context (L.entry_block def) in
-   let series_ptr = L.build_alloca (L.pointer_type (series_t ltype)) "series_ptr_alloc" build in
-   ignore(L.build_store (L.param def 0) series_ptr build);
-   let pop_value_ptr = L.build_alloca ltype "rem_val_ptr" build in
-   ignore(L.build_store (L.param def 1) pop_value_ptr build);
-   let pop_value = L.build_load pop_value_ptr "rem_val" build in
-   let series_load = L.build_load series_ptr "series_load" build in
-   let series_size_ptr_ptr = L.build_struct_gep series_load 0 "series_size_ptr_ptr" build in 
-   let series_size_ptr = L.build_load series_size_ptr_ptr "series_size_ptr" build in
-   let series_size = L.build_load series_size_ptr "series_size" build in
-   let seriesFindIndex = L.build_call (StringMap.find (type_str typ) series_find) [| series_load; remove_value |] "series_find" build in
-   let series_find_if_cond _builder = 
-       L.build_icmp L.Icmp.Sge seriesFindIndex (L.const_int i32_t 0) "loop_cond" _builder in
-   let series_else_body _builder = ignore(L.const_int i32_t 0); _builder in
-   let series_find_if_body _builder = 
-      let loop_idx_ptr = L.build_alloca i32_t "loop_cnt_ptr" _builder in
-      let loop_start_idx = L.build_add seriesFindIndex (L.const_int i32_t 1) "loop_start_idx" _builder in
-      let _ = L.build_store loop_start_idx loop_idx_ptr _builder in
-      let loop_upper_bound = series_size in
-      let loop_cond _builder = 
-         L.build_icmp L.Icmp.Slt (L.build_load loop_idx_ptr "loop_cnt" _builder) loop_upper_bound "loop_cond" _builder 
-      in
-      let loop_body _builder = 
-        let cur_index = L.build_load loop_idx_ptr "cur_idx" _builder in
-        let shiftto_index = L.build_sub cur_index (L.const_int i32_t 1) "shift_to_idx" _builder in
-        let get_val = L.build_call (StringMap.find (type_str typ) series_get) [| series_load; cur_index |] "series_get" _builder in
-        let _ = L.build_call (StringMap.find (type_str typ) series_set) [| series_load; shiftto_index; get_val |] "" _builder in
-        let index_incr = L.build_add cur_index (L.const_int i32_t 1) "loop_itr" _builder in
-        let _ = L.build_store index_incr loop_idx_ptr _builder in 
-        _builder
-      in
-      let while_builder = build_while _builder loop_cond loop_body def in
-      let size_dec = L.build_sub series_size (L.const_int i32_t 1) "size_dec" while_builder in
-      let _ = L.build_store size_dec series_size_ptr while_builder in
-      ignore(L.build_ret_void while_builder); while_builder 
-   in
-   let if_builder = build_if build series_find_if_cond series_find_if_body series_else_body def in
-   let _ = L.build_ret_void if_builder in
-   StringMap.add def_name def m in 
-List.fold_left series_pop_ty StringMap.empty [ A.Bool; A.Int; A.Float ] in *) 
+     let ltype = (ltype_of_typ typ) in 
+     let def_name = (type_str typ) in
+     let def = L.define_function ("series_pop" ^ def_name) (L.function_type ltype [| L.pointer_type (series_t ltype) |]) the_module in
+     let build = L.builder_at_end context (L.entry_block def) in
+     let series_ptr = L.build_alloca (L.pointer_type (series_t ltype)) "series_ptr_alloc" build in
+     ignore(L.build_store (L.param def 0) series_ptr build);
+     let series_load = L.build_load series_ptr "series_load" build in
+     let series_arr_ptr = L.build_struct_gep series_load 1 "series_arr_ptr" build in
+     let series_arr_load = L.build_load series_arr_ptr "series_arr_load" build in
+     let series_size_ptr_ptr = L.build_struct_gep series_load 0 "series_size_ptr_ptr" build in 
+     let series_size_ptr = L.build_load series_size_ptr_ptr "series_size_ptr" build in
+     let series_size = L.build_load series_size_ptr "series_size" build in
+     let series_sizeMin1 = L.build_sub series_size (L.const_int i32_t 1) "dec_size" build in
+     let last_element_ptr = L.build_gep series_arr_load [| series_sizeMin1 |] "series_arry_next_element_ptr" build in
+     let last_element_val = L.build_load last_element_ptr "series_arry_next_element" build in
+     let _ = L.build_store series_sizeMin1 series_size_ptr build in
+     let _ = L.build_ret last_element_val build in
+  StringMap.add def_name def m in
+List.fold_left series_pop_ty StringMap.empty [ A.Bool; A.Int; A.Float; A.String ] in
 
 let rec expr builder ((_, e) : sexpr) = match e with
 	SSliteral s   -> L.build_global_stringptr s "str" builder
@@ -275,8 +251,6 @@ let rec expr builder ((_, e) : sexpr) = match e with
     | A.Geq     -> L.build_icmp L.Icmp.Sge
     ) e1' e2' "tmp" builder
   | SSeriesliteral (series_type, literals) ->
-    (* if List.length sexpr_list = 0
-    then raise (Failure "empty array init is not supported") *)
     let ltype = (ltype_of_typ series_type) in (*gets type of elements in arr *) 
     let new_series_ptr = L.build_alloca (series_t ltype) "new_series_ptr" builder in
     let _ = init_series builder new_series_ptr series_type in
@@ -289,6 +263,8 @@ let rec expr builder ((_, e) : sexpr) = match e with
       L.build_call (StringMap.find (type_str series_type) series_get) [| (lookup id); (expr builder e) |] "series_get" builder 
   | SSeriesSize (series_type, id) -> 
       L.build_call ((StringMap.find (type_str series_type)) series_size) [| (lookup id) |] "series_size" builder
+  | SSeriesPop (series_type, id) -> 
+      L.build_call ((StringMap.find (type_str series_type)) series_pop) [| (lookup id) |] "series_pop" builder
 in
 
 (* LLVM insists each basic block end with exactly one "terminator" 
@@ -305,8 +281,6 @@ let rec stmt builder = function
   | SExpr e -> ignore(expr builder e); builder
   | SSeriesPush (id, e) -> 
       ignore(L.build_call (StringMap.find (type_str (fst e)) series_push) [| (lookup id); (expr builder e) |] "" builder); builder 
-  (* | SSeriesPop (id, e) ->
-  ignore(L.build_call (StringMap.find (type_str (fst e)) series_pop) [| (lookup id); (expr builder e) |] "" builder); builder *)
   | SIf (predicate, then_stmt, else_stmt) ->
     let bool_val = expr builder predicate in
     let merge_bb = L.append_block context "merge" main_func in

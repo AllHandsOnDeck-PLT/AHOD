@@ -7,7 +7,7 @@ let trd (_,_,c) = c;;
 
 %}
 
-%token LPAREN RPAREN LBRACE RBRACE LSQUARE RSQUARE SERIESSIZE SERIESPUSH SERIESPOP SERIES COLON SEMI COMMA PLUS MINUS MULT DIVIDE ASSIGN MOD POWER FLOOR DOT DOTDOT DOTDOTDOT NEWLINE
+%token LPAREN RPAREN LBRACE RBRACE LSQUARE RSQUARE SERIESSIZE SERIESPUSH SERIESPOP SERIES COLON SEMI COMMA PLUS MINUS MULT DIVIDE ASSIGN MOD POWER FLOOR DOT NEWLINE
 %token NOT EQ NEQ LT LEQ GT GEQ AND OR IN
 %token RETURN IF ELIF ELSE FOR WHILE INT BOOL FLOAT NONE STRING RANGE WHEN DO EXTERNAL LET BE WITH PASS MAIN TIMES CONST
 %token <int> ILIT
@@ -25,7 +25,6 @@ let trd (_,_,c) = c;;
 %left EQ NEQ
 %left LT GT LEQ GEQ 
 %nonassoc DO
-%nonassoc DOTDOT DOTDOTDOT
 %nonassoc COLON
 %left PLUS MINUS
 %left MOD 
@@ -83,7 +82,6 @@ stmt:
     | FOR ID IN expr COLON stmt_block       { ForLit($2, $4, $6) } 
     | WHILE expr COLON stmt_block           { While($2, $4) } 
     | ID DOT SERIESPUSH LPAREN expr RPAREN NEWLINE { SeriesPush($1, $5)}
-    | ID DOT SERIESPOP LPAREN expr RPAREN NEWLINE { SeriesPop($1, $5)}
     
 if_stmt:
     | IF expr COLON stmt_block elif_stmt        { If($2, $4, $5) }
@@ -116,8 +114,8 @@ expr:
     | SLIT 	                         { Sliteral($1) }
     | LSQUARE args_list_opt RSQUARE  { Seriesliteral($2) }
     | ID LSQUARE expr RSQUARE        { SeriesGet($1, $3) }
-    /* | ID DOT SERIESSIZE              { SeriesSize($1)} */
-    | SERIESSIZE LPAREN ID RPAREN    { SeriesSize($3)}
+    | ID DOT SERIESSIZE LPAREN RPAREN { SeriesSize($1)}
+    | ID DOT SERIESPOP LPAREN RPAREN { SeriesPop($1)}
     | ID                             { Id($1) } 
     | ID ASSIGN expr                 { Assign($1, $3) }
     | expr PLUS   expr               { Binop($1, Add,     $3) } 

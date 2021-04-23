@@ -1,6 +1,8 @@
 int a
 main:
   {
-    #nothing should be printed out 
-    #test: a = 1 #should still be valid
+    # nothing should be printed out 
+    # test: a = 1 #should still be valid
+    a = 1 #expects a newline.. but finds a comment so fails 
+    #test
   }
