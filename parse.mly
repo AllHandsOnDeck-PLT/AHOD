@@ -44,7 +44,7 @@ program:
 decls:
     /*nothing*/      { ([], []) }
     | decls global_decl  { (List.rev ($2::fst $1), snd $1) }
-    // | decls class_decl { (fst $1, List.rev ($2::snd $1)) }
+    | decls class_decl { (fst $1, List.rev ($2::snd $1)) }
     | decls action_decl { (fst $1, List.rev ($2::snd $1)) }
 
 

@@ -1,16 +1,7 @@
-main:
-  {
-
-  player = Player("bob")
-
-  do PRINT(player.name)
-  player do PLAY(3)
-  }
-
 Player player
 
 let Player(string name) be:
-  {
+{
   string name: name
   int score: 0
 
@@ -18,7 +9,17 @@ let Player(string name) be:
   {
   	do PRINT(number)
   }
-  }
+}
+
+main:
+{
+
+  player = Player("bob")
+
+  do PRINT(player.name)
+  player do PLAY(3)
+}
+
 /* 
   void Player(struct_player *obj, char* name){
     obj -> name = name 
