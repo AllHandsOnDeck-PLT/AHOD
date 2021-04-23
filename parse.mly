@@ -82,7 +82,7 @@ action_decl:
       atyp = $3;
       aname = $4;
       aparams = $6 ; 
-      abody = $9 }}
+      abody = [$9] }}
 
 // Block([]) 
 // action_decl: 

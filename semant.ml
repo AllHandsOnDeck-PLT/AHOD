@@ -71,9 +71,14 @@ in
 
 let rec check_stmt = function
   Expr e -> SExpr (check_expr e) 
-
   | Block sl -> 
-      SBlock(List.map check_stmt sl)
+    let rec check_stmt_list = function
+        [Return _ as s] -> [check_stmt s]
+      | Return _ :: _   -> raise (Failure "nothing may follow a return")
+      | Block sl :: ss  -> check_stmt_list (sl @ ss) (* Flatten blocks *)
+      | s :: ss         -> check_stmt s :: check_stmt_list ss
+      | []              -> []
+  in  SBlock(List.map check_stmt sl)
 in
   let check_action act =
       { sentitytyp = act.entitytyp;
@@ -81,9 +86,12 @@ in
         saname = act.aname; 
         satyp = act.atyp;
         saparams = act.aparams;
-        sabody = match check_stmt (act.abody) with
+        sabody = match check_stmt (Block act.abody) with
         SBlock(sl) -> sl
-        | _ -> raise (Failure ("internal error: block didn't become a block?"))
+            | _ -> raise (Failure ("internal error: block didn't become a block?"))
+        (* let _ = List.map check_stmt (Block act.abody) in match (Block act.abody) with
+        SBlock(sl) -> sl
+        | _ -> raise (Failure ("internal error: block didn't become a block?")) *)
         (* sabody = check_stmt (act.abody);  *)
         
     }

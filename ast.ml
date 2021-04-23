@@ -39,8 +39,8 @@ type attr_decl =
 type action_decl = {
   entitytyp : typ;
   entityid : string;
-  aname : string;
   atyp : typ; 
+  aname : string;
   aparams : bind list;
   abody: stmt list;
 }
