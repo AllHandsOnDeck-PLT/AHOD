@@ -1,7 +1,16 @@
 series<int> a
+series<string> b
+series<float> c
+series<bool> d 
 main:
   {
     a = [1,3]
   	do PRINT(a[1])
+    b = ["banana", "apple"]
+    do PRINT(b[1])
+    c = [1.1]
+    do PRINT(c[0])
+    d = [true, false]
+    do PRINT(d[1])
   }
   

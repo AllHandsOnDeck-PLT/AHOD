@@ -1,0 +1,6 @@
+int a
+main:
+  {
+    #nothing should be printed out 
+    #test: a = 1 #should still be valid
+  }

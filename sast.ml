@@ -9,6 +9,7 @@ and sx =
   | SSliteral of string
   | SSeriesliteral of typ * sexpr list
   | SSeriesGet of typ * string * sexpr
+  | SSeriesSize of typ * string
   | SActionCall of string * sexpr list
   | SId of string
   | SAssign of string * sexpr
@@ -23,7 +24,8 @@ type sstmt =
   | SFor of sexpr * sexpr * sexpr * sstmt
   | SForLit of string * sexpr * sstmt 
   | SWhile of sexpr * sstmt
-  | SSeriesAdd of string * sexpr 
+  | SSeriesPush of string * sexpr 
+  | SSeriesPop of string * sexpr 
 
 type saction_decl = {
   sentitytyp : typ;
@@ -46,6 +48,7 @@ let rec string_of_sexpr (t, e) =
   | SSliteral(l) -> l
   | SSeriesliteral(_) -> "list_literal"
   | SSeriesGet(_, id, e) -> id ^ "[" ^ (string_of_sexpr e) ^ "]"
+  | SSeriesSize(_, id) -> "series_size " ^ id
   | SId(s) -> s
   | SBinop(e1, o, e2) ->
       string_of_sexpr e1 ^ " " ^ string_of_op o ^ " " ^ string_of_sexpr e2

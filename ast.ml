@@ -14,8 +14,9 @@ type expr =
   | ActionCall of string * expr list
   | Id of string
   | Assign of string * expr
-  | Binop of expr * op * expr (*need to add binop*)
+  | Binop of expr * op * expr (*need to add unop*)
   | SeriesGet of string * expr
+  | SeriesSize of string
   | Noexpr
 
 type stmt =
@@ -26,7 +27,8 @@ type stmt =
   | For of expr * expr * expr * stmt
   | ForLit of string * expr * stmt 
   | While of expr * stmt
-  | SeriesAdd of string * expr
+  | SeriesPush of string * expr
+  | SeriesPop of string * expr
 
 type action_decl = {
   entitytyp : typ;
@@ -70,6 +72,7 @@ let rec string_of_expr = function
   | Sliteral(l) -> l
   | SeriesGet(id, e) ->  id ^ "[" ^ (string_of_expr e) ^ "]"
   | Seriesliteral(_) -> "series_literal"
+  | SeriesSize(id) -> "series_size " ^ id
   | Id(s) -> s
   | Binop(e1, o, e2) ->
       string_of_expr e1 ^ " " ^ string_of_op o ^ " " ^ string_of_expr e2

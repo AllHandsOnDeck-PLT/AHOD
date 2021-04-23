@@ -1,0 +1,7 @@
+series<int> a
+int b 
+main:
+  {
+    a = [2, 3, 4, 5]
+    size(a)
+  }

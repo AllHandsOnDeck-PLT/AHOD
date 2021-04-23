@@ -14,7 +14,9 @@ rule token = parse
 | '}'      { RBRACE }
 | '['      { LSQUARE }
 | ']'      { RSQUARE }
-| "add"    { SERIESADD }
+| "push"   { SERIESPUSH }
+| "pop"    { SERIESPOP }
+| "size"   { SERIESSIZE }
 | "series" { SERIES }
 (*| '<'      { LBRACK }*)
 (*| '>'      { RBRACK }*)
@@ -80,5 +82,5 @@ rule token = parse
 | _ as char { raise (Failure("illegal character " ^ Char.escaped char)) }
 
 and comment = parse
-  '\n' { token lexbuf }
+  "\n" { token lexbuf }
 | _    { comment lexbuf }

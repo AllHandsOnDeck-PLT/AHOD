@@ -1,0 +1,16 @@
+series<int> a
+series<string> b
+main:
+  {
+    a = [2] 
+    a.push(1)
+  	do PRINT(a[1])
+    a.push(3)
+    do PRINT(a[2])
+    do PRINT(a[2-1])
+    b = ["stmt1", "stmt2"]
+    b.push("stmt3")
+    b.push("stmt4")
+    do PRINT(b[3])
+  }
+  

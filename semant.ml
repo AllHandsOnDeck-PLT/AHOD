@@ -75,6 +75,8 @@ let check (globals, action_decls, main_stmt) =
              | _ -> raise (Failure ("list_get index must be integer, not " ^ string_of_typ t)) 
          in let list_type = check_list_type var
          in (list_type, SSeriesGet(list_type, var, (ty, e')))
+    | SeriesSize var -> 
+      (Int, SSeriesSize(check_list_type var, var))
 	in
   let check_match_list_type_expr l e = 
     let (t', e') as e'' = check_expr e
@@ -84,9 +86,12 @@ let check (globals, action_decls, main_stmt) =
 
 	let rec check_stmt = function
 		Expr e -> SExpr (check_expr e) 
-    | SeriesAdd (var, e) -> 
+    | SeriesPush (var, e) -> 
         let _ = check_list_type var in
-        SSeriesAdd(var, check_match_list_type_expr var e) 
+        SSeriesPush(var, check_match_list_type_expr var e) 
+    | SeriesPop (var, e) ->
+        let _ = check_list_type var in
+        SSeriesPop(var, check_match_list_type_expr var e)
     | If(p, b1, b2) -> SIf(check_expr p, check_stmt b1, check_stmt b2)
     | While(p, s) -> SWhile(check_expr p, check_stmt s)
     | For(e1, e2, e3, st) ->
