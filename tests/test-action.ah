@@ -1,5 +1,5 @@
 int x
-when do PLAY():
+when do int PLAY():
 {
   	do PRINT("no params from this action")
 }

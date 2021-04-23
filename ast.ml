@@ -40,7 +40,7 @@ type action_decl = {
   entitytyp : typ;
   entityid : string;
   aname : string;
-  typ : typ; 
+  atyp : typ; 
   aparams : bind list;
   abody: stmt;
 }

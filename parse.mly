@@ -75,14 +75,15 @@ class_decl:
       attributes = $8 }}*/
 
 action_decl: 
-    WHEN DO ACTIONID LPAREN params_list_opt RPAREN COLON stmt_block     
+    WHEN DO typ ACTIONID LPAREN params_list_opt RPAREN COLON stmt     
     {{ 
       entitytyp = None;
       entityid = "";
-      aname = $3;
-      typ = None;
-      aparams = $5 ; 
-      abody = $8 }}
+      atyp = $3;
+      aname = $4;
+      aparams = $6 ; 
+      abody = $9 }}
+
 // Block([]) 
 // action_decl: 
 //     WHENDO ACTIONID LPAREN params_list RPAREN COLON stmt_block          
