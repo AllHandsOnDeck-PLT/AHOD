@@ -38,8 +38,8 @@ let check_list_type id =
      Series t -> t
    | t -> raise (Failure ("check list type error, typ: " ^ string_of_typ t))
 in
-
-(* let add_action map ad = 
+ 
+let add_action map ad = 
   let built_in_err = "function " ^ ad.aname ^ " may not be defined"
   and dup_err = "duplicate function " ^ ad.aname
   and make_err er = raise (Failure er)
@@ -57,7 +57,7 @@ in
 let find_act s = 
   try StringMap.find s action_decls_map
   with Not_found -> raise (Failure ("unrecognized action " ^ s))
-in *)
+in
 
 let rec check_expr = function
   (*need to figure out typ, if name is defined*)
@@ -142,7 +142,7 @@ let rec check_expr = function
       | []              -> []
   in  SBlock(List.map check_stmt sl)
 in
-
+(* 
 let add_action map ad = 
   let built_in_err = "action " ^ ad.aname ^ " may not be defined"
   and dup_err = "duplicate action " ^ ad.aname
@@ -161,7 +161,7 @@ in
 let find_act s = 
   try StringMap.find s action_decls_map
   with Not_found -> raise (Failure ("unrecognized action " ^ s))
-in
+in *)
 
 
 
