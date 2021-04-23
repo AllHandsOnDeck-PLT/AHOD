@@ -1,7 +1,13 @@
 int x
+bool y 
+string z
 main:
   {
-  x = 5
+  x = 4
   do PRINT(x)
+  y = true
+  do PRINT(y)
+  z = "banana"
+  do PRINT(z)
   }
   
