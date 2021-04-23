@@ -46,6 +46,7 @@ type action_decl = {
   atyp : typ; 
   aname : string;
   aparams : bind list;
+  alocals : bind list;
   abody: stmt list;
 }
 

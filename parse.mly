@@ -18,6 +18,7 @@ let trd (_,_,c) = c;;
 %start program
 %type <Ast.program> program
 
+%nonassoc NOELSE
 %nonassoc FOR IN
 %right ASSIGN
 %left OR
@@ -58,7 +59,8 @@ global_decl:
     typ ID NEWLINE { ($1, $2) }
     
 main_decl:
-    MAIN COLON stmt_block { $3 } 
+    MAIN COLON stmt { $3 }
+    /*MAIN COLON stmt_block { $3 } */
 
 class_decl:
     LET CLASSID LPAREN params_list RPAREN BE COLON class_block     
@@ -75,14 +77,15 @@ class_decl:
       attributes = $8 }}*/
 
 action_decl: 
-    WHEN DO typ ACTIONID LPAREN params_list_opt RPAREN COLON stmt_block      
+    WHEN DO typ ACTIONID LPAREN params_list_opt RPAREN COLON NEWLINE LBRACE NEWLINE locals_list stmt_list RBRACE NEWLINE    
     {{ 
       entitytyp = None;
       entityid = "";
       atyp = $3;
       aname = $4;
       aparams = $6 ; 
-      abody = [$9] }}
+      alocals = $12
+      abody = [$13] }}
 
 // Block([]) 
 // action_decl: 
@@ -110,10 +113,10 @@ class_decl_list:
 
 attr_decl:
     | typ ID COLON expr NEWLINE { OneAdecl($1, $2, $4)}
+
 params_list_opt: 
     |params_list    {$1}
     | /*Nothing*/   {[]}
-
 
 params_list:
     param                        { [$1] } 
@@ -122,8 +125,16 @@ params_list:
 param:
       typ ID                       { $1, $2 }
 
+/*stmt_block:
+    NEWLINE LBRACE NEWLINE locals_list stmt_list RBRACE NEWLINE              { Block(List.rev $4, List.rev $5) }
+*/
 stmt_block:
     NEWLINE LBRACE NEWLINE stmt_list RBRACE NEWLINE              { Block(List.rev $4) }
+
+
+locals_list:
+    global_decl                           { [$1] }
+    | locals_list global_decl               { $2 :: $1 }
 
 stmt_list: 
     stmt                                  { [$1] }
@@ -131,28 +142,41 @@ stmt_list:
 
 stmt:
     | stmt_block                            { $1 }
+    //| NEWLINE LBRACE NEWLINE stmt_list RBRACE NEWLINE  { Block(List.rev $4) }
     | expr NEWLINE                          { Expr $1 } 
     // | PASS NEWLINE                       { }
     | RETURN expr_opt NEWLINE               { Return $2 }
     | if_stmt                               { $1 }
-    | FOR LPAREN expr SEMI expr SEMI expr RPAREN COLON stmt_block  { For($3, $5, $7, $10)   }
+
+    | FOR LPAREN expr SEMI expr SEMI expr RPAREN COLON stmt { For($3, $5, $7, $10)   }
+    | FOR ID IN expr COLON stmt       { ForLit($2, $4, $6) } 
+    | WHILE expr COLON stmt          { While($2, $4) }
+
+    /*| FOR LPAREN expr SEMI expr SEMI expr RPAREN COLON stmt_block  { For($3, $5, $7, $10)   }
     | FOR ID IN expr COLON stmt_block       { ForLit($2, $4, $6) } 
-    | WHILE expr COLON stmt_block          { While($2, $4) } 
+    | WHILE expr COLON stmt_block          { While($2, $4) } */
     | ID DOT SERIESADD LPAREN expr RPAREN   { SeriesAdd($1, $5)}
+
 if_stmt:
     | IF expr COLON stmt_block elif_stmt        { If($2, $4, $5) }
     | IF expr COLON stmt_block else_block_opt   { If($2, $4, $5) }
+    /*| IF expr COLON stmt_block elif_stmt        { If($2, $4, $5) }*/
+    /*| IF expr COLON stmt_block else_block_opt   { If($2, $4, $5) }*/
 
 elif_stmt:
     | ELIF expr COLON stmt_block elif_stmt          { If($2, $4, $5) }
-    | ELIF expr COLON stmt_block else_block_opt     { If($2, $4, $5) }
+    | ELIF expr COLON stmt_block else_block         { If($2, $4, $5) }
+    | ELIF expr COLON stmt_block %prec NOELSE                   { If($2, $4, Block([])) }
+    /*| ELIF expr COLON stmt_block elif_stmt          { If($2, $4, $5) }*/
+    /*| ELIF expr COLON stmt_block else_block_opt     { If($2, $4, $5) }*/
 
 else_block_opt:
       /* nothing */      { Block([]) }
       | else_block       { $1 }
 
 else_block:
-      ELSE COLON stmt_block     { $3 }
+    ELSE COLON stmt        { $3 }
+    /*ELSE COLON stmt_block     { $3 }*/
 
 typ:
     | INT               { Int       }
