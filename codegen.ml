@@ -62,7 +62,7 @@ let translate (globals, action_decls, main_stmt) =
     let ftype = L.function_type i32_t [| |] in
     L.define_function "main" ftype the_module 
   in
-  let mbuilder = L.builder_at_end context (L.entry_block main_func) in
+  let builder = L.builder_at_end context (L.entry_block main_func) in
 
   (*series generation*)
   let init_series builder series_ptr series_type = 
@@ -294,13 +294,14 @@ let translate (globals, action_decls, main_stmt) =
           (*| SForLit ( e1, e2, body) -> stmt builder
           ( SBlock [SExpr e1 ; SWhile (e2, SBlock [body ; SExpr e]) ] )*)
     in
-    let builder = stmt builder (SBlock adecl.sabody) in 
+
+    let builder = stmt (builder (SBlock adecl.sabody)) in 
     add_terminal builder (match adecl.satyp with
             A.None -> L.build_ret_void
           | A.Float -> L.build_ret (L.const_float float_t 0.0)
           | t -> L.build_ret (L.const_int (ltype_of_typ t) 0)) 
 
-    let builder = stmt builder (main_stmt) in
+    let builder = stmt (builder (main_stmt)) in
     let _ = L.build_ret (L.const_int i32_t 0) (builder) in
 
     (* 
@@ -327,7 +328,7 @@ the_module
 
 (* let (build_action_body) 
 
-  let/in 
+  let/in st_gen 
   let bldr_act in let ret_act  
   let bldr_main in let ret_main  
 in 
