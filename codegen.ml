@@ -129,7 +129,10 @@ let local_vars =
 
        let lookup n = StringMap.find n global_vars
        in
-  
+(*
+       let lookup_class n = StringMap.find n global_vars
+       in
+*)  
 
 let printf_t : L.lltype = 
       L.var_arg_function_type i32_t [| L.pointer_type i8_t |] in
@@ -191,9 +194,12 @@ let rec expr builder ((_, e) : sexpr) = match e with
   | SNoexpr     -> L.const_int i32_t 0
   | SAssign (s, e) -> let e' = expr builder e in
                           ignore(L.build_store e' (lookup s) builder); e'
-
 (*
   | SPClassCall("Player", [e]) ->
+    let e' = expr builder e in
+                          ignore(L.build_store e' (lookup_class s) builder); e'
+*)
+    (*
     let create_obj_gen e llbuilder = 
       let params = List.map (expr_gen llbuilder) el in
       let obj = L.build_call f (Array.of_list params) "tmp" llbuilder in
