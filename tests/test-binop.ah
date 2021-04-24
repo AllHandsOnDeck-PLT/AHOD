@@ -25,5 +25,8 @@ main:
   do PRINT(2 > 1)
   do PRINT(1 >= 2)
   do PRINT(3 >= 2)
+  do PRINT(-3 + 1)
+  do PRINT(-3 - 1)
+  do PRINT(not true)
   }
   

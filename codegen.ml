@@ -5,57 +5,58 @@ open Sast
 module StringMap = Map.Make(String)
 
 let translate (globals, action_decls, main_stmt) =
-	 let context    = L.global_context () in
+  let context    = L.global_context () in
 
-	 let the_module = L.create_module context "AHOD" in
+  let the_module = L.create_module context "AHOD" in
 
-	 let str_format_str = L.define_global "str" (L.const_stringz context "%s\n") the_module  
-	 and int_format_str =  L.define_global "str" (L.const_stringz context "%d\n") the_module 
-	 and float_format_str = L.define_global "str" (L.const_stringz context "%g\n") the_module 
-	 and bool_format_str = L.define_global "str" (L.const_stringz context "%d\n") the_module in
+  let str_format_str = L.define_global "str" (L.const_stringz context "%s\n") the_module  
+  and int_format_str =  L.define_global "str" (L.const_stringz context "%d\n") the_module 
+  and float_format_str = L.define_global "str" (L.const_stringz context "%g\n") the_module 
+  and bool_format_str = L.define_global "str" (L.const_stringz context "%d\n") the_module in
 
-	 let i32_t      = L.i32_type    context
-	 and i8_t       = L.i8_type     context
-	 and i1_t       = L.i1_type     context
-	 and float_t    = L.double_type context
-	 and string_t   = L.pointer_type (L.i8_type context)
-   and void_t     = L.void_type   context 
-   and series_t t   = L.struct_type context [| L.pointer_type (L.i32_type context); (L.pointer_type t) |]
-   in
+  let i32_t      = L.i32_type    context
+  and i8_t       = L.i8_type     context
+  and i1_t       = L.i1_type     context
+  and float_t    = L.double_type context
+  and string_t   = L.pointer_type (L.i8_type context)
+  and void_t     = L.void_type   context 
+  and series_t t   = L.struct_type context [| L.pointer_type (L.i32_type context); (L.pointer_type t) |]
+  in
    
-   let rec ltype_of_typ = function
+  let rec ltype_of_typ = function
     | A.Int   -> i32_t
     | A.Bool  -> i1_t 
     | A.Float -> float_t
     | A.String -> string_t
     | A.None -> void_t
     | A.Series t -> series_t (ltype_of_typ t)
-    in
-    let type_str t = match t with
-        A.Int -> "int"
-      | A.Bool -> "bool"
-      | A.Float -> "float"
-      | A.String -> "str"
-      | _ -> raise (Failure "Invalid string map key type")
-    in
+  in
 
-    let main_func = 
-      let ftype = L.function_type i32_t [| |]
-      in
-      L.define_function "main" ftype the_module
+  let type_str t = match t with
+    | A.Int -> "int"
+    | A.Bool -> "bool"
+    | A.Float -> "float"
+    | A.String -> "str"
+    | _ -> raise (Failure "Invalid string map key type")
+  in
+
+  let main_func = 
+    let ftype = L.function_type i32_t [| |]
     in
+    L.define_function "main" ftype the_module
+  in
     
-    let builder = L.builder_at_end context (L.entry_block main_func) in
+  let builder = L.builder_at_end context (L.entry_block main_func) in
 
- let global_vars : L.llvalue StringMap.t = (* type:  L.llvalue StringMap.t *)
-  let global_var m (t, n) = (*t: type, n:name*)
-    let init = match t with
-        A.Float -> L.const_float (ltype_of_typ t) 0.0
-      | A.String -> L.const_pointer_null (ltype_of_typ t)
-      | A.Series series_type -> L.const_struct context ([| L.const_pointer_null (L.pointer_type(L.i32_type context)); L.const_pointer_null (L.pointer_type(ltype_of_typ series_type))|])
-      | _ -> L.const_int (ltype_of_typ t) 0
-    in StringMap.add n (L.define_global n init the_module) m in
-  List.fold_left global_var StringMap.empty globals in
+  let global_vars : L.llvalue StringMap.t = (* type:  L.llvalue StringMap.t *)
+    let global_var m (t, n) = (*t: type, n:name*)
+      let init = match t with
+          A.Float -> L.const_float (ltype_of_typ t) 0.0
+        | A.String -> L.const_pointer_null (ltype_of_typ t)
+        | A.Series series_type -> L.const_struct context ([| L.const_pointer_null (L.pointer_type(L.i32_type context)); L.const_pointer_null (L.pointer_type(ltype_of_typ series_type))|])
+        | _ -> L.const_int (ltype_of_typ t) 0
+      in StringMap.add n (L.define_global n init the_module) m in
+    List.fold_left global_var StringMap.empty globals in
 
 
 
@@ -231,7 +232,7 @@ let rec expr builder ((_, e) : sexpr) = match e with
     | A.Greater -> L.build_fcmp L.Fcmp.Ogt
     | A.Geq     -> L.build_fcmp L.Fcmp.Oge
     | A.And | A.Or ->
-        raise (Failure "internal error: semant should have rejected and/or on float")
+      raise (Failure "internal error: semant should have rejected and/or on float")
     ) e1' e2' "tmp" builder
   | SBinop (e1, op, e2) ->
     let e1' = expr builder e1
@@ -250,6 +251,13 @@ let rec expr builder ((_, e) : sexpr) = match e with
     | A.Greater -> L.build_icmp L.Icmp.Sgt
     | A.Geq     -> L.build_icmp L.Icmp.Sge
     ) e1' e2' "tmp" builder
+  | SUnop(op, ((t, _) as e)) ->
+    let e' = expr builder e in
+    (match op with
+      | A.Neg when t = A.Float -> L.build_fneg 
+      | A.Neg                  -> L.build_neg
+      | A.Not                  -> L.build_not) 
+    e' "tmp" builder
   | SSeriesliteral (series_type, literals) ->
     let ltype = (ltype_of_typ series_type) in (*gets type of elements in arr *) 
     let new_series_ptr = L.build_alloca (series_t ltype) "new_series_ptr" builder in

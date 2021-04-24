@@ -58,35 +58,43 @@ let check (globals, action_decls, main_stmt) =
       let err = "illegal assignment " ^ string_of_typ lt ^ " = " ^ 
              string_of_typ rt 
       in (check_assign lt rt err, SAssign(var, (rt, e')))
+    | Unop(op, e) as ex -> 
+      let (t, e') = check_expr e in
+      let ty = match op with
+        Neg when t = Int || t = Float -> t
+      | Not when t = Bool -> Bool
+      | _ -> raise (Failure ("illegal unary operator " ^ 
+                              string_of_uop op ^ string_of_typ t ^
+                              " in " ^ string_of_expr ex))
+      in (ty, SUnop(op, (t, e')))
     | Binop(e1, op, e2) as e -> 
-          let (t1, e1') = check_expr e1 
-          and (t2, e2') = check_expr e2 in
-          (* All binary operators require operands of the same type *)
-          let same = t1 = t2 in
-          (* Determine expression type based on operator and operand types *)
-          let ty = match op with
-            Add | Sub | Mult | Div when same && t1 = Int   -> Int
-          | Add | Sub | Mult | Div when same && t1 = Float -> Float
-          | Equal | Neq            when same               -> Bool
-          | Less | Leq | Greater | Geq
-                     when same && (t1 = Int || t1 = Float) -> Bool
-          | And | Or when same && t1 = Bool -> Bool
-          | _ -> raise (
-        Failure ("illegal binary operator " ))
-          in (ty, SBinop((t1, e1'), op, (t2, e2')))
+      let (t1, e1') = check_expr e1 
+      and (t2, e2') = check_expr e2 in
+      (* All binary operators require operands of the same type *)
+      let same = t1 = t2 in
+      (* Determine expression type based on operator and operand types *)
+      let ty = match op with
+        Add | Sub | Mult | Div when same && t1 = Int   -> Int
+      | Add | Sub | Mult | Div when same && t1 = Float -> Float
+      | Equal | Neq            when same               -> Bool
+      | Less | Leq | Greater | Geq
+                  when same && (t1 = Int || t1 = Float) -> Bool
+      | And | Or when same && t1 = Bool -> Bool
+      | _ -> raise (Failure ("illegal binary operator " )) in 
+        (ty, SBinop((t1, e1'), op, (t2, e2')))
     | Seriesliteral vals ->
-         let (t', _) = check_expr (List.hd vals) in
-         let map_func lit = check_expr lit in
-         let vals' = List.map map_func vals in
-         (* TODO: check if all vals are same type *)
-         (Series t', SSeriesliteral(t', vals'))
+      let (t', _) = check_expr (List.hd vals) in
+      let map_func lit = check_expr lit in
+      let vals' = List.map map_func vals in
+      (* TODO: check if all vals are same type *)
+      (Series t', SSeriesliteral(t', vals'))
     | SeriesGet (var, e) -> 
-         let (t, e') = check_expr e in
-         let ty = match t with 
-             Int -> Int
-             | _ -> raise (Failure ("series_get index must be integer, not " ^ string_of_typ t)) 
-         in let series_type = check_series_type var
-         in (series_type, SSeriesGet(series_type, var, (ty, e')))
+      let (t, e') = check_expr e in
+      let ty = match t with 
+          Int -> Int
+          | _ -> raise (Failure ("series_get index must be integer, not " ^ string_of_typ t)) 
+      in let series_type = check_series_type var
+      in (series_type, SSeriesGet(series_type, var, (ty, e')))
     | SeriesSize var -> 
       (Int, SSeriesSize(check_series_type var, var))
     | SeriesPop var -> 

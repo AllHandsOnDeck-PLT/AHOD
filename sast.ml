@@ -15,6 +15,7 @@ and sx =
   | SId of string
   | SAssign of string * sexpr
   | SBinop of sexpr * op * sexpr
+  | SUnop of uop * sexpr
   | SNoexpr
 
 type sstmt =
@@ -50,11 +51,12 @@ let rec string_of_sexpr (t, e) =
   | SSeriesGet(_, id, e) -> id ^ "[" ^ (string_of_sexpr e) ^ "]"
   | SSeriesSize(_, id) -> "series_size " ^ id
   | SSeriesPop(_, id) -> "series_pop " ^ id
+  | SActionCall(f, el) ->
+  "do " ^f ^ "(" ^ String.concat ", " (List.map string_of_sexpr el) ^ ")"
   | SId(s) -> s
+  | SAssign(v, e) -> v ^ " = " ^ string_of_sexpr e
   | SBinop(e1, o, e2) ->
       string_of_sexpr e1 ^ " " ^ string_of_op o ^ " " ^ string_of_sexpr e2
-  | SAssign(v, e) -> v ^ " = " ^ string_of_sexpr e
-  | SActionCall(f, el) ->
-    "do " ^f ^ "(" ^ String.concat ", " (List.map string_of_sexpr el) ^ ")"
+  | SUnop(o, e) -> string_of_uop o ^ string_of_sexpr e
   | SNoexpr -> ""
           ) ^ ")"  
