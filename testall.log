@@ -1,0 +1,93 @@
+/usr/bin/lli
+
+###### Testing test-action
+./AHOD.native tests/test-action.ah > test-action.ll
+Fatal error: exception Parsing.Parse_error
+###### FAILED
+
+###### Testing test-assgin-local
+./AHOD.native tests/test-assgin-local.ah > test-assgin-local.ll
+Fatal error: exception Parsing.Parse_error
+###### FAILED
+
+###### Testing test-assign
+./AHOD.native tests/test-assign.ah > test-assign.ll
+Fatal error: exception Failure("unrecognized action PRINT")
+###### FAILED
+
+###### Testing test-binop
+./AHOD.native tests/test-binop.ah > test-binop.ll
+Fatal error: exception Failure("unrecognized action PRINT")
+###### FAILED
+
+###### Testing test-class1
+./AHOD.native tests/test-class1.ah > test-class1.ll
+Fatal error: exception Parsing.Parse_error
+###### FAILED
+
+###### Testing test-class2
+./AHOD.native tests/test-class2.ah > test-class2.ll
+Fatal error: exception Parsing.Parse_error
+###### FAILED
+
+###### Testing test-for1
+./AHOD.native tests/test-for1.ah > test-for1.ll
+Fatal error: exception Failure("unrecognized action PRINT")
+###### FAILED
+
+###### Testing test-for2
+./AHOD.native tests/test-for2.ah > test-for2.ll
+Fatal error: exception Failure("unrecognized action PRINT")
+###### FAILED
+
+###### Testing test-globals
+./AHOD.native tests/test-globals.ah > test-globals.ll
+Fatal error: exception Parsing.Parse_error
+###### FAILED
+
+###### Testing test-helloworld
+./AHOD.native tests/test-helloworld.ah > test-helloworld.ll
+Fatal error: exception Failure("unrecognized action PRINT")
+###### FAILED
+
+###### Testing test-if-else
+./AHOD.native tests/test-if-else.ah > test-if-else.ll
+Fatal error: exception Failure("unrecognized action PRINT")
+###### FAILED
+
+###### Testing test-if
+./AHOD.native tests/test-if.ah > test-if.ll
+Fatal error: exception Failure("unrecognized action PRINT")
+###### FAILED
+
+###### Testing test-printint
+./AHOD.native tests/test-printint.ah > test-printint.ll
+Fatal error: exception Failure("unrecognized action PRINT")
+###### FAILED
+
+###### Testing test-series
+./AHOD.native tests/test-series.ah > test-series.ll
+Fatal error: exception Failure("unrecognized action PRINT")
+###### FAILED
+
+###### Testing test-while-gcd
+./AHOD.native tests/test-while-gcd.ah > test-while-gcd.ll
+Fatal error: exception Failure("unrecognized action PRINT")
+###### FAILED
+
+###### Testing test-while1
+./AHOD.native tests/test-while1.ah > test-while1.ll
+Fatal error: exception Failure("unrecognized action PRINT")
+###### FAILED
+
+###### Testing test-while2
+./AHOD.native tests/test-while2.ah > test-while2.ll
+Fatal error: exception Failure("unrecognized action PRINT")
+###### FAILED
+
+###### Testing fail-*
+./AHOD.native < tests/fail-*.ah 2> fail-*.err >> testall.log
+./testall.sh: 1: eval: cannot open tests/fail-*.ah: No such file
+diff -b fail-*.err tests/fail-*.err > fail-*.diff
+FAILED fail-*.err differs from tests/fail-*.err
+###### FAILED
