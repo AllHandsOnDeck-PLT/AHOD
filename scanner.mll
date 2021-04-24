@@ -16,6 +16,8 @@ rule token = parse
 | ']'      { RSQUARE }
 | "add"    { SERIESADD }
 | "series" { SERIES }
+| "Player" { PLAYER }
+| "Card"   { CARD }
 (*| '<'      { LBRACK }*)
 (*| '>'      { RBRACK }*)
 | ':'      { COLON }

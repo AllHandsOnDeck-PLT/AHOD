@@ -13,6 +13,8 @@ and sx =
   | SId of string
   | SAssign of string * sexpr
   | SBinop of sexpr * op * sexpr
+  | SClassCall of string * sexpr list
+  | SAttrCall of string * string 
   | SNoexpr
 
 type sstmt =
@@ -25,12 +27,22 @@ type sstmt =
   | SWhile of sexpr * sstmt
   | SSeriesAdd of string * sexpr 
 
+type sattr_decl = 
+  | SOneAdecl of typ * string * sexpr 
+
+
 type saction_decl = {
   sentitytyp : typ;
   sentityid : string;
   saname : string;
   saparams : bind list;
   sabody: sstmt;
+}
+type sclass_decl = {
+  scname : string;
+  scparams : bind list;
+  sactions : saction_decl list;
+  sattributes : sattr_decl list;
 }
 
 type sprogram = bind list * saction_decl list * sstmt 

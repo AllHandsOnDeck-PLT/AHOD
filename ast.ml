@@ -1,9 +1,11 @@
 type op = Add | Sub | Mult | Div | Equal | Neq | Less | Leq | Greater | Geq |
           And | Or | Mod
 
-type typ = Int | Float | Bool | String | None | Series of typ
+
+type typ = Int | Float | Bool | String | None | Series of typ | ClassID | Player | Card
 
 type bind = typ * string
+          
 
 type expr =
   | Iliteral of int
@@ -15,8 +17,13 @@ type expr =
   | Id of string
   | Assign of string * expr
   | Binop of expr * op * expr (*need to add binop*)
+  | PClassCall of expr list
+  | CClassCall of expr list
+ (*| ClassCall of string * expr list*)
+  | AttrCall of string * string 
   | SeriesGet of string * expr
   | Noexpr
+
 
 type stmt =
   | Block of stmt list
@@ -28,12 +35,23 @@ type stmt =
   | While of expr * stmt
   | SeriesAdd of string * expr
 
+type attr_decl = 
+  | OneAdecl of typ * string * expr 
+
+
 type action_decl = {
   entitytyp : typ;
   entityid : string;
   aname : string;
   aparams : bind list;
   abody: stmt;
+}
+
+type class_decl = {
+  cname : string;
+  cparams : bind list;
+  actions : action_decl list;
+  attributes : attr_decl list;
 }
 
 type program = bind list * action_decl list * stmt

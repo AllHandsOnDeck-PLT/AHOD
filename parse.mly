@@ -7,8 +7,8 @@ let trd (_,_,c) = c;;
 
 %}
 
-%token LPAREN RPAREN LBRACE RBRACE LSQUARE RSQUARE SERIESADD SERIES COLON SEMI COMMA PLUS MINUS MULT DIVIDE ASSIGN MOD POWER FLOOR DOT DOTDOT DOTDOTDOT NEWLINE
-%token NOT EQ NEQ LT LEQ GT GEQ AND OR IN
+%token LPAREN RPAREN LBRACE RBRACE LSQUARE RSQUARE SERIESADD SERIES CARD PLAYER COLON SEMI COMMA PLUS MINUS MULT DIVIDE ASSIGN MOD POWER FLOOR DOT DOTDOT DOTDOTDOT NEWLINE
+%token NOT EQ NEQ LT LEQ GT GEQ AND OR IN 
 %token RETURN IF ELIF ELSE FOR WHILE INT BOOL FLOAT NONE STRING RANGE WHEN DO EXTERNAL LET BE WITH PASS MAIN TIMES CONST
 %token <int> ILIT
 %token <bool> BLIT
@@ -59,6 +59,29 @@ global_decl:
 main_decl:
       MAIN COLON stmt_block { $3 } 
 
+class_decl:
+    LET CLASSID LPAREN params_list RPAREN BE COLON class_block     
+    {{
+      cname = $2;
+      cparams = $4; 
+      actions = fst $8;
+      attributes = snd $8 }}
+
+    /*LET CLASSID LPAREN params_list RPAREN BE COLON class_block        
+    {{ 
+      cname = $2;
+      cparams = $4;
+      attributes = $8 }}*/
+class_block:
+    NEWLINE LBRACE NEWLINE class_decl_list RBRACE NEWLINE { $4 }
+
+class_decl_list:
+  | action_decl                     { ([$1], []) }
+  | attr_decl                       { ([], [$1]) }
+  | class_decl_list action_decl     { (List.rev ($2::fst $1), snd $1) }
+  | class_decl_list attr_decl       { (fst $1, List.rev ($2::snd $1)) }
+attr_decl:
+    | typ ID COLON expr NEWLINE { OneAdecl($1, $2, $4)}
 params_list:
     param                        { [$1] } 
     | params_list COMMA param      { $3::$1 }
@@ -99,12 +122,15 @@ else_block:
       ELSE COLON stmt_block     { $3 }
 
 typ:
-    | INT               { Int       }
-    | BOOL              { Bool      }
-    | FLOAT             { Float     }
-    | STRING            { String    }
-    | NONE              { None      }
-    | SERIES LT typ GT  { Series($3)}
+    | INT                                           { Int       }
+    | BOOL                                          { Bool      }
+    | FLOAT                                         { Float     }
+    | STRING                                        { String    }
+    | NONE                                          { None      }
+    | SERIES LT typ GT                              { Series($3)}
+    | CLASSID                                       { ClassID }
+    | PLAYER                                        { Player }
+    | CARD                                          { Card }
 
 expr:
     | call_action                    { $1 } 
@@ -139,6 +165,14 @@ args_list:
 
 call_action:
     | DO ACTIONID LPAREN args_list_opt RPAREN        { ActionCall($2, $4) }
+
+
+call_class: 
+    | PLAYER LPAREN args_list_opt RPAREN            { PClassCall($3) } 
+    | CARD LPAREN args_list_opt RPAREN            { CClassCall($3) } 
+
+call_attr:
+    ID DOT ID      { AttrCall($1, $3) }
 
 expr_opt:
     /* nothing */      { Noexpr }
