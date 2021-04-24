@@ -38,6 +38,15 @@ let check_list_type id =
      Series t -> t
    | t -> raise (Failure ("check list type error, typ: " ^ string_of_typ t))
 in
+
+let built_in_decls = 
+  let add_bind map (name, ty) = StringMap.add name {
+    atyp = None;
+    aname = name; 
+    aparams = [(ty, "x")];
+    abody = [] } map
+  in List.fold_left add_bind StringMap.empty [ ("PRINT", Int)]
+in
  
 let add_action map ad = 
   let built_in_err = "function " ^ ad.aname ^ " may not be defined"

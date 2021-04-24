@@ -46,7 +46,7 @@ let translate (globals, action_decls, main_stmt) =
       L.define_function "main" ftype the_module
     in
     
-    let builder = L.builder_at_end context (L.entry_block main_func) in
+    let mbuilder = L.builder_at_end context (L.entry_block main_func) in
 
     let init_series builder series_ptr series_type = 
       (* initialize size to 0 *)
@@ -88,6 +88,7 @@ let printf_func : L.llvalue =
   in let build_action_body adecl =
     let (the_action, _) = StringMap.find adecl.saname action_decls_map in
     let builder = L.builder_at_end context (L.entry_block the_action) in
+    (* let main_builder = L.builder_at_end context (L.entry_block main_func) in *)
 
 
 (* COME BACK TO ADD IN LOCALS AND PARAMS 
@@ -314,21 +315,29 @@ let rec stmt builder = function
       (*| SForLit ( e1, e2, body) -> stmt builder
 	    ( SBlock [SExpr e1 ; SWhile (e2, SBlock [body ; SExpr e]) ] )*)
     in
+(* 
+    let mbuilder = stmt builder main_stmt
+    in
+    let _ = L.build_ret (L.const_int i32_t 0) (mbuilder) 
+    in *)
 
-  (* let builder = stmt builder main_stmt  *)
-  let builder = stmt builder (SBlock adecl.sabody) 
-  in 
-  add_terminal builder (match adecl.satyp with
-          A.None -> L.build_ret_void
-        | A.Float -> L.build_ret (L.const_float float_t 0.0)
-        | t -> L.build_ret (L.const_int (ltype_of_typ t) 0)) 
+    (* let builder = stmt builder main_stmt  *)
+    let builder = stmt builder (SBlock adecl.sabody) 
+    in 
+    add_terminal builder (match adecl.satyp with
+            A.None -> L.build_ret_void
+          | A.Float -> L.build_ret (L.const_float float_t 0.0)
+          | t -> L.build_ret (L.const_int (ltype_of_typ t) 0)) 
 
 in 
-
-(* let builder = stmt builder main_stmt
-  in 
-
-let _ = L.build_ret (L.const_int i32_t 0) (builder) 
-in *)
+  
+  (* List.iter build_action_body action_decls;
+in  *)
+let mbuilder = stmt builder main_stmt
+  in
+let _ = L.build_ret (L.const_int i32_t 0) (mbuilder) 
+in
+    (* build_action_body main_stmt;  *)
 List.iter build_action_body action_decls;
+(* build_action_body main_stmt; *)
 the_module

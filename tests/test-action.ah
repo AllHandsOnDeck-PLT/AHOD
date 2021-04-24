@@ -1,9 +1,8 @@
 int x
-when do int PLAY():
+when do None PLAY():
 {
-  	do PRINT("no params from this action")
+  x = 3
 }
-
 main:
 {
   do PLAY()
