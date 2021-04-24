@@ -58,11 +58,7 @@ let translate (globals, action_decls, main_stmt) =
   let printf_func : L.llvalue = 
     L.declare_function "printf" printf_t the_module in
 
-(*~~~~~~~~~~~~~~~~~~~~  main function generation top-level ~~~~~~~~~~~~~~~~~~~~~~~~~~~~*)
-  let main_func = 
-    let ftype = L.function_type i32_t [| |] in
-  L.define_function "main" ftype the_module in
-  let builder = L.builder_at_end context (L.entry_block main_func) in
+
 
   (*series generation*)
   let init_series builder series_ptr series_type = 
@@ -87,11 +83,7 @@ let translate (globals, action_decls, main_stmt) =
     StringMap.add name (L.define_function name atype the_module, adecl) m in 
   List.fold_left action_decl StringMap.empty action_decls in 
 
-  (*~~~~~~~~~~~~~~~~~~~~~~~~~ action generation top-level ~~~~~~~~~~~~~~~~~~~~~~~~~~~~*)
-  let build_action_body adecl =
-    let (the_action, _) = StringMap.find adecl.saname action_decls_map in
-    let builder = L.builder_at_end context (L.entry_block the_action) in
-    (* let main_builder = L.builder_at_end context (L.entry_block main_func) in *)
+  
 
     let lookup n = StringMap.find n global_vars in
 
@@ -251,7 +243,7 @@ let translate (globals, action_decls, main_stmt) =
       | SExpr e -> ignore(expr builder e); builder
       | SSeriesAdd (id, e) -> 
           ignore(L.build_call (StringMap.find (type_str (fst e)) series_add) [| (lookup id); (expr builder e) |] "" builder); builder 
-      | SIf (predicate, then_stmt, else_stmt) ->
+      (* | SIf (predicate, then_stmt, else_stmt) ->
         let bool_val = expr builder predicate in
         let merge_bb = L.append_block context "merge" main_func in
         let build_br_merge = L.build_br merge_bb in (* partial function *)
@@ -281,12 +273,12 @@ let translate (globals, action_decls, main_stmt) =
           L.builder_at_end context merge_bb
           (* Implement for loops as while loops *)
           | SFor (e1, e2, e3, body) -> stmt builder
-          ( SBlock [SExpr e1 ; SWhile (e2, SBlock [body ; SExpr e3]) ] )
+          ( SBlock [SExpr e1 ; SWhile (e2, SBlock [body ; SExpr e3]) ] ) *)
           (*| SForLit ( e1, e2, body) -> stmt builder
           ( SBlock [SExpr e1 ; SWhile (e2, SBlock [body ; SExpr e]) ] )*)
     in
     
-    let _ = 
+    (* let _ = 
       let builder = stmt builder (SBlock adecl.sabody) in 
       add_terminal builder (match adecl.satyp with
               A.None -> L.build_ret_void
@@ -295,17 +287,48 @@ let translate (globals, action_decls, main_stmt) =
     in 
 
     let builder = stmt builder (main_stmt) in
+    ignore(L.build_ret (L.const_int i32_t 0) (builder)); *)
+
+  (*~~~~~~~~~~~~~~~~~~~~~~~~~ action generation top-level ~~~~~~~~~~~~~~~~~~~~~~~~~~~~*)
+  let build_action_body adecl =
+    let (the_action, _) = StringMap.find adecl.saname action_decls_map in
+    let builder = L.builder_at_end context (L.entry_block the_action) in
+
+    let _ = stmt builder (SBlock adecl.sabody) in 
+      add_terminal builder (match adecl.satyp with
+              A.None -> L.build_ret_void
+            | A.Float -> L.build_ret (L.const_float float_t 0.0)
+            | t -> L.build_ret (L.const_int (ltype_of_typ t) 0));
+    () 
+  in
+  let _ = List.iter build_action_body action_decls in 
+
+  (*~~~~~~~~~~~~~~~~~~~~  main function generation top-level ~~~~~~~~~~~~~~~~~~~~~~~~~~~~*)
+  let build_main main_func =
+	    let fty = L.function_type i32_t[||] in 
+		let f = L.define_function "main" fty the_module in 	
+		let builder = L.builder_at_end context (L.entry_block f) in
+		
+		let _ = stmt builder (main_stmt) in 
+		
+		
+		L.build_ret (L.const_int i32_t 0) builder
+	in
+	let _ = build_main main_stmt in
+  (* let main_func = 
+    let ftype = L.function_type i32_t [| |] in
+  L.define_function "main" ftype the_module in
+  let builder = L.builder_at_end context (L.entry_block main_func) in
+
+  let _ = stmt builder (main_stmt) in
+    (* ignore(L.build_ret (L.const_int i32_t 0) (builder)); *)
+    (* L.build_ret (L.const_int i32_t 0) builder *)
     ignore(L.build_ret (L.const_int i32_t 0) (builder));
+    ()
+  in
+  let _ = main_func main_stmt in  *)
 
-    (* 
-        let mbuilder = stmt builder main_stmt
-        in
-        let _ = L.build_ret (L.const_int i32_t 0) (mbuilder) 
-        in *)
-
-        (* let builder = stmt builder main_stmt  *)
-    
-  in 
+  the_module; 
     
 
   (* let mbuilder = stmt builder (main_stmt) in
@@ -313,9 +336,9 @@ let translate (globals, action_decls, main_stmt) =
   (* List.iter build_action_body action_decls; in  *)
   (* build_action_body main_stmt;  *)
  
-  List.iter build_action_body action_decls;
+  (* List.iter build_action_body action_decls;  *)
   (* build_action_body main_stmt; *)
-  the_module
+  (* the_module *)
 
 (* let (build_action_body) 
 

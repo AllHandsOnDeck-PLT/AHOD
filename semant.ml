@@ -54,13 +54,13 @@ let add_action map ad =
   and make_err er = raise (Failure er)
   and n = ad.aname (* Name of the function *)
   in match ad with (* No duplicate functions or redefinitions of built-ins *)
-       (* _ when StringMap.mem n built_in_decls -> make_err built_in_err *)
+       _ when StringMap.mem n built_in_decls -> make_err built_in_err
      | _ when StringMap.mem n map -> make_err dup_err  
      | _ ->  StringMap.add n ad map 
 in
 
 (* Collect all function names into one symbol table *)
-let action_decls_map = List.fold_left add_action StringMap.empty action_decls (* built_in_decls*)
+let action_decls_map = List.fold_left add_action built_in_decls action_decls 
 in
 
 let find_act s = 

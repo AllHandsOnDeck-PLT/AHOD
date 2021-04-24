@@ -1,7 +1,7 @@
 int x
 when do None PLAY():
 {
-  x = 3
+  do PRINT(3)
 }
 main:
 {
