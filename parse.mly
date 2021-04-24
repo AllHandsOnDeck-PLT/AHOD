@@ -7,9 +7,9 @@ let trd (_,_,c) = c;;
 
 %}
 
-%token LPAREN RPAREN LBRACE RBRACE LSQUARE RSQUARE SERIESSIZE SERIESPUSH SERIESPOP SERIES COLON SEMI COMMA PLUS MINUS MULT DIVIDE ASSIGN MOD POWER FLOOR DOT NEWLINE
-%token NOT EQ NEQ LT LEQ GT GEQ AND OR IN
-%token RETURN IF ELIF ELSE FOR WHILE INT BOOL FLOAT NONE STRING RANGE WHEN DO EXTERNAL LET BE WITH PASS MAIN TIMES CONST
+%token LPAREN RPAREN LBRACE RBRACE LSQUARE RSQUARE SERIESSIZE SERIESPUSH SERIESPOP SERIES COLON SEMI COMMA PLUS MINUS MULT DIVIDE ASSIGN FLOOR DOT NEWLINE
+%token NOT EQ NEQ LT LEQ GT GEQ AND OR
+%token RETURN IF ELIF ELSE FOR WHILE INT BOOL FLOAT NONE STRING RANGE WHEN DO EXTERNAL LET BE WITH MAIN TIMES CONST
 %token <int> ILIT
 %token <bool> BLIT
 %token <string> ID ACTIONID CLASSID FLIT SLIT
@@ -18,7 +18,6 @@ let trd (_,_,c) = c;;
 %start program
 %type <Ast.program> program
 
-%nonassoc FOR IN
 %right ASSIGN
 %left OR
 %left AND
@@ -27,10 +26,7 @@ let trd (_,_,c) = c;;
 %nonassoc DO
 %nonassoc COLON
 %left PLUS MINUS
-%left MOD 
-%left FLOOR 
 %left MULT DIVIDE
-%left POWER
 %right NOT
 
 %%
@@ -75,11 +71,10 @@ stmt_list:
 stmt:
     | stmt_block                            { $1 }
     | expr NEWLINE                          { Expr $1 } 
-    // | PASS NEWLINE                       { }
     | RETURN expr_opt NEWLINE               { Return $2 }
     | if_stmt                               { $1 }
     | FOR LPAREN expr SEMI expr SEMI expr RPAREN COLON stmt_block  { For($3, $5, $7, $10)   }
-    | FOR ID IN expr COLON stmt_block       { ForLit($2, $4, $6) } 
+    /* | FOR ID IN expr COLON stmt_block       { ForLit($2, $4, $6) }  */
     | WHILE expr COLON stmt_block           { While($2, $4) } 
     | ID DOT SERIESPUSH LPAREN expr RPAREN NEWLINE { SeriesPush($1, $5)}
     

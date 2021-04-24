@@ -6,7 +6,7 @@ let digits = digit+
 
 rule token = parse
   [' ' '\t' '\r' ] { token lexbuf } (* Whitespace *)
-| "#"    { comment lexbuf }           (* Comments *)
+| "#"      { comment lexbuf }           (* Comments *)
 | "\n"	   { NEWLINE }
 | "("      { LPAREN }
 | ")"      { RPAREN }
@@ -25,8 +25,8 @@ rule token = parse
 | '-'      { MINUS }
 | '*'      { MULT }
 | '/'      { DIVIDE }
-| '%'      { MOD }
-| "**"     { POWER }
+(* | '%'      { MOD }
+| "**"     { POWER } *)
 | '.'      { DOT }
 | '='      { ASSIGN }
 | "=="     { EQ }
@@ -43,7 +43,7 @@ rule token = parse
 | "elif"   { ELIF }
 | "else"   { ELSE }
 | "for"    { FOR }
-| "in"     { IN }
+(* | "in"     { IN } *)
 | "while"  { WHILE }
 | "when"   { WHEN }
 | "do"     { DO }
@@ -51,7 +51,6 @@ rule token = parse
 | "be"     { BE }
 | "with"   { WITH }
 | "times"  { TIMES }
-| "pass"   { PASS }
 | "const"  { CONST }
 | "return" { RETURN }
 | "int"    { INT }
@@ -76,5 +75,5 @@ rule token = parse
 | _ as char { raise (Failure("illegal character " ^ Char.escaped char)) }
 
 and comment = parse
-  '\n' { token lexbuf }
+  '\n' { CEND }
 | _    { comment lexbuf }
