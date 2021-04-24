@@ -10,6 +10,7 @@ let trd (_,_,c) = c;;
 %token LPAREN RPAREN LBRACE RBRACE LSQUARE RSQUARE SERIESSIZE SERIESPUSH SERIESPOP SERIES COLON SEMI COMMA PLUS MINUS MULT DIVIDE ASSIGN FLOOR DOT NEWLINE
 %token NOT EQ NEQ LT LEQ GT GEQ AND OR
 %token RETURN IF ELIF ELSE FOR WHILE INT BOOL FLOAT NONE STRING RANGE WHEN DO EXTERNAL LET BE WITH MAIN TIMES CONST
+%token CEND
 %token <int> ILIT
 %token <bool> BLIT
 %token <string> ID ACTIONID CLASSID FLIT SLIT
@@ -33,7 +34,10 @@ let trd (_,_,c) = c;;
 
 program:
     decls main_decl EOF { (fst $1, snd $1, $2) }
-
+/* 
+end_of_line: 
+    | NEWLINE 
+    | CEND { CEND :: [EOL] } */
 action_decl:
     WHEN DO ACTIONID LPAREN params_list RPAREN COLON stmt_block          
     {{ 
