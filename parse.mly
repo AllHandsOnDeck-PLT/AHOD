@@ -34,18 +34,19 @@ let trd (_,_,c) = c;;
 
 program:
     decls main_decl EOF { (fst $1, snd $1, $2) }
-/* 
-end_of_line: 
-    | NEWLINE 
-    | CEND { CEND :: [EOL] } */
+
+cend_opt: /*comment */ 
+    /*nothing */ { Noexpr } 
+    | CEND       { Noexpr }
+
 action_decl:
-    WHEN DO ACTIONID LPAREN params_list RPAREN COLON stmt_block          
+    WHEN DO ACTIONID LPAREN params_list RPAREN COLON cend_opt stmt_block          
     {{ 
       entitytyp = None;
       entityid = "";
       aname = $3;
       aparams = $5;
-      abody = $8 }}
+      abody = $9 }}
 
 decls:
     /*nothing*/      { ([], []) }
@@ -53,10 +54,10 @@ decls:
     | decls action_decl  { (fst $1, List.rev ($2::snd $1)) }
 
 global_decl:
-    typ ID NEWLINE { ($1, $2) }
+    typ ID cend_opt NEWLINE { ($1, $2)}
     
 main_decl:
-      MAIN COLON stmt_block { $3 } 
+      MAIN COLON cend_opt stmt_block { $4 } 
 
 params_list:
     param                        { [$1] } 
@@ -65,37 +66,37 @@ params_list:
 param:
       typ ID                       { $1, $2 }
 
-stmt_block:
-    NEWLINE LBRACE NEWLINE stmt_list RBRACE NEWLINE              { Block(List.rev $4) }
+stmt_block: /* doesn't have comment optional before first newline, causes reduce reduce but added cend_opt btwn most instances of stmt_block*/
+    NEWLINE LBRACE cend_opt NEWLINE stmt_list RBRACE cend_opt NEWLINE              { Block(List.rev $5) }
 
 stmt_list: 
     stmt                                  { [$1] }
     | stmt_list stmt                         { $2 :: $1 }
 
 stmt:
-    | stmt_block                            { $1 }
-    | expr NEWLINE                          { Expr $1 } 
-    | RETURN expr_opt NEWLINE               { Return $2 }
+    | stmt_block                                { $1 }
+    | expr cend_opt NEWLINE                     { Expr $1} 
+    | RETURN expr_opt NEWLINE               { Return $2} /* doesn't have comment optional causes shift reduce*/
     | if_stmt                               { $1 }
-    | FOR LPAREN expr SEMI expr SEMI expr RPAREN COLON stmt_block  { For($3, $5, $7, $10)   }
+    | FOR LPAREN expr SEMI expr SEMI expr RPAREN COLON cend_opt stmt_block  { For($3, $5, $7, $11)   }
     /* | FOR ID IN expr COLON stmt_block       { ForLit($2, $4, $6) }  */
-    | WHILE expr COLON stmt_block           { While($2, $4) } 
-    | ID DOT SERIESPUSH LPAREN expr RPAREN NEWLINE { SeriesPush($1, $5)}
+    | WHILE expr COLON cend_opt stmt_block           { While($2, $5) } 
+    | ID DOT SERIESPUSH LPAREN expr RPAREN cend_opt NEWLINE { SeriesPush($1, $5)}
     
 if_stmt:
-    | IF expr COLON stmt_block elif_stmt        { If($2, $4, $5) }
-    | IF expr COLON stmt_block else_block_opt   { If($2, $4, $5) }
+    | IF expr COLON cend_opt stmt_block elif_stmt        { If($2, $5, $6) }
+    | IF expr COLON cend_opt stmt_block else_block_opt   { If($2, $5, $6) }
 
 elif_stmt:
-    | ELIF expr COLON stmt_block elif_stmt          { If($2, $4, $5) }
-    | ELIF expr COLON stmt_block else_block_opt     { If($2, $4, $5) }
+    | ELIF expr COLON cend_opt stmt_block elif_stmt          { If($2, $5, $6) }
+    | ELIF expr COLON cend_opt stmt_block else_block_opt     { If($2, $5, $6) }
 
 else_block_opt:
       /* nothing */      { Block([]) }
       | else_block       { $1 }
 
 else_block:
-      ELSE COLON stmt_block     { $3 }
+      ELSE COLON cend_opt stmt_block     { $4 }
 
 typ:
     | INT               { Int       }
@@ -117,6 +118,7 @@ expr:
     | ID DOT SERIESPOP LPAREN RPAREN { SeriesPop($1)}
     | ID                             { Id($1) } 
     | ID ASSIGN expr                 { Assign($1, $3) }
+    | CEND                           { Noexpr }
     | expr PLUS   expr               { Binop($1, Add,     $3) } 
     | expr MINUS  expr               { Binop($1, Sub,     $3) }
     | expr MULT   expr               { Binop($1, Mult,    $3) }

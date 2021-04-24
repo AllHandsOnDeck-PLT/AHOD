@@ -29,6 +29,7 @@ type stmt =
   | ForLit of string * expr * stmt 
   | While of expr * stmt
   | SeriesPush of string * expr
+  | Nostmt
 
 type action_decl = {
   entitytyp : typ;

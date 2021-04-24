@@ -1,8 +1,7 @@
-int a
-main:
-  {
-    # nothing should be printed out 
-    # test: a = 1 #should still be valid
-    a = 1 #expects a newline.. but finds a comment so fails 
-    #test
-  }
+int a /* nothing should be printed out */
+main: /*comments everywhere */
+  { /* woo */ 
+    /* only single line comments, decieving huh*/ 
+    a = 1 /* comment and code woah */
+    /*test*/
+  } /* woo */ 
