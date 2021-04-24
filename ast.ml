@@ -46,7 +46,7 @@ type action_decl = {
   atyp : typ; 
   aname : string;
   aparams : bind list;
-  alocals : bind list;
+  (* alocals : bind list; *)
   abody: stmt list;
 }
 
@@ -58,7 +58,7 @@ type class_decl = {
 }
 
 (* type program = bind list * class_decl list * stmt *)
-type program = bind list * action_decl list * class_decl list * stmt
+type program = bind list * action_decl list * stmt
 
 (*  Pretty-printing functions *)
 let string_of_op = function

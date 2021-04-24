@@ -37,7 +37,7 @@ type saction_decl = {
   saname : string;
   satyp : typ; 
   saparams : bind list;
-  salocals : bind list;
+  (* salocals : bind list; *)
   sabody: sstmt list;
 }
 

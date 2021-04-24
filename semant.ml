@@ -51,7 +51,7 @@ let add_action map ad =
 in
 
 (* Collect all function names into one symbol table *)
-let action_decls_map = List.fold_left add_action action_decls (* built_in_decls*)
+let action_decls_map = List.fold_left add_action StringMap.empty action_decls (* built_in_decls*)
 in
 
 let find_act s = 
@@ -92,18 +92,18 @@ let rec check_expr = function
           in (ty, SBinop((t1, e1'), op, (t2, e2')))
     | ActionCall(aname, args) as acall -> 
       let ad = find_act aname in
-      let param_length = List.length ad.params in
+      let param_length = List.length ad.aparams in
       if List.length args != param_length then
         raise (Failure ("expecting " ^ string_of_int param_length ^ 
                         " arguments in " ^ string_of_expr acall))
       else let check_call (at, _) e = 
-        let (et, e') = expr e in 
+        let (et, e') = check_expr e in 
         let err = "illegal argument found " ^ string_of_typ et ^
           " expected " ^ string_of_typ at ^ " in " ^ string_of_expr e
         in (check_assign at et err, e')
       in 
-      let args' = List.map2 check_call ad.params args
-      in (ad.typ, SActionCall(aname, args'))
+      let args' = List.map2 check_call ad.aparams args
+      in (ad.atyp, SActionCall(aname, args'))
     | Seriesliteral vals ->
          let (t', _) = check_expr (List.hd vals) in
          let map_func lit = check_expr lit in
@@ -124,7 +124,7 @@ let rec check_expr = function
      in if t' != (check_list_type l) then raise (Failure err) else (t', e') 
    in
 
-	let rec check_stmt = function
+	let rec check_stmt = function (*currently only suuports one input -- support for map *)
 		Expr e -> SExpr (check_expr e) 
     | SeriesAdd (var, e) -> 
         let _ = check_list_type var in
@@ -143,6 +143,13 @@ let rec check_expr = function
   in  SBlock(List.map check_stmt sl)
 in
 (* 
+1. build map for action
+2. go through stmts
+3. inside stmts check for expr
+- explicitly check for main in check_stmt
+- pass in a map 
+
+** have check_expr BEFORE check_stmt
 let add_action map ad = 
   let built_in_err = "action " ^ ad.aname ^ " may not be defined"
   and dup_err = "duplicate action " ^ ad.aname
@@ -166,8 +173,9 @@ in *)
 
 
   let check_action act =
-      { sentitytyp = act.entitytyp;
-        sentityid  = act.entityid;
+      { 
+        (* sentitytyp = act.entitytyp;
+        sentityid  = act.entityid; *)
         saname = act.aname; 
         satyp = act.atyp;
         saparams = act.aparams;

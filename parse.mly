@@ -44,7 +44,7 @@ program:
 decls:
     /*nothing*/      { ([], []) }
     | decls global_decl  { (List.rev ($2::fst $1), snd $1) }
-    | decls class_decl { (fst $1, List.rev ($2::snd $1)) }
+    // | decls class_decl { (fst $1, List.rev ($2::snd $1)) }
     | decls action_decl { (fst $1, List.rev ($2::snd $1)) }
 
 
@@ -79,14 +79,14 @@ class_decl:
 action_decl: 
     WHEN DO typ ACTIONID LPAREN params_list_opt RPAREN COLON NEWLINE LBRACE NEWLINE locals_list stmt_list RBRACE NEWLINE    
     {{ 
-      entitytyp = None;
-      entityid = "";
       atyp = $3;
       aname = $4;
       aparams = $6 ; 
-      alocals = $12
       abody = [$13] }}
 
+//   entitytyp = None;
+//   entityid = "";
+//alocals = $12
 // Block([]) 
 // action_decl: 
 //     WHENDO ACTIONID LPAREN params_list RPAREN COLON stmt_block          

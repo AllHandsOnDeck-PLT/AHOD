@@ -315,12 +315,13 @@ let rec stmt builder = function
 	    ( SBlock [SExpr e1 ; SWhile (e2, SBlock [body ; SExpr e]) ] )*)
     in
 
-(* let builder = stmt builder main_stmt  *)
-let builder = stmt builder (SBlock adecl.sabody) in 
-add_terminal builder (match adecl.satyp with
-        A.None -> L.build_ret_void
-      | A.Float -> L.build_ret (L.const_float float_t 0.0)
-      | t -> L.build_ret (L.const_int (ltype_of_typ t) 0)) 
+  (* let builder = stmt builder main_stmt  *)
+  let builder = stmt builder (SBlock adecl.sabody) 
+  in 
+  add_terminal builder (match adecl.satyp with
+          A.None -> L.build_ret_void
+        | A.Float -> L.build_ret (L.const_float float_t 0.0)
+        | t -> L.build_ret (L.const_int (ltype_of_typ t) 0)) 
 
 in 
 
