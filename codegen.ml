@@ -34,7 +34,7 @@ let translate (globals, action_decls, main_stmt) =
   in
 
   let type_str t = match t with
-      A.Int -> "int"
+    | A.Int -> "int"
     | A.Bool -> "bool"
     | A.Float -> "float"
     | A.String -> "str"
@@ -48,9 +48,10 @@ let translate (globals, action_decls, main_stmt) =
           A.Float -> L.const_float (ltype_of_typ t) 0.0
         | A.String -> L.const_pointer_null (ltype_of_typ t)
         | A.Series series_type -> L.const_struct context ([| L.const_pointer_null (L.pointer_type(ltype_of_typ series_type)); L.const_pointer_null (L.pointer_type(ltype_of_typ series_type))|])
-        | _ -> L.const_int (ltype_of_typ t) 0
-      in StringMap.add n (L.define_global n init the_module) m in
-    List.fold_left global_var StringMap.empty globals in
+        | _ -> L.const_int (ltype_of_typ t) 0 
+      in 
+    StringMap.add n (L.define_global n init the_module) m in
+  List.fold_left global_var StringMap.empty globals in
   
   let printf_t : L.lltype = 
     L.var_arg_function_type i32_t [| L.pointer_type i8_t |] in
@@ -60,8 +61,7 @@ let translate (globals, action_decls, main_stmt) =
 (*~~~~~~~~~~~~~~~~~~~~  main function generation top-level ~~~~~~~~~~~~~~~~~~~~~~~~~~~~*)
   let main_func = 
     let ftype = L.function_type i32_t [| |] in
-    L.define_function "main" ftype the_module 
-  in
+  L.define_function "main" ftype the_module in
   let builder = L.builder_at_end context (L.entry_block main_func) in
 
   (*series generation*)
@@ -82,12 +82,10 @@ let translate (globals, action_decls, main_stmt) =
   let action_decls_map : (L.llvalue * saction_decl) StringMap.t =
     let action_decl m adecl =
       let name = adecl.saname
-      and param_types = Array.of_list (List.map (fun (t,_) -> ltype_of_typ t) adecl.saparams) in 
-      let atype = L.function_type (ltype_of_typ adecl.satyp) param_types 
-      in StringMap.add name (L.define_function name atype the_module, adecl) m 
-    in List.fold_left action_decl StringMap.empty action_decls 
-  
-  in 
+        and param_types = Array.of_list (List.map (fun (t,_) -> ltype_of_typ t) adecl.saparams) in 
+      let atype = L.function_type (ltype_of_typ adecl.satyp) param_types in 
+    StringMap.add name (L.define_function name atype the_module, adecl) m in 
+  List.fold_left action_decl StringMap.empty action_decls in 
 
   (*~~~~~~~~~~~~~~~~~~~~~~~~~ action generation top-level ~~~~~~~~~~~~~~~~~~~~~~~~~~~~*)
   let build_action_body adecl =
@@ -120,36 +118,32 @@ let translate (globals, action_decls, main_stmt) =
         let _ = L.build_store next_size series_size_ptr build in
         let _ = L.build_store (L.build_load valPtr "val" build) next_element_ptr build in
         let _ = L.build_ret_void build in
-        StringMap.add def_name def m 
-      in
-    List.fold_left series_add_ty StringMap.empty [ A.Bool; A.Int; A.Float; A.String ] 
-    in
+      StringMap.add def_name def m in
+    List.fold_left series_add_ty StringMap.empty [ A.Bool; A.Int; A.Float; A.String ] in
 
     let series_get : L.llvalue StringMap.t = 
       let series_get_ty m typ = 
-          let ltype = (ltype_of_typ typ) in 
-          let def_name = (type_str typ) in
-          let def = L.define_function ("series_get" ^ def_name) (L.function_type ltype [| L.pointer_type (series_t ltype); i32_t |]) the_module in
-          let build = L.builder_at_end context (L.entry_block def) in
-          let series_ptr = L.build_alloca (L.pointer_type (series_t ltype)) "series_ptr_alloc" build in
-          let _ = L.build_store (L.param def 0) series_ptr build in
-          let idx_ptr = L.build_alloca i32_t "idx_alloc" build in
-          let _ = L.build_store (L.param def 1) idx_ptr build in
-          let series_load = L.build_load series_ptr "series_load" build in
-          let series_array_ptr = L.build_struct_gep series_load 1 "series_array_ptr" build in
-          let series_array_load = L.build_load series_array_ptr "array_load" build in
-          let idx = L.build_load idx_ptr "idx_load" build in
-          let series_array_element_ptr = L.build_gep series_array_load [| idx |] "series_arry_element_ptr" build in
-          let element_val = L.build_load series_array_element_ptr "series_array_element_ptr" build in
-          let _ = L.build_ret element_val build in
-          StringMap.add def_name def m 
-      in
-    List.fold_left series_get_ty StringMap.empty [ A.Bool; A.Int; A.Float; A.String ] 
-    in
+        let ltype = (ltype_of_typ typ) in 
+        let def_name = (type_str typ) in
+        let def = L.define_function ("series_get" ^ def_name) (L.function_type ltype [| L.pointer_type (series_t ltype); i32_t |]) the_module in
+        let build = L.builder_at_end context (L.entry_block def) in
+        let series_ptr = L.build_alloca (L.pointer_type (series_t ltype)) "series_ptr_alloc" build in
+        let _ = L.build_store (L.param def 0) series_ptr build in
+        let idx_ptr = L.build_alloca i32_t "idx_alloc" build in
+        let _ = L.build_store (L.param def 1) idx_ptr build in
+        let series_load = L.build_load series_ptr "series_load" build in
+        let series_array_ptr = L.build_struct_gep series_load 1 "series_array_ptr" build in
+        let series_array_load = L.build_load series_array_ptr "array_load" build in
+        let idx = L.build_load idx_ptr "idx_load" build in
+        let series_array_element_ptr = L.build_gep series_array_load [| idx |] "series_arry_element_ptr" build in
+        let element_val = L.build_load series_array_element_ptr "series_array_element_ptr" build in
+        let _ = L.build_ret element_val build in
+      StringMap.add def_name def m in
+    List.fold_left series_get_ty StringMap.empty [ A.Bool; A.Int; A.Float; A.String ] in
 
     (*expression generation*)
     let rec expr builder ((_, e) : sexpr) = match e with
-      SSliteral s   -> L.build_global_stringptr s "str" builder
+      | SSliteral s   -> L.build_global_stringptr s "str" builder
       | SBliteral b -> L.const_int i1_t (if b then 1 else 0)
       | SIliteral i -> L.const_int i32_t i 
       | SFliteral f -> L.const_float_of_string float_t f
@@ -175,8 +169,7 @@ let translate (globals, action_decls, main_stmt) =
         let result = (match adecl.satyp with 
                             A.None -> ""
                           | _ -> a ^ "_result") 
-        in
-              L.build_call adef (Array.of_list llargs) result builder
+        in L.build_call adef (Array.of_list llargs) result builder
       | SExprActionCall(exp, a, args) -> raise (Failure "Need to implement this class-dependent expression")
       | SClassCall(a, args) -> raise (Failure "Need to implement this class-dependent expression")
       | SAttrCall(a, args) -> raise (Failure "Need to implement this class-dependent expression")
@@ -231,8 +224,7 @@ let translate (globals, action_decls, main_stmt) =
           raise (Failure "Mod not implemented yet")
         ) e1' e2' "tmp" builder
       | SSeriesliteral (series_type, literals) ->
-        let ltype = (ltype_of_typ series_type) in (*gets type of elements in arr *) 
-        (* L.build_alloca (series_t ltype) "new_series_ptr" builder creates arr with that type *)
+        let ltype = (ltype_of_typ series_type) in 
         let new_series_ptr = L.build_alloca (series_t ltype) "new_series_ptr" builder in
         let _ = init_series builder new_series_ptr series_type in
         let map_func literal = 
@@ -241,11 +233,10 @@ let translate (globals, action_decls, main_stmt) =
         let _ = List.rev (List.map map_func literals) in
         L.build_load new_series_ptr "new_series" builder
       | SSeriesGet (series_type, id, e) ->
-          L.build_call (StringMap.find (type_str series_type) series_get) [| (lookup id); (expr builder e) |] "series_get" builder 
-        
+          L.build_call (StringMap.find (type_str series_type) series_get) [| (lookup id); (expr builder e) |] "series_get" builder   
     in
 
-  (* LLVM insists each basic block end with exactly one "terminator" 
+    (* LLVM insists each basic block end with exactly one "terminator" 
       instruction that transfers control.  This function runs "instr builder"
       if the current block does not already have a terminator.  Used,
       e.g., to handle the "fall off the end of the function" case. *)
@@ -294,15 +285,17 @@ let translate (globals, action_decls, main_stmt) =
           (*| SForLit ( e1, e2, body) -> stmt builder
           ( SBlock [SExpr e1 ; SWhile (e2, SBlock [body ; SExpr e]) ] )*)
     in
+    
+    let _ = 
+      let builder = stmt builder (SBlock adecl.sabody) in 
+      add_terminal builder (match adecl.satyp with
+              A.None -> L.build_ret_void
+            | A.Float -> L.build_ret (L.const_float float_t 0.0)
+            | t -> L.build_ret (L.const_int (ltype_of_typ t) 0)) 
+    in 
 
-    let builder = stmt (builder (SBlock adecl.sabody)) in 
-    add_terminal builder (match adecl.satyp with
-            A.None -> L.build_ret_void
-          | A.Float -> L.build_ret (L.const_float float_t 0.0)
-          | t -> L.build_ret (L.const_int (ltype_of_typ t) 0)) 
-
-    let builder = stmt (builder (main_stmt)) in
-    let _ = L.build_ret (L.const_int i32_t 0) (builder) in
+    let builder = stmt builder (main_stmt) in
+    ignore(L.build_ret (L.const_int i32_t 0) (builder));
 
     (* 
         let mbuilder = stmt builder main_stmt
@@ -315,16 +308,14 @@ let translate (globals, action_decls, main_stmt) =
   in 
     
 
-    (* let mbuilder = stmt builder (main_stmt) in
-    let _ = L.build_ret (L.const_int i32_t 0) (mbuilder) in *)
-  
+  (* let mbuilder = stmt builder (main_stmt) in
+  let _ = L.build_ret (L.const_int i32_t 0) (mbuilder) in *)
   (* List.iter build_action_body action_decls; in  *)
- 
   (* build_action_body main_stmt;  *)
-
+ 
   List.iter build_action_body action_decls;
-(* build_action_body main_stmt; *)
-the_module
+  (* build_action_body main_stmt; *)
+  the_module
 
 (* let (build_action_body) 
 
