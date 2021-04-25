@@ -83,9 +83,32 @@ let translate (globals, action_decls, main_stmt) =
     StringMap.add name (L.define_function name atype the_module, adecl) m in 
   List.fold_left action_decl StringMap.empty action_decls in 
 
-  
+  let (the_action, _) = StringMap.find adecl.saname action_decls_map in
+  let builder = L.builder_at_end context (L.entry_block the_action) in
+  (* Construct the function's "locals": formal arguments and locally
+  declared variables.  Allocate each on the stack, initialize their
+  value, if appropriate, and remember their values in the "locals" map *)
+  let local_vars =
+    let add_formal m (t, n) p = L.set_value_name n p;
+    let local = L.build_alloca (ltype_of_typ t) n builder in
+      ignore (L.build_store p local builder);
+    StringMap.add n local m 
 
-    let lookup n = StringMap.find n global_vars in
+    (* Allocate space for any locally declared variables and add the
+      * resulting registers to our map *)
+    and add_local m (t, n) =
+    let local_var = L.build_alloca (ltype_of_typ t) n builder in 
+      StringMap.add n local_var m 
+    in
+
+    let params = List.fold_left2 add_formal StringMap.empty adecl.saparams
+        (Array.to_list (L.params the_action)) in
+    List.fold_left add_local params adecl.salocals 
+  in
+
+  let lookup n = try StringMap.find n local_vars
+                  with Not_found -> StringMap.find n global_vars
+  in
 
     (*series generation*)
     let series_add : L.llvalue StringMap.t = 
@@ -302,7 +325,7 @@ let translate (globals, action_decls, main_stmt) =
     () 
   in
   let _ = List.iter build_action_body action_decls in 
-
+  
   (*~~~~~~~~~~~~~~~~~~~~  main function generation top-level ~~~~~~~~~~~~~~~~~~~~~~~~~~~~*)
   let build_main main_func =
 	    let fty = L.function_type i32_t[||] in 

@@ -60,6 +60,14 @@ global_decl:
     
 main_decl:
     MAIN COLON stmt { $3 }
+/*
+main_decl:
+    typ MAIN COLON NEWLINE LBRACE NEWLINE locals_list stmt_wrap RBRACE NEWLINE {{ 
+      mtyp = $1;
+      mname = $2;
+      mlocals = $7;
+      abody = [$8] }}
+*/
     /*MAIN COLON stmt_block { $3 } */
 
 class_decl:
@@ -77,12 +85,13 @@ class_decl:
       attributes = $8 }}*/
 
 action_decl: 
-    WHEN DO typ ACTIONID LPAREN params_list_opt RPAREN COLON /*locals_list*/ stmt_block     
+    WHEN DO typ ACTIONID LPAREN params_list_opt RPAREN COLON NEWLINE LBRACE NEWLINE locals_list stmt_wrap RBRACE NEWLINE 
     {{ 
       atyp = $3;
       aname = $4;
       aparams = $6; 
-      abody = [$9] }}
+      alocals = $12;
+      abody = [$13] }}
 
 //   entitytyp = None;
 //   entityid = "";
@@ -134,7 +143,10 @@ stmt_block:
 locals_list:
     global_decl                           { [$1] }
     | locals_list global_decl               { $2 :: $1 }
-    
+
+stmt_wrap: 
+    stmt_list                               { Block(List.rev $1) }
+
 stmt_list: 
     stmt                                     { [$1] }
     | stmt_list stmt                         { $2 :: $1 }
