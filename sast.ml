@@ -9,6 +9,7 @@ and sx =
   | SSliteral of string
   | SSeriesliteral of typ * sexpr list
   | SSeriesGet of typ * string * sexpr
+  | SPrintCall of sexpr  
   | SActionCall of string * sexpr list  
   | SExprActionCall of sexpr * string * sexpr list
   | SId of string

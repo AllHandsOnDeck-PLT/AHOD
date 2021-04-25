@@ -45,7 +45,7 @@ let built_in_decls =
     aname = name; 
     aparams = [(ty, "x")];
     abody = [] } map
-  in List.fold_left add_bind StringMap.empty [("PRINT", String)]
+  in List.fold_left add_bind StringMap.empty []
 in
 (* ("PRINT", Int); ("PRINT", String); ("PRINT", Float); ("PRINT", Bool) *)
 let add_action map ad = 
@@ -100,6 +100,7 @@ let rec check_expr = function
           | _ -> raise (
         Failure ("illegal binary operator " ))
           in (ty, SBinop((t1, e1'), op, (t2, e2')))
+    | PrintCall(e) as print -> (None,SPrintCall(check_expr e))
     (* | PrintCall("PRINT", [arg]) as acall -> (None, SPrintCall("PRINT",[arg])) <- professor implementation*)
     (*in codegen look for sprint, add to sast, change from list or args to just arg*)
     | ActionCall(aname, args) as acall -> 

@@ -143,7 +143,7 @@ let translate (globals, action_decls, main_stmt) =
       | SNoexpr     -> L.const_int i32_t 0
       | SAssign (s, e) -> let e' = expr builder e in
                               ignore(L.build_store e' (lookup s) builder); e'
-      | SActionCall("PRINT", [e]) ->
+      | SPrintCall(e) ->
         (*don't do match here do SprintCall, makes sure it doesn't have list of args, pattern match on type
         do different versions 4-5 patterns for each type. don't need the PRINT, comes with type expression pair
         match in 1st element of *)
@@ -246,18 +246,18 @@ let translate (globals, action_decls, main_stmt) =
       | SExpr e -> ignore(expr builder e); (builder,func)
       | SSeriesAdd (id, e) -> 
           ignore(L.build_call (StringMap.find (type_str (fst e)) series_add) [| (lookup id); (expr builder e) |] "" builder); (builder,func) 
-      (*| SIf (predicate, then_stmt, else_stmt) ->
+     (* | SIf (predicate, then_stmt, else_stmt) ->
         let bool_val = expr builder predicate in
         let merge_bb = L.append_block context "merge" func in
         let build_br_merge = L.build_br merge_bb in (* partial function *)
 
-        let then_bb = L.append_block context "then" func in
+         let then_bb = L.append_block context "then" func in
           let (tbuilder,_) = stmt ((L.builder_at_end context then_bb),func)
           in
           add_terminal tbuilder then_stmt   
           build_br_merge;
 
-         let else_bb = L.append_block context "else" func in
+        let else_bb = L.append_block context "else" func in
             add_terminal (stmt (L.builder_at_end context else_bb) else_stmt)
             build_br_merge;
         ignore(L.build_cond_br bool_val then_bb else_bb builder);

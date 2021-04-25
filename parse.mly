@@ -9,7 +9,7 @@ let trd (_,_,c) = c;;
 
 %token LPAREN RPAREN LBRACE RBRACE LSQUARE RSQUARE SERIESADD SERIES COLON SEMI COMMA PLUS MINUS MULT DIVIDE ASSIGN MOD POWER FLOOR DOT DOTDOT DOTDOTDOT NEWLINE
 %token NOT EQ NEQ LT LEQ GT GEQ AND OR IN
-%token RETURN IF ELIF ELSE FOR WHILE INT BOOL FLOAT NONE STRING RANGE WHEN DO EXTERNAL LET BE WITH PASS MAIN TIMES CONST
+%token RETURN IF ELIF ELSE FOR WHILE INT BOOL FLOAT NONE STRING RANGE WHEN DO EXTERNAL LET BE WITH PASS MAIN PRINT TIMES CONST
 %token <int> ILIT
 %token <bool> BLIT
 %token <string> ID ACTIONID CLASSID FLIT SLIT
@@ -186,6 +186,7 @@ typ:
     | CLASSID           { ClassID } 
 
 expr:
+    | call_print                    { $1 } 
     | call_action                    { $1 } 
     | call_class       { $1 }
     | call_attr        { $1 }
@@ -217,6 +218,9 @@ args_list_opt:
 args_list:
     expr                            { [$1] } 
     | args_list COMMA expr          { $3 :: $1 }
+
+call_print:
+    | DO PRINT LPAREN expr RPAREN        { PrintCall($4) } 
 
 call_action:
     | DO ACTIONID LPAREN args_list_opt RPAREN        { ActionCall($2, $4) } 
