@@ -22,7 +22,7 @@ let translate (globals, action_decls, main_stmt) =
 	 and string_t    = L.pointer_type (L.i8_type context)
    and void_t      = L.void_type   context 
    and series_t t  = L.struct_type context [| L.pointer_type (L.i32_type context); (L.pointer_type t) |]
-   and player_t  = L.pointer_type (L.struct_type context [| (L.pointer_type (L.i8_type context)); (L.i32_type context) |])
+   and player_t  = L.struct_type context [| (L.pointer_type (L.i8_type context)); (L.i32_type context) |]
    (*struct_set_body  class_t *)
   in
 
