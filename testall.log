@@ -1,8 +1,8 @@
-/usr/bin/lli
+/usr/local/opt/llvm/bin/lli
 
 ###### Testing test-assgin-local
 ./AHOD.native tests/test-assgin-local.ah > test-assgin-local.ll
-Fatal error: exception Parsing.Parse_error
+Fatal error: exception Stdlib.Parsing.Parse_error
 ###### FAILED
 
 ###### Testing test-assign
@@ -23,7 +23,10 @@ diff -b test-binop.out tests/test-binop.out > test-binop.diff
 
 ###### Testing test-class1
 ./AHOD.native tests/test-class1.ah > test-class1.ll
-Fatal error: exception Parsing.Parse_error
+Stored value type does not match pointer operand type!
+  store { i8*, i32 }* %playercall, { i8*, i32 }* @player, align 8
+ { i8*, i32 }LLVM ERROR: Broken module found, compilation aborted!
+./testall.sh: line 63: 57100 Abort trap: 6           ./AHOD.native tests/test-class1.ah > test-class1.ll
 ###### FAILED
 
 ###### Testing test-for1
@@ -108,7 +111,7 @@ diff -b test-while2.out tests/test-while2.out > test-while2.diff
 
 ###### Testing fail-*
 ./AHOD.native < tests/fail-*.ah 2> fail-*.err >> testall.log
-./testall.sh: 1: eval: cannot open tests/fail-*.ah: No such file
+./testall.sh: line 73: tests/fail-*.ah: No such file or directory
 diff -b fail-*.err tests/fail-*.err > fail-*.diff
 FAILED fail-*.err differs from tests/fail-*.err
 ###### FAILED
