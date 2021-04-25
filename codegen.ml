@@ -206,7 +206,7 @@ let rec expr builder ((_, e) : sexpr) = match e with
     L.build_call playercall_func (Array.of_list (List.map (expr builder) (e))) "playercall" builder
   
   (*AttL.build_in_bounds_gep arr [|L.const_int i32_t 0; L.const_int i32_t 0|] "arrptr" builder*)
-  (* SPlayerAttrCall(attr) -> AttL.build_in_bounds_gep player [|L.const_int i32_t 0; L.const_int i32_t 1|] "player" builder*)
+  | SPlayerAttrCall(objname, attr) -> L.build_in_bounds_gep playercall_func [|L.const_int i32_t 0; L.const_int i32_t 1|] "playercall" builder
   (*^ do lookup player*)
 
 
