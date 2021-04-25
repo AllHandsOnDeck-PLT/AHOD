@@ -1,11 +1,11 @@
 #include <stdio.h>
+#include <stdlib.h>
 
 struct Player 
 {
   char *name;
   int score;
 };
-
 
 /*int main() {
 
@@ -19,10 +19,9 @@ struct Player
 
 struct Player *playercall(char* name, int score)
 {
-/*  struct Player *p;
+  struct Player *p;
   p = (struct Player *) malloc(sizeof(struct Player));
   p->name = name;
   p->score = score;
-  return p;*/
-  return NULL;
+  return p;
 }

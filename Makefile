@@ -29,4 +29,4 @@ playercall : playercall.c
 .PHONY : clean
 clean :
 	ocamlbuild -clean
-	rm -rf testall.log ocamlllvm *.diff .ll .native
+	rm -rf testall.log ocamlllvm *.diff .ll .native *.o
