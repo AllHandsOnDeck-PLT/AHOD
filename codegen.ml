@@ -140,9 +140,19 @@ let printf_func : L.llvalue =
     L.declare_function "printf" printf_t the_module in
 
 let playercall_t : L.lltype =
-      L.function_type player_t [| string_t ; i32_t |] in (*what to use for type?*)
+      L.function_type player_t [| string_t ; i32_t |] in 
   let playercall_func : L.llvalue =
       L.declare_function "playercall" playercall_t the_module in
+
+let getplayername_t : L.lltype =
+      L.function_type string_t [| player_t |] in 
+  let getplayername_func : L.llvalue =
+      L.declare_function "getplayername" getplayername_t the_module in
+
+let getplayerscore_t : L.lltype =
+      L.function_type i32_t [| player_t |] in 
+  let getplayerscore_func : L.llvalue =
+      L.declare_function "getplayerscore" getplayerscore_t the_module in
 
 let series_add : L.llvalue StringMap.t = 
   let series_add_ty m typ =
@@ -206,7 +216,11 @@ let rec expr builder ((_, e) : sexpr) = match e with
     L.build_call playercall_func (Array.of_list (List.map (expr builder) (e))) "playercall" builder
   
   (*AttL.build_in_bounds_gep arr [|L.const_int i32_t 0; L.const_int i32_t 0|] "arrptr" builder*)
-  | SPlayerAttrCall(objname, attr) -> L.build_in_bounds_gep playercall_func [|L.const_int i32_t 0; L.const_int i32_t 1|] "playercall" builder
+  | SPlayerAttrCall(objname, attr) -> 
+  (match attr with
+  "name" -> L.build_in_bounds_gep getplayername_func [|L.const_int i32_t 0; L.const_int i32_t 0|] "getplayername" builder
+  | "score" -> L.build_in_bounds_gep getplayerscore_func [|L.const_int i32_t 1; L.const_int i32_t 1|] "getplayerscore" builder
+  )
   (*^ do lookup player*)
 
 
