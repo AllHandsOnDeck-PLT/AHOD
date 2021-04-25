@@ -23,7 +23,9 @@ diff -b test-binop.out tests/test-binop.out > test-binop.diff
 
 ###### Testing test-class1
 ./AHOD.native tests/test-class1.ah > test-class1.ll
-Fatal error: exception Parsing.Parse_error
+Stored value type does not match pointer operand type!
+  store { i8*, i32 }* %playercall, { i8*, i32 }* @player
+ { i8*, i32 }LLVM ERROR: Broken module found, compilation aborted!
 ###### FAILED
 
 ###### Testing test-for1
