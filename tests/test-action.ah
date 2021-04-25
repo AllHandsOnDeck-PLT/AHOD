@@ -3,6 +3,7 @@ when do None PLAY():
 {
   do PRINT(3)
 }
+
 main:
 {
   do PLAY()

@@ -1,0 +1,10 @@
+when do None PLAY():
+{
+  int x
+  x = 3
+  do PRINT(3)
+}
+main:
+{
+  do PLAY()
+}

@@ -16,7 +16,7 @@ will always return particular information for type
 built in struct, generate and try to access that 
 *)
 
-let check (globals, action_decls, main) = (*changed from class_decls to action_decls*)
+let check (globals, action_decls, main_stmt) = (*changed from class_decls to action_decls*)
   
   (* Verify a list of bindings has no none types or duplicate names *)
   let check_binds (kind : string) (binds : bind list) =
@@ -308,7 +308,7 @@ let check (globals, action_decls, main) = (*changed from class_decls to action_d
     }
     (*(check_stmt main_stmt, list.map checsk_func action_decl) *)
    
-  in (globals, List.map check_action action_decls, check_stmt main)
+  in (globals, List.map check_action action_decls, check_stmt main_stmt)
     (* (globals, [], check_stmt main_stmt) <- in case w/classes*)
 
 

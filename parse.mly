@@ -84,6 +84,10 @@ class_decl:
       cparams = $4;
       attributes = $8 }}*/
 
+/*
+action_decl: 
+    WHEN DO typ ACTIONID LPAREN params_list_opt RPAREN COLON /*locals_list*/ stmt_block  
+*/
 action_decl: 
     WHEN DO typ ACTIONID LPAREN params_list_opt RPAREN COLON NEWLINE LBRACE NEWLINE locals_list stmt_wrap RBRACE NEWLINE 
     {{ 
