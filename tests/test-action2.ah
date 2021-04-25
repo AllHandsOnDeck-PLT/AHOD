@@ -1,0 +1,14 @@
+int x
+when do None PLAY():
+{
+  do PRINT("actions are cool")
+}
+when do None PLAYTWO():
+{
+  do PRINT("two actions are cooler")
+}
+main:
+{
+  do PLAY()
+  do PLAYTWO() 
+}

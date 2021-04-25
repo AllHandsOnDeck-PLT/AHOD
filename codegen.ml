@@ -144,6 +144,9 @@ let translate (globals, action_decls, main_stmt) =
       | SAssign (s, e) -> let e' = expr builder e in
                               ignore(L.build_store e' (lookup s) builder); e'
       | SActionCall("PRINT", [e]) ->
+        (*don't do match here do SprintCall, makes sure it doesn't have list of args, pattern match on type
+        do different versions 4-5 patterns for each type. don't need the PRINT, comes with type expression pair
+        match in 1st element of *)
         (match fst e with 
         A.String -> L.build_call printf_func [| L.const_in_bounds_gep str_format_str [|L.const_int i32_t 0; L.const_int i32_t 0|] ; (expr builder e) |]
         "printf" builder
@@ -238,63 +241,54 @@ let translate (globals, action_decls, main_stmt) =
       | None -> ignore (instr builder) in
 
     (*statement generation*)
-    let rec stmt builder = function
-      | SBlock (stmt_list) -> List.fold_left stmt builder stmt_list 
-      | SExpr e -> ignore(expr builder e); builder
+    let rec stmt (builder, func) = function
+      | SBlock (stmt_list) -> List.fold_left stmt (builder, func) stmt_list  
+      | SExpr e -> ignore(expr builder e); builder, func
       | SSeriesAdd (id, e) -> 
-          ignore(L.build_call (StringMap.find (type_str (fst e)) series_add) [| (lookup id); (expr builder e) |] "" builder); builder 
-      (* | SIf (predicate, then_stmt, else_stmt) ->
+          ignore(L.build_call (StringMap.find (type_str (fst e)) series_add) [| (lookup id); (expr builder e) |] "" builder); builder, func 
+      | SIf (predicate, then_stmt, else_stmt) ->
         let bool_val = expr builder predicate in
-        let merge_bb = L.append_block context "merge" main_func in
+        let merge_bb = L.append_block context "merge" func in
         let build_br_merge = L.build_br merge_bb in (* partial function *)
 
-        let then_bb = L.append_block context "then" main_func in
-            add_terminal (stmt (L.builder_at_end context then_bb) then_stmt)
+        let then_bb = L.append_block context "then" func in
+            add_terminal (stmt ((L.builder_at_end context then_bb),func) then_stmt)
             build_br_merge;
 
-        let else_bb = L.append_block context "else" main_func in
-            add_terminal (stmt (L.builder_at_end context else_bb) else_stmt)
+        let else_bb = L.append_block context "else" func in
+            add_terminal (stmt (L.builder_at_end context else_bb, func) else_stmt)
             build_br_merge;
         ignore(L.build_cond_br bool_val then_bb else_bb builder);
         L.builder_at_end context merge_bb
         | SWhile (predicate, body) ->
-          let pred_bb = L.append_block context "while" main_func in
+          let pred_bb = L.append_block context "while" func in
           ignore(L.build_br pred_bb builder);
       
-          let body_bb = L.append_block context "while_body" main_func in
-          add_terminal (stmt (L.builder_at_end context body_bb) body)
+          let body_bb = L.append_block context "while_body" func in
+          add_terminal (stmt (L.builder_at_end context body_bb, func) body)
             (L.build_br pred_bb);
       
           let pred_builder = L.builder_at_end context pred_bb in
           let bool_val = expr pred_builder predicate in
       
-          let merge_bb = L.append_block context "merge" main_func in
+          let merge_bb = L.append_block context "merge" func in
           ignore(L.build_cond_br bool_val body_bb merge_bb pred_builder);
           L.builder_at_end context merge_bb
           (* Implement for loops as while loops *)
-          | SFor (e1, e2, e3, body) -> stmt builder
-          ( SBlock [SExpr e1 ; SWhile (e2, SBlock [body ; SExpr e3]) ] ) *)
-          (*| SForLit ( e1, e2, body) -> stmt builder
-          ( SBlock [SExpr e1 ; SWhile (e2, SBlock [body ; SExpr e]) ] )*)
-    in
-    
-    (* let _ = 
-      let builder = stmt builder (SBlock adecl.sabody) in 
-      add_terminal builder (match adecl.satyp with
-              A.None -> L.build_ret_void
-            | A.Float -> L.build_ret (L.const_float float_t 0.0)
-            | t -> L.build_ret (L.const_int (ltype_of_typ t) 0)) 
-    in 
+          (* | SFor (e1, e2, e3, body) -> stmt builder
+          ( SBlock [SExpr e1 ; SWhile (e2, SBlock [body ; SExpr e3]) ] ) <- unsure if func needs to be at end *)
 
-    let builder = stmt builder (main_stmt) in
-    ignore(L.build_ret (L.const_int i32_t 0) (builder)); *)
+
+          (* | SForLit ( e1, e2, body) -> stmt builder
+          ( SBlock [SExpr e1 ; SWhile (e2, SBlock [body ; SExpr e]) ] ) *)
+    in
 
   (*~~~~~~~~~~~~~~~~~~~~~~~~~ action generation top-level ~~~~~~~~~~~~~~~~~~~~~~~~~~~~*)
   let build_action_body adecl =
     let (the_action, _) = StringMap.find adecl.saname action_decls_map in
     let builder = L.builder_at_end context (L.entry_block the_action) in
 
-    let _ = stmt builder (SBlock adecl.sabody) in 
+    let _ = stmt (builder, the_action) (SBlock adecl.sabody) in (* the_action <-add after builder*)
       add_terminal builder (match adecl.satyp with
               A.None -> L.build_ret_void
             | A.Float -> L.build_ret (L.const_float float_t 0.0)
@@ -309,7 +303,7 @@ let translate (globals, action_decls, main_stmt) =
 		let f = L.define_function "main" fty the_module in 	
 		let builder = L.builder_at_end context (L.entry_block f) in
 		
-		let _ = stmt builder (main_stmt) in 
+		let _ = stmt (builder, f) (main_stmt) in (* f <-add after builder*)
 		
 		
 		L.build_ret (L.const_int i32_t 0) builder

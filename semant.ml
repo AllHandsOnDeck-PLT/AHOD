@@ -45,9 +45,9 @@ let built_in_decls =
     aname = name; 
     aparams = [(ty, "x")];
     abody = [] } map
-  in List.fold_left add_bind StringMap.empty [ ("PRINT", Int)]
+  in List.fold_left add_bind StringMap.empty [("PRINT", String)]
 in
- 
+(* ("PRINT", Int); ("PRINT", String); ("PRINT", Float); ("PRINT", Bool) *)
 let add_action map ad = 
   let built_in_err = "function " ^ ad.aname ^ " may not be defined"
   and dup_err = "duplicate function " ^ ad.aname
@@ -64,8 +64,9 @@ let action_decls_map = List.fold_left add_action built_in_decls action_decls
 in
 
 let find_act s = 
-  try StringMap.find s action_decls_map
-  with Not_found -> raise (Failure ("unrecognized action " ^ s))
+  try StringMap.find s action_decls_map  
+  with Not_found -> 
+    raise (Failure ("unrecognized action " ^ s))
 in
 
 let rec check_expr = function
@@ -99,20 +100,25 @@ let rec check_expr = function
           | _ -> raise (
         Failure ("illegal binary operator " ))
           in (ty, SBinop((t1, e1'), op, (t2, e2')))
+    (* | PrintCall("PRINT", [arg]) as acall -> (None, SPrintCall("PRINT",[arg])) <- professor implementation*)
+    (*in codegen look for sprint, add to sast, change from list or args to just arg*)
     | ActionCall(aname, args) as acall -> 
-      let ad = find_act aname in
-      let param_length = List.length ad.aparams in
-      if List.length args != param_length then
-        raise (Failure ("expecting " ^ string_of_int param_length ^ 
-                        " arguments in " ^ string_of_expr acall))
-      else let check_call (at, _) e = 
-        let (et, e') = check_expr e in 
-        let err = "illegal argument found " ^ string_of_typ et ^
-          " expected " ^ string_of_typ at ^ " in " ^ string_of_expr e
-        in (check_assign at et err, e')
-      in 
-      let args' = List.map2 check_call ad.aparams args
-      in (ad.atyp, SActionCall(aname, args'))
+      (* match aname with 
+      | "PRINT" -> let aname = aname in (None, SActionCall(aname,args))
+      | _ ->   <-xijiao implementation*)
+        let ad = find_act aname in
+        let param_length = List.length ad.aparams in
+        if List.length args != param_length then
+          raise (Failure ("expecting " ^ string_of_int param_length ^ 
+                          " arguments in " ^ string_of_expr acall))
+        else let check_call (at, _) e = 
+          let (et, e') = check_expr e in 
+          let err = "illegal argument found " ^ string_of_typ et ^
+            " expected " ^ string_of_typ at ^ " in " ^ string_of_expr e
+          in (check_assign at et err, e')
+        in 
+        let args' = List.map2 check_call ad.aparams args
+        in (ad.atyp, SActionCall(aname, args'))
     | Seriesliteral vals ->
          let (t', _) = check_expr (List.hd vals) in
          let map_func lit = check_expr lit in
