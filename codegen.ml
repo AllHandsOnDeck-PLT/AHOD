@@ -361,7 +361,7 @@ let translate (globals, action_decls, main_stmt) =
     in
   (*lookup needs to be defined above and also needs local_vars defined *) 
     let lookup n = try StringMap.find n local_vars 
-                   with Not_found -> StringMap.find n global_vars
+                   with Not_found -> StringMap.find n global_vars 
     in
 
         (*series generation*)
@@ -554,7 +554,7 @@ let translate (globals, action_decls, main_stmt) =
               (*| SForLit ( e1, e2, body) -> stmt builder
               ( SBlock [SExpr e1 ; SWhile (e2, SBlock [body ; SExpr e]) ] )*)
         in
-        
+
     let _ = stmt builder (SBlock adecl.sabody) in 
       add_terminal builder (match adecl.satyp with
               A.None -> L.build_ret_void

@@ -84,33 +84,15 @@ class_decl:
       cparams = $4;
       attributes = $8 }}*/
 
-/*
-action_decl: 
-    WHEN DO typ ACTIONID LPAREN params_list_opt RPAREN COLON /*locals_list*/ stmt_block  
-*/
 action_decl: 
     WHEN DO typ ACTIONID LPAREN params_list_opt RPAREN COLON NEWLINE LBRACE NEWLINE locals_list stmt_wrap RBRACE NEWLINE 
     {{ 
       atyp = $3;
       aname = $4;
-      aparams = $6; 
-      alocals = $12;
+      aparams = List.rev $6; 
+      alocals = List.rev $12;
       abody = [$13] }}
 
-//   entitytyp = None;
-//   entityid = "";
-//alocals = $12
-// Block([]) 
-// action_decl: 
-//     WHENDO ACTIONID LPAREN params_list RPAREN COLON stmt_block          
-//     {{ 
-//       entitytyp = None;
-//       entityid = "";
-//       aname = $2;
-//       typ = None;
-//       aparams = $4;
-//       abody = $7 }}
-      
 /*add locals into action _decl and main */
 class_block:
     NEWLINE LBRACE NEWLINE class_decl_list RBRACE NEWLINE { $4 }
@@ -145,8 +127,8 @@ stmt_block:
     NEWLINE LBRACE NEWLINE stmt_list RBRACE NEWLINE              { Block(List.rev $4) }
 
 locals_list:
-    global_decl                           { [$1] }
-    | locals_list global_decl               { $2 :: $1 }
+    | /*nothing */                         {[]}
+    | locals_list global_decl              {$2 :: $1 }
 
 stmt_wrap: 
     stmt_list                               { Block(List.rev $1) }

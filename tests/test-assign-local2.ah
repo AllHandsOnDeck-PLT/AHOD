@@ -1,8 +1,11 @@
 when do None PLAY():
 {
   int x
-  x = 3
-  do PRINT(3)
+  int y
+  x = 3 
+  y = 4 
+  do PRINT(x)
+  do PRINT(y)
 }
 main:
 {
