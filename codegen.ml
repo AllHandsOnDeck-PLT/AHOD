@@ -246,7 +246,7 @@ let translate (globals, action_decls, main_stmt) =
       | SExpr e -> ignore(expr builder e); (builder,func)
       | SSeriesAdd (id, e) -> 
           ignore(L.build_call (StringMap.find (type_str (fst e)) series_add) [| (lookup id); (expr builder e) |] "" builder); (builder,func) 
-      | SIf (predicate, then_stmt, else_stmt) ->
+      (*| SIf (predicate, then_stmt, else_stmt) ->
         let bool_val = expr builder predicate in
         let merge_bb = L.append_block context "merge" func in
         let build_br_merge = L.build_br merge_bb in (* partial function *)
@@ -257,7 +257,7 @@ let translate (globals, action_decls, main_stmt) =
           add_terminal tbuilder then_stmt   
           build_br_merge;
 
-        (* let else_bb = L.append_block context "else" func in
+         let else_bb = L.append_block context "else" func in
             add_terminal (stmt (L.builder_at_end context else_bb) else_stmt)
             build_br_merge;
         ignore(L.build_cond_br bool_val then_bb else_bb builder);
