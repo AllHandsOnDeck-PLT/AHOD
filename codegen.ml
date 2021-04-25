@@ -243,20 +243,22 @@ let translate (globals, action_decls, main_stmt) =
     (*statement generation*)
     let rec stmt (builder, func) = function
       | SBlock (stmt_list) -> List.fold_left stmt (builder, func) stmt_list  
-      | SExpr e -> ignore(expr builder e); builder, func
+      | SExpr e -> ignore(expr builder e); (builder,func)
       | SSeriesAdd (id, e) -> 
-          ignore(L.build_call (StringMap.find (type_str (fst e)) series_add) [| (lookup id); (expr builder e) |] "" builder); builder, func 
+          ignore(L.build_call (StringMap.find (type_str (fst e)) series_add) [| (lookup id); (expr builder e) |] "" builder); (builder,func) 
       | SIf (predicate, then_stmt, else_stmt) ->
         let bool_val = expr builder predicate in
         let merge_bb = L.append_block context "merge" func in
         let build_br_merge = L.build_br merge_bb in (* partial function *)
 
         let then_bb = L.append_block context "then" func in
-            add_terminal (stmt ((L.builder_at_end context then_bb),func) then_stmt)
-            build_br_merge;
+          let (tbuilder,_) = stmt ((L.builder_at_end context then_bb),func)
+          in
+          add_terminal tbuilder then_stmt   
+          build_br_merge;
 
-        let else_bb = L.append_block context "else" func in
-            add_terminal (stmt (L.builder_at_end context else_bb, func) else_stmt)
+        (* let else_bb = L.append_block context "else" func in
+            add_terminal (stmt (L.builder_at_end context else_bb) else_stmt)
             build_br_merge;
         ignore(L.build_cond_br bool_val then_bb else_bb builder);
         L.builder_at_end context merge_bb
@@ -273,7 +275,8 @@ let translate (globals, action_decls, main_stmt) =
       
           let merge_bb = L.append_block context "merge" func in
           ignore(L.build_cond_br bool_val body_bb merge_bb pred_builder);
-          L.builder_at_end context merge_bb
+          L.builder_at_end context merge_bb <- uncomment here after for continued incremental development *)
+          
           (* Implement for loops as while loops *)
           (* | SFor (e1, e2, e3, body) -> stmt builder
           ( SBlock [SExpr e1 ; SWhile (e2, SBlock [body ; SExpr e3]) ] ) <- unsure if func needs to be at end *)
