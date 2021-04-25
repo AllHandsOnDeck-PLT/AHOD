@@ -7,7 +7,10 @@ type token =
   | RSQUARE
   | SERIESADD
   | SERIES
+  | CARD
+  | PLAYER
   | COLON
+  | SEMI
   | COMMA
   | PLUS
   | MINUS

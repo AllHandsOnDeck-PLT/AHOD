@@ -3,19 +3,32 @@
 ocamlfind ocamldep -package llvm -package llvm.analysis -modules AHOD.ml > AHOD.ml.depends
 # Target: codegen.ml.depends, tags: { package(llvm), package(llvm.analysis), warn(+a-4), extension:ml, file:codegen.ml, ocaml, ocamldep, quiet, traverse }
 ocamlfind ocamldep -package llvm -package llvm.analysis -modules codegen.ml > codegen.ml.depends
-+ ocamlfind ocamldep -package llvm -package llvm.analysis -modules codegen.ml > codegen.ml.depends
-File "codegen.ml", line 271, characters 3-6:
-Warning 1: this is the start of a comment.
 # Target: ast.ml.depends, tags: { package(llvm), package(llvm.analysis), warn(+a-4), extension:ml, file:ast.ml, ocaml, ocamldep, quiet, traverse }
 ocamlfind ocamldep -package llvm -package llvm.analysis -modules ast.ml > ast.ml.depends
 # Target: sast.ml.depends, tags: { package(llvm), package(llvm.analysis), warn(+a-4), extension:ml, file:sast.ml, ocaml, ocamldep, quiet, traverse }
 ocamlfind ocamldep -package llvm -package llvm.analysis -modules sast.ml > sast.ml.depends
 # Target: ast.cmo, tags: { package(llvm), package(llvm.analysis), warn(+a-4), byte, compile, extension:cmo, extension:ml, file:ast.cmo, file:ast.ml, implem, ocaml, quiet, traverse }
 ocamlfind ocamlc -c -w +a-4 -package llvm -package llvm.analysis -o ast.cmo ast.ml
++ ocamlfind ocamlc -c -w +a-4 -package llvm -package llvm.analysis -o ast.cmo ast.ml
+File "ast.ml", line 75, characters 24-225:
+Warning 8: this pattern-matching is not exhaustive.
+Here is an example of a case that is not matched:
+ClassID
+File "ast.ml", line 85, characters 25-551:
+Warning 8: this pattern-matching is not exhaustive.
+Here is an example of a case that is not matched:
+(PlayerClassCall _|CClassCall _|AttrCall (_, _))
 # Target: sast.cmo, tags: { package(llvm), package(llvm.analysis), warn(+a-4), byte, compile, extension:cmo, extension:ml, file:sast.cmo, file:sast.ml, implem, ocaml, quiet, traverse }
 ocamlfind ocamlc -c -w +a-4 -package llvm -package llvm.analysis -o sast.cmo sast.ml
++ ocamlfind ocamlc -c -w +a-4 -package llvm -package llvm.analysis -o sast.cmo sast.ml
+File "sast.ml", line 54, characters 34-593:
+Warning 8: this pattern-matching is not exhaustive.
+Here is an example of a case that is not matched:
+(SClassCall (_, _)|SPlayerClassCall _|SAttrCall (_, _))
 # Target: parse.mly, tags: { package(llvm), package(llvm.analysis), warn(+a-4), extension:mly, file:parse.mly, infer, ocaml, ocamlyacc, parser, quiet, traverse }
 ocamlyacc parse.mly
++ ocamlyacc parse.mly
+8 rules never reduced
 # Target: parse.mli.depends, tags: { package(llvm), package(llvm.analysis), warn(+a-4), extension:mli, file:parse.mli, ocaml, ocamldep, quiet, traverse }
 ocamlfind ocamldep -package llvm -package llvm.analysis -modules parse.mli > parse.mli.depends
 # Target: scanner.mll, tags: { package(llvm), package(llvm.analysis), warn(+a-4), extension:mll, file:scanner.mll, lexer, ocaml, ocamllex, quiet, traverse }
@@ -29,31 +42,37 @@ ocamlfind ocamldep -package llvm -package llvm.analysis -modules semant.ml > sem
 # Target: codegen.cmo, tags: { package(llvm), package(llvm.analysis), warn(+a-4), byte, compile, extension:cmo, extension:ml, file:codegen.cmo, file:codegen.ml, implem, ocaml, quiet, traverse }
 ocamlfind ocamlc -c -w +a-4 -package llvm -package llvm.analysis -o codegen.cmo codegen.ml
 + ocamlfind ocamlc -c -w +a-4 -package llvm -package llvm.analysis -o codegen.cmo codegen.ml
-File "codegen.ml", line 271, characters 3-6:
-Warning 1: this is the start of a comment.
-File "codegen.ml", line 169, characters 2-690:
+File "codegen.ml", line 29, characters 26-229:
 Warning 8: this pattern-matching is not exhaustive.
 Here is an example of a case that is not matched:
-(None|Series _)
-File "codegen.ml", line 182, characters 4-520:
+(Player|Card)
+File "codegen.ml", line 229, characters 2-690:
+Warning 8: this pattern-matching is not exhaustive.
+Here is an example of a case that is not matched:
+(None|ClassID|Player|Card|Series _)
+File "codegen.ml", line 242, characters 4-520:
 Warning 8: this pattern-matching is not exhaustive.
 Here is an example of a case that is not matched:
 Mod
-File "codegen.ml", line 199, characters 4-466:
+File "codegen.ml", line 259, characters 4-466:
 Warning 8: this pattern-matching is not exhaustive.
 Here is an example of a case that is not matched:
 Mod
-File "codegen.ml", line 159, characters 40-3236:
+File "codegen.ml", line 192, characters 40-5223:
 Warning 8: this pattern-matching is not exhaustive.
 Here is an example of a case that is not matched:
 (SActionCall ("PRINT", _::_::_)|SActionCall ("PRINT", [])|
-SActionCall ("", _))
-File "codegen.ml", line 237, characters 23-1514:
+SActionCall ("", _)|SClassCall (_, _)|SAttrCall (_, _))
+File "codegen.ml", line 319, characters 23-1712:
 Warning 8: this pattern-matching is not exhaustive.
 Here is an example of a case that is not matched:
-(SReturn _|SFor (_, _, _))
-File "codegen.ml", line 7, characters 24-36:
+(SReturn _|SForLit (_, _, _))
+File "codegen.ml", line 4, characters 0-12:
+Warning 33: unused open Hashtbl.
+File "codegen.ml", line 8, characters 24-36:
 Warning 27: unused variable action_decls.
+File "codegen.ml", line 74, characters 9-19:
+Warning 26: unused variable init_class.
 # Target: scanner.cmo, tags: { package(llvm), package(llvm.analysis), warn(+a-4), byte, compile, extension:cmo, extension:ml, file:scanner.cmo, file:scanner.ml, implem, ocaml, quiet, traverse }
 ocamlfind ocamlc -c -w +a-4 -package llvm -package llvm.analysis -o scanner.cmo scanner.ml
 # Target: semant.cmo, tags: { package(llvm), package(llvm.analysis), warn(+a-4), byte, compile, extension:cmo, extension:ml, file:semant.cmo, file:semant.ml, implem, ocaml, quiet, traverse }
@@ -61,22 +80,40 @@ ocamlfind ocamlc -c -w +a-4 -package llvm -package llvm.analysis -o semant.cmo s
 + ocamlfind ocamlc -c -w +a-4 -package llvm -package llvm.analysis -o semant.cmo semant.ml
 File "semant.ml", line 1, characters 0-8:
 Warning 45: this open statement shadows the constructor None (which is later used)
-File "semant.ml", line 85, characters 22-468:
+File "semant.ml", line 34, characters 22-2189:
 Warning 8: this pattern-matching is not exhaustive.
 Here is an example of a case that is not matched:
-(Return _|For (_, _, _))
+(CClassCall _|AttrCall (_, _))
+File "semant.ml", line 86, characters 22-477:
+Warning 8: this pattern-matching is not exhaustive.
+Here is an example of a case that is not matched:
+(Return _|ForLit (_, _, _))
 File "semant.ml", line 6, characters 20-32:
 Warning 27: unused variable action_decls.
-File "semant.ml", line 43, characters 6-26:
+File "semant.ml", line 44, characters 6-26:
 Warning 26: unused variable ex.
-File "semant.ml", line 49, characters 6-28:
+File "semant.ml", line 50, characters 6-28:
 Warning 26: unused variable e.
 # Target: AHOD.cmo, tags: { package(llvm), package(llvm.analysis), warn(+a-4), byte, compile, extension:cmo, extension:ml, file:AHOD.cmo, file:AHOD.ml, implem, ocaml, quiet, traverse }
 ocamlfind ocamlc -c -w +a-4 -package llvm -package llvm.analysis -o AHOD.cmo AHOD.ml
 # Target: ast.cmx, tags: { package(llvm), package(llvm.analysis), warn(+a-4), compile, extension:cmx, extension:ml, file:ast.cmx, file:ast.ml, implem, native, ocaml, quiet, traverse }
 ocamlfind ocamlopt -c -w +a-4 -package llvm -package llvm.analysis -o ast.cmx ast.ml
++ ocamlfind ocamlopt -c -w +a-4 -package llvm -package llvm.analysis -o ast.cmx ast.ml
+File "ast.ml", line 75, characters 24-225:
+Warning 8: this pattern-matching is not exhaustive.
+Here is an example of a case that is not matched:
+ClassID
+File "ast.ml", line 85, characters 25-551:
+Warning 8: this pattern-matching is not exhaustive.
+Here is an example of a case that is not matched:
+(PlayerClassCall _|CClassCall _|AttrCall (_, _))
 # Target: sast.cmx, tags: { package(llvm), package(llvm.analysis), warn(+a-4), compile, extension:cmx, extension:ml, file:sast.cmx, file:sast.ml, implem, native, ocaml, quiet, traverse }
 ocamlfind ocamlopt -c -w +a-4 -package llvm -package llvm.analysis -o sast.cmx sast.ml
++ ocamlfind ocamlopt -c -w +a-4 -package llvm -package llvm.analysis -o sast.cmx sast.ml
+File "sast.ml", line 54, characters 34-593:
+Warning 8: this pattern-matching is not exhaustive.
+Here is an example of a case that is not matched:
+(SClassCall (_, _)|SPlayerClassCall _|SAttrCall (_, _))
 # Target: parse.ml.depends, tags: { package(llvm), package(llvm.analysis), warn(+a-4), extension:ml, file:parse.ml, ocaml, ocamldep, quiet, traverse }
 ocamlfind ocamldep -package llvm -package llvm.analysis -modules parse.ml > parse.ml.depends
 # Target: parse.cmx, tags: { package(llvm), package(llvm.analysis), warn(+a-4), compile, extension:cmx, extension:ml, file:parse.cmx, file:parse.ml, implem, native, ocaml, quiet, traverse }
@@ -84,6 +121,8 @@ ocamlfind ocamlopt -c -w +a-4 -package llvm -package llvm.analysis -o parse.cmx 
 + ocamlfind ocamlopt -c -w +a-4 -package llvm -package llvm.analysis -o parse.cmx parse.ml
 File "parse.mly", line 2, characters 0-8:
 Warning 45: this open statement shadows the constructor None (which is later used)
+File "parse.mly", line 2, characters 0-8:
+Warning 45: this open statement shadows the label actions (which is later used)
 File "parse.mly", line 4, characters 4-8:
 Warning 32: unused value frst.
 File "parse.mly", line 5, characters 4-8:
@@ -93,31 +132,37 @@ Warning 32: unused value trd.
 # Target: codegen.cmx, tags: { package(llvm), package(llvm.analysis), warn(+a-4), compile, extension:cmx, extension:ml, file:codegen.cmx, file:codegen.ml, implem, native, ocaml, quiet, traverse }
 ocamlfind ocamlopt -c -w +a-4 -package llvm -package llvm.analysis -o codegen.cmx codegen.ml
 + ocamlfind ocamlopt -c -w +a-4 -package llvm -package llvm.analysis -o codegen.cmx codegen.ml
-File "codegen.ml", line 271, characters 3-6:
-Warning 1: this is the start of a comment.
-File "codegen.ml", line 169, characters 2-690:
+File "codegen.ml", line 29, characters 26-229:
 Warning 8: this pattern-matching is not exhaustive.
 Here is an example of a case that is not matched:
-(None|Series _)
-File "codegen.ml", line 182, characters 4-520:
+(Player|Card)
+File "codegen.ml", line 229, characters 2-690:
+Warning 8: this pattern-matching is not exhaustive.
+Here is an example of a case that is not matched:
+(None|ClassID|Player|Card|Series _)
+File "codegen.ml", line 242, characters 4-520:
 Warning 8: this pattern-matching is not exhaustive.
 Here is an example of a case that is not matched:
 Mod
-File "codegen.ml", line 199, characters 4-466:
+File "codegen.ml", line 259, characters 4-466:
 Warning 8: this pattern-matching is not exhaustive.
 Here is an example of a case that is not matched:
 Mod
-File "codegen.ml", line 159, characters 40-3236:
+File "codegen.ml", line 192, characters 40-5223:
 Warning 8: this pattern-matching is not exhaustive.
 Here is an example of a case that is not matched:
 (SActionCall ("PRINT", _::_::_)|SActionCall ("PRINT", [])|
-SActionCall ("", _))
-File "codegen.ml", line 237, characters 23-1514:
+SActionCall ("", _)|SClassCall (_, _)|SAttrCall (_, _))
+File "codegen.ml", line 319, characters 23-1712:
 Warning 8: this pattern-matching is not exhaustive.
 Here is an example of a case that is not matched:
-(SReturn _|SFor (_, _, _))
-File "codegen.ml", line 7, characters 24-36:
+(SReturn _|SForLit (_, _, _))
+File "codegen.ml", line 4, characters 0-12:
+Warning 33: unused open Hashtbl.
+File "codegen.ml", line 8, characters 24-36:
 Warning 27: unused variable action_decls.
+File "codegen.ml", line 74, characters 9-19:
+Warning 26: unused variable init_class.
 # Target: scanner.cmx, tags: { package(llvm), package(llvm.analysis), warn(+a-4), compile, extension:cmx, extension:ml, file:scanner.cmx, file:scanner.ml, implem, native, ocaml, quiet, traverse }
 ocamlfind ocamlopt -c -w +a-4 -package llvm -package llvm.analysis -o scanner.cmx scanner.ml
 # Target: semant.cmx, tags: { package(llvm), package(llvm.analysis), warn(+a-4), compile, extension:cmx, extension:ml, file:semant.cmx, file:semant.ml, implem, native, ocaml, quiet, traverse }
@@ -125,15 +170,19 @@ ocamlfind ocamlopt -c -w +a-4 -package llvm -package llvm.analysis -o semant.cmx
 + ocamlfind ocamlopt -c -w +a-4 -package llvm -package llvm.analysis -o semant.cmx semant.ml
 File "semant.ml", line 1, characters 0-8:
 Warning 45: this open statement shadows the constructor None (which is later used)
-File "semant.ml", line 85, characters 22-468:
+File "semant.ml", line 34, characters 22-2189:
 Warning 8: this pattern-matching is not exhaustive.
 Here is an example of a case that is not matched:
-(Return _|For (_, _, _))
+(CClassCall _|AttrCall (_, _))
+File "semant.ml", line 86, characters 22-477:
+Warning 8: this pattern-matching is not exhaustive.
+Here is an example of a case that is not matched:
+(Return _|ForLit (_, _, _))
 File "semant.ml", line 6, characters 20-32:
 Warning 27: unused variable action_decls.
-File "semant.ml", line 43, characters 6-26:
+File "semant.ml", line 44, characters 6-26:
 Warning 26: unused variable ex.
-File "semant.ml", line 49, characters 6-28:
+File "semant.ml", line 50, characters 6-28:
 Warning 26: unused variable e.
 # Target: AHOD.cmx, tags: { package(llvm), package(llvm.analysis), warn(+a-4), compile, extension:cmx, extension:ml, file:AHOD.cmx, file:AHOD.ml, implem, native, ocaml, quiet, traverse }
 ocamlfind ocamlopt -c -w +a-4 -package llvm -package llvm.analysis -o AHOD.cmx AHOD.ml

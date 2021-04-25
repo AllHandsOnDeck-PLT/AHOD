@@ -33,6 +33,7 @@ let check (globals, action_decls, main_stmt) =
 
 	let rec check_expr = function
 		(*need to figure out typ, if name is defined*)
+    | PlayerClassCall(pparams) ->  (Player, SPlayerClassCall(List.map check_expr pparams))
 		| ActionCall(aname, aparams) -> (String, SActionCall(aname, List.map check_expr aparams))
 		| Sliteral s -> (String, SSliteral(s))
 		| Iliteral i -> (Int, SIliteral(i))
@@ -89,8 +90,8 @@ let check (globals, action_decls, main_stmt) =
         SSeriesAdd(var, check_match_list_type_expr var e) 
     | If(p, b1, b2) -> SIf(check_expr p, check_stmt b1, check_stmt b2)
     | While(p, s) -> SWhile(check_expr p, check_stmt s)
-    (*| For(e1, e2, e3, st) ->
-     SFor(expr e1, check_expr e2, expr e3, check_stmt st)*)
+    | For(e1, e2, e3, st) ->
+      SFor(check_expr e1, check_expr e2, check_expr e3, check_stmt st)
     | Block sl -> 
          SBlock(List.map check_stmt sl)
     in

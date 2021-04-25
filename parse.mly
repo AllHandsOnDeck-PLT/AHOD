@@ -154,6 +154,7 @@ expr:
     | expr LEQ    expr               { Binop($1, Leq,     $3) }
     | expr GT     expr               { Binop($1, Greater, $3) }
     | expr GEQ    expr               { Binop($1, Geq,     $3) }
+    | call_class                   { $1 } 
 
 args_list_opt:
     /*nothing */                  { [] }
@@ -168,7 +169,7 @@ call_action:
 
 
 call_class: 
-    | PLAYER LPAREN args_list_opt RPAREN            { PClassCall($3) } 
+    | PLAYER LPAREN args_list_opt RPAREN            { PlayerClassCall($3) } 
     | CARD LPAREN args_list_opt RPAREN            { CClassCall($3) } 
 
 call_attr:

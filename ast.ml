@@ -17,7 +17,7 @@ type expr =
   | Id of string
   | Assign of string * expr
   | Binop of expr * op * expr (*need to add binop*)
-  | PClassCall of expr list
+  | PlayerClassCall of expr list
   | CClassCall of expr list
  (*| ClassCall of string * expr list*)
   | AttrCall of string * string 
@@ -79,6 +79,8 @@ let rec string_of_typ = function
   | String -> "string"
   | None -> "none"
   | Series x -> "series<" ^ (string_of_typ x) ^ ">"
+  | Player -> "player"
+  | Card -> "card"
 
 let rec string_of_expr = function
     Iliteral(l) -> string_of_int l

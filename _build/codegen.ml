@@ -1,6 +1,7 @@
 module L = Llvm
 module A = Ast
 open Sast
+open Hashtbl
 
 module StringMap = Map.Make(String)
 
@@ -14,15 +15,17 @@ let translate (globals, action_decls, main_stmt) =
 	 and float_format_str = L.define_global "str" (L.const_stringz context "%g\n") the_module 
 	 and bool_format_str = L.define_global "str" (L.const_stringz context "%d\n") the_module in
 
-	 let i32_t      = L.i32_type    context
-	 and i8_t       = L.i8_type     context
-	 and i1_t       = L.i1_type     context
-	 and float_t    = L.double_type context
-	 and string_t   = L.pointer_type (L.i8_type context)
-   and void_t     = L.void_type   context 
-   and series_t t   = L.struct_type context [| L.pointer_type (L.i32_type context); (L.pointer_type t) |]
-   in
-   
+	 let i32_t       = L.i32_type    context
+	 and i8_t        = L.i8_type     context
+	 and i1_t        = L.i1_type     context
+	 and float_t     = L.double_type context
+	 and string_t    = L.pointer_type (L.i8_type context)
+   and void_t      = L.void_type   context 
+   and series_t t  = L.struct_type context [| L.pointer_type (L.i32_type context); (L.pointer_type t) |]
+   and player_t  = L.pointer_type (L.struct_type context [| (L.pointer_type (L.i8_type context)); (L.i32_type context) |])
+   (*struct_set_body  class_t *)
+  in
+
    let rec ltype_of_typ = function
     | A.Int   -> i32_t
     | A.Bool  -> i1_t 
@@ -30,6 +33,7 @@ let translate (globals, action_decls, main_stmt) =
     | A.String -> string_t
     | A.None -> void_t
     | A.Series t -> series_t (ltype_of_typ t)
+    | A.ClassID -> player_t 
     in
     let type_str t = match t with
         A.Int -> "int"
@@ -39,6 +43,7 @@ let translate (globals, action_decls, main_stmt) =
       | _ -> raise (Failure "Invalid string map key type")
     in
 
+  
     let main_func = 
       let ftype = L.function_type i32_t [| |]
       in
@@ -60,6 +65,20 @@ let translate (globals, action_decls, main_stmt) =
         ignore(L.build_store p series_array_ptr builder);
     in
 
+    (*
+    create the  struct 
+     *)
+     (* THINK ABOUT HOW TO ALLOCATE MEMORY FOR ATTRIBUTES, CHANGE build_ *)
+(* ======================== initialized the class ========================= *)
+
+     let init_class builder class_struct_ptr class_type = 
+      let class_struct_ptr = L.build_struct_gep class_struct_ptr 1 "class" builder in 
+        let p = L.build_array_alloca (ltype_of_typ class_type) (L.const_int i32_t 1028) "p" builder in
+        ignore(L.build_store p class_struct_ptr builder);
+
+    in
+(* ======================================================================= *)
+
  let global_vars : L.llvalue StringMap.t = (* type:  L.llvalue StringMap.t *)
   let global_var m (t, n) = (*t: type, n:name*)
     (* let global = L.build_alloca (ltype_of_typ t) n builder in   *)
@@ -67,49 +86,63 @@ let translate (globals, action_decls, main_stmt) =
         A.Float -> L.const_float (ltype_of_typ t) 0.0
       | A.String -> L.const_pointer_null (ltype_of_typ t)
       | A.Series series_type -> L.const_struct context ([| L.const_pointer_null (L.pointer_type(ltype_of_typ series_type)); L.const_pointer_null (L.pointer_type(ltype_of_typ series_type))|])
+      (* ======================== initialized the class ========================= *)
+      (* unsure about class_type *)
+      | A.Player -> L.const_struct context ([|L.const_pointer_null (L.pointer_type(L.i8_type context)) ; L.const_pointer_null (L.i32_type context)|])
+      (* ======================== initialized the class ========================= *)
       | _ -> L.const_int (ltype_of_typ t) 0
     in StringMap.add n (L.define_global n init the_module) m in
   List.fold_left global_var StringMap.empty globals in
 
 
 
-(* Construct the function's "locals": formal arguments and locally
-       declared variables.  Allocate each on the stack, initialize their
-       value, if appropriate, and remember their values in the "locals" map *)
-
-(*let local_vars : L.llvalue StringMap.t =
+(*
+let local_vars : L.llvalue StringMap.t =
 (* Function Locals *)
   let add_local m (t,n) =  
     let local_var = L.build_alloca (ltype_of_typ t) n builder in
-    StringMap.add n local m 
+    StringMap.add n local m  
  in*)
+
+
 
  (* Variable Lookup *)
  (*let lookup n m = StringMap.find n m
 in*)
 (*
 let local_vars =
-
       (* Allocate space for any locally declared variables and add the
        * resulting registers to our map *)
       let add_local m (t, n) =
   let local_var = L.build_alloca (ltype_of_typ t) n builder
   in StringMap.add n local_var m 
       in
-
       List.fold_left add_local formals fdecl.slocals 
     in
 *)
     (* Return the value for a variable or formal argument.
        Check local names first, then global names *)
-    let lookup n = StringMap.find n global_vars
-    in
+       
+       (*let lookup n = try StringMap.find n local_vars
+            with Not_found -> StringMap.find n global_vars
+       in*)
 
+       let lookup n = StringMap.find n global_vars
+       in
+(*
+       let lookup_class n = StringMap.find n global_vars
+       in
+*)  
 
 let printf_t : L.lltype = 
       L.var_arg_function_type i32_t [| L.pointer_type i8_t |] in
 let printf_func : L.llvalue = 
     L.declare_function "printf" printf_t the_module in
+
+let playercall_t : L.lltype =
+      L.function_type player_t [| string_t ; i32_t |] in (*what to use for type?*)
+  let playercall_func : L.llvalue =
+      L.declare_function "playercall" playercall_t the_module in
 
 let series_add : L.llvalue StringMap.t = 
   let series_add_ty m typ =
@@ -165,6 +198,33 @@ let rec expr builder ((_, e) : sexpr) = match e with
   | SNoexpr     -> L.const_int i32_t 0
   | SAssign (s, e) -> let e' = expr builder e in
                           ignore(L.build_store e' (lookup s) builder); e'
+
+  (*| SPClassCall("Player", [e]) ->
+    let e' = expr builder e in
+                          ignore(L.build_store e' (lookup_class s) builder); e'*)
+  | SPlayerClassCall(e) ->
+    L.build_call playercall_func (Array.of_list (List.map (expr builder) (e))) "playercall" builder
+  
+  (*AttL.build_in_bounds_gep arr [|L.const_int i32_t 0; L.const_int i32_t 0|] "arrptr" builder*)
+  (* SPlayerAttrCall(attr) -> AttL.build_in_bounds_gep player [|L.const_int i32_t 0; L.const_int i32_t 1|] "player" builder*)
+  (*^ do lookup player*)
+
+
+    (*
+    let create_obj_gen e llbuilder = 
+      let params = List.map (expr_gen llbuilder) el in
+      let obj = L.build_call f (Array.of_list params) "tmp" llbuilder in
+      obj
+    in
+      create_obj_gen id el d llbuilder
+
+    (*what to do here? 
+    - how would we assign each of the things in list of expression to player attributes
+    *)
+    L.build_call printf_func [| L.const_in_bounds_gep str_format_str [|L.const_int i32_t 0; L.const_int i32_t 0|] ; (expr builder e) |]
+		"printf" builder 
+
+		)*)
 	| SActionCall("PRINT", [e]) ->
 		(match fst e with 
 		A.String -> L.build_call printf_func [| L.const_in_bounds_gep str_format_str [|L.const_int i32_t 0; L.const_int i32_t 0|] ; (expr builder e) |]
@@ -220,6 +280,28 @@ let rec expr builder ((_, e) : sexpr) = match e with
     in
     let _ = List.rev (List.map map_func literals) in
     L.build_load new_series_ptr "new_series" builder
+
+      (* ======================== class call ========================= *)
+      (*
+      global_vars -> object -> stringmap : (k,v) - (name_class, name), (value_class, value)
+        
+        *)
+ (*  | SClassCall (name_class, value_class) ->
+      
+
+      (s, e) -> let e' = expr builder e in
+                          ignore(L.build_store e' (lookup s) builder); e'
+
+
+      let ltype = (ltype_of_typ class_type) in (*gets type of elements in arr *) 
+      let new_class_ptr = L.build_alloca (class_t ltype) "new_class_ptr" builder in
+      let _ = init_class builder new_class_ptr class_type in
+      let map_func literal = 
+         ignore(L.build_call (StringMap.find (type_str class_type)) [| new_class_ptr; (expr builder literal) |] "" builder);
+      in
+      let _ = List.rev (List.map map_func literals) in
+      L.build_load new_class_ptr "new_class" builder
+            (* ======================================================= *)*)
   | SSeriesGet (series_type, id, e) ->
       L.build_call (StringMap.find (type_str series_type) series_get) [| (lookup id); (expr builder e) |] "series_get" builder 
 		
@@ -253,28 +335,28 @@ let rec stmt builder = function
         build_br_merge;
     ignore(L.build_cond_br bool_val then_bb else_bb builder);
     L.builder_at_end context merge_bb
-  | SWhile (predicate, body) ->
-    let pred_bb = L.append_block context "while" main_func in
-    ignore(L.build_br pred_bb builder);
+    | SWhile (predicate, body) ->
+      let pred_bb = L.append_block context "while" main_func in
+      ignore(L.build_br pred_bb builder);
+  
+      let body_bb = L.append_block context "while_body" main_func in
+      add_terminal (stmt (L.builder_at_end context body_bb) body)
+        (L.build_br pred_bb);
+  
+      let pred_builder = L.builder_at_end context pred_bb in
+      let bool_val = expr pred_builder predicate in
+  
+      let merge_bb = L.append_block context "merge" main_func in
+      ignore(L.build_cond_br bool_val body_bb merge_bb pred_builder);
+      L.builder_at_end context merge_bb
+    
 
-    let body_bb = L.append_block context "while_body" main_func in
-    add_terminal (stmt (L.builder_at_end context body_bb) body)
-      (L.build_br pred_bb);
-
-    let pred_builder = L.builder_at_end context pred_bb in
-    let bool_val = expr pred_builder predicate in
-
-    let merge_bb = L.append_block context "merge" main_func in
-    ignore(L.build_cond_br bool_val body_bb merge_bb pred_builder);
-    L.builder_at_end context merge_bb
-
-   (*) (* Implement for loops as while loops *)
-    | SFor (e1, e2, e3, body) -> stmt builder
-    ( SBlock [SExpr e1 ; SWhile (e2, SBlock [body ; SExpr e3]) ] )*)
-
-
-
-in
+      (* Implement for loops as while loops *)
+      | SFor (e1, e2, e3, body) -> stmt builder
+      ( SBlock [SExpr e1 ; SWhile (e2, SBlock [body ; SExpr e3]) ] )
+      (*| SForLit ( e1, e2, body) -> stmt builder
+	    ( SBlock [SExpr e1 ; SWhile (e2, SBlock [body ; SExpr e]) ] )*)
+    in
 
 
 let builder = stmt builder main_stmt 

@@ -33,6 +33,7 @@ let check (globals, action_decls, main_stmt) =
 
 	let rec check_expr = function
 		(*need to figure out typ, if name is defined*)
+    | PlayerClassCall(pparams) ->  (Player, SPlayerClassCall(List.map check_expr pparams))
 		| ActionCall(aname, aparams) -> (String, SActionCall(aname, List.map check_expr aparams))
 		| Sliteral s -> (String, SSliteral(s))
 		| Iliteral i -> (Int, SIliteral(i))

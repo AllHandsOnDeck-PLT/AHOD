@@ -14,6 +14,7 @@ and sx =
   | SAssign of string * sexpr
   | SBinop of sexpr * op * sexpr
   | SClassCall of string * sexpr list
+  | SPlayerClassCall of sexpr list
   | SAttrCall of string * string 
   | SNoexpr
 

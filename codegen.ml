@@ -22,8 +22,8 @@ let translate (globals, action_decls, main_stmt) =
 	 and string_t    = L.pointer_type (L.i8_type context)
    and void_t      = L.void_type   context 
    and series_t t  = L.struct_type context [| L.pointer_type (L.i32_type context); (L.pointer_type t) |]
-   and class_t  = L.struct_type context [| L.pointer_type (L.pointer_type (L.i8_type context)); L.pointer_type (L.i32_type context) |]
-
+   and player_t  = L.pointer_type (L.struct_type context [| (L.pointer_type (L.i8_type context)); (L.i32_type context) |])
+   (*struct_set_body  class_t *)
   in
 
    let rec ltype_of_typ = function
@@ -33,7 +33,7 @@ let translate (globals, action_decls, main_stmt) =
     | A.String -> string_t
     | A.None -> void_t
     | A.Series t -> series_t (ltype_of_typ t)
-    | A.ClassID -> class_t 
+    | A.ClassID -> player_t 
     in
     let type_str t = match t with
         A.Int -> "int"
@@ -139,6 +139,10 @@ let printf_t : L.lltype =
 let printf_func : L.llvalue = 
     L.declare_function "printf" printf_t the_module in
 
+let playercall_t : L.lltype =
+      L.function_type player_t [| string_t ; i32_t |] in (*what to use for type?*)
+  let playercall_func : L.llvalue =
+      L.declare_function "playercall" playercall_t the_module in
 
 let series_add : L.llvalue StringMap.t = 
   let series_add_ty m typ =
@@ -194,11 +198,18 @@ let rec expr builder ((_, e) : sexpr) = match e with
   | SNoexpr     -> L.const_int i32_t 0
   | SAssign (s, e) -> let e' = expr builder e in
                           ignore(L.build_store e' (lookup s) builder); e'
-(*
-  | SPClassCall("Player", [e]) ->
+
+  (*| SPClassCall("Player", [e]) ->
     let e' = expr builder e in
-                          ignore(L.build_store e' (lookup_class s) builder); e'
-*)
+                          ignore(L.build_store e' (lookup_class s) builder); e'*)
+  | SPlayerClassCall(e) ->
+    L.build_call playercall_func (Array.of_list (List.map (expr builder) (e))) "playercall" builder
+  
+  (*AttL.build_in_bounds_gep arr [|L.const_int i32_t 0; L.const_int i32_t 0|] "arrptr" builder*)
+  (* SPlayerAttrCall(attr) -> AttL.build_in_bounds_gep player [|L.const_int i32_t 0; L.const_int i32_t 1|] "player" builder*)
+  (*^ do lookup player*)
+
+
     (*
     let create_obj_gen e llbuilder = 
       let params = List.map (expr_gen llbuilder) el in
