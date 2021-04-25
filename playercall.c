@@ -25,3 +25,13 @@ struct Player *playercall(char* name, int score)
   p->score = score;
   return p;
 }
+
+char *getplayername(struct Player *player)
+{
+  return player->name;
+}
+
+int getplayerscore(struct Player *player)
+{
+  return player->score;
+}
