@@ -80,8 +80,10 @@ class_decl_list:
   | attr_decl                       { ([], [$1]) }
   | class_decl_list action_decl     { (List.rev ($2::fst $1), snd $1) }
   | class_decl_list attr_decl       { (fst $1, List.rev ($2::snd $1)) }
+
 attr_decl:
     | typ ID COLON expr NEWLINE { OneAdecl($1, $2, $4)}
+
 params_list:
     param                        { [$1] } 
     | params_list COMMA param      { $3::$1 }
@@ -133,7 +135,6 @@ typ:
     | CARD                                          { Card }
 
 expr:
-    | call_action                    { $1 } 
     | ILIT                           { Iliteral($1) } 
     | FLIT                           { Fliteral($1) } 
     | BLIT                           { Bliteral($1) } 
@@ -154,7 +155,9 @@ expr:
     | expr LEQ    expr               { Binop($1, Leq,     $3) }
     | expr GT     expr               { Binop($1, Greater, $3) }
     | expr GEQ    expr               { Binop($1, Geq,     $3) }
-    | call_class                   { $1 } 
+    | call_class                     { $1 } 
+    | call_action                    { $1 } 
+    | call_attr                      { $1 }
 
 args_list_opt:
     /*nothing */                  { [] }
@@ -167,13 +170,12 @@ args_list:
 call_action:
     | DO ACTIONID LPAREN args_list_opt RPAREN        { ActionCall($2, $4) }
 
-
 call_class: 
     | PLAYER LPAREN args_list_opt RPAREN            { PlayerClassCall($3) } 
     | CARD LPAREN args_list_opt RPAREN            { CClassCall($3) } 
 
 call_attr:
-    ID DOT ID      { AttrCall($1, $3) }
+    ID DOT ID      { PlayerAttrCall($1, $3) }
 
 expr_opt:
     /* nothing */      { Noexpr }

@@ -20,7 +20,7 @@ type expr =
   | PlayerClassCall of expr list
   | CClassCall of expr list
  (*| ClassCall of string * expr list*)
-  | AttrCall of string * string 
+  | PlayerAttrCall of string * string 
   | SeriesGet of string * expr
   | Noexpr
 
