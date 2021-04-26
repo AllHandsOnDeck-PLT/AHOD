@@ -1,5 +1,5 @@
 int z 
-when do None PLAY():
+when do void PLAY():
 {
   int x
   int y

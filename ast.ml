@@ -3,7 +3,7 @@ type op = Add | Sub | Mult | Div | Equal | Neq | Less | Leq | Greater | Geq |
 
 type uop = Neg | Not
           
-type typ = Int | Float | Bool | String | None | Series of typ | Player | Card
+type typ = Int | Float | Bool | String | Void | Series of typ | Player | Card
 
 type bind = typ * string
           
@@ -84,7 +84,7 @@ let rec string_of_typ = function
   | Bool -> "bool"
   | Float -> "float"
   | String -> "string"
-  | None -> "none"
+  | Void -> "void"
   | Series x -> "series<" ^ (string_of_typ x) ^ ">"
   | Player -> "player"
   | Card -> "card"

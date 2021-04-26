@@ -1,5 +1,5 @@
 int a /* nothing should be printed out */
-when do None PLAY(): /*test*/
+when do void PLAY(): /*test*/
 {/*test*/
   do PRINT("actions are cool")/*test*/
 }/*test*/

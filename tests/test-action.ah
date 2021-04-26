@@ -1,5 +1,5 @@
 int x
-when do None PLAY():
+when do void PLAY():
 {
   do PRINT("actions are cool")
 }

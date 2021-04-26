@@ -31,7 +31,7 @@ let translate (globals, action_decls, main_decl) =
     | A.Bool  -> i1_t 
     | A.Float -> float_t
     | A.String -> string_t
-    | A.None -> void_t
+    | A.Void -> void_t
     | A.Series t -> series_t (ltype_of_typ t)
     | A.Player -> player_t 
     | A.Card -> card_t 
@@ -280,7 +280,7 @@ List.fold_left series_pop_ty StringMap.empty [ A.Bool; A.Int; A.Float; A.String;
     (match fst e with 
     A.String -> L.build_call printf_func [| L.const_in_bounds_gep str_format_str [|L.const_int i32_t 0; L.const_int i32_t 0|] ; (expr builder e) |]
     "printf" builder
-    | A.Int | A.None -> L.build_call printf_func [| L.const_in_bounds_gep int_format_str [|L.const_int i32_t 0; L.const_int i32_t 0|]  ; (expr builder e) |]
+    | A.Int | A.Void -> L.build_call printf_func [| L.const_in_bounds_gep int_format_str [|L.const_int i32_t 0; L.const_int i32_t 0|]  ; (expr builder e) |]
     "printf" builder
     | A.Float -> L.build_call printf_func [| L.const_in_bounds_gep float_format_str [|L.const_int i32_t 0; L.const_int i32_t 0|]  ; (expr builder e) |]
     "printf" builder
@@ -306,7 +306,7 @@ List.fold_left series_pop_ty StringMap.empty [ A.Bool; A.Int; A.Float; A.String;
     let (adef, main_func) = StringMap.find a action_decls_map in
     let llargs = List.rev (List.map (expr builder) (List.rev args)) in
     let result = (match main_func.satyp with 
-                  A.None -> ""
+                  A.Void -> ""
                 | _ -> a ^ "_result") 
     in L.build_call adef (Array.of_list llargs) result builder
 
@@ -394,7 +394,7 @@ let rec stmt builder = function
   | SExpr e -> ignore(expr builder e); builder
   | SReturn e -> ignore(match adecl.satyp with
                             (* Special "return nothing" instr *)
-                            A.None -> L.build_ret_void builder 
+                            A.Void -> L.build_ret_void builder 
                             (* Build return statement *)
                           | _ -> L.build_ret (expr builder e) builder );
                           builder
@@ -434,7 +434,7 @@ let rec stmt builder = function
 
     let builder = stmt builder (SBlock adecl.sabody) in 
       add_terminal builder (match adecl.satyp with
-              A.None -> L.build_ret_void
+              A.Void -> L.build_ret_void
             | A.Float -> L.build_ret (L.const_float float_t 0.0)
             | t -> L.build_ret (L.const_int (ltype_of_typ t) 0));
     
@@ -582,7 +582,7 @@ List.fold_left series_pop_ty StringMap.empty [ A.Bool; A.Int; A.Float; A.String;
       (match fst e with 
       A.String -> L.build_call printf_func [| L.const_in_bounds_gep str_format_str [|L.const_int i32_t 0; L.const_int i32_t 0|] ; (expr builder e) |]
       "printf" builder
-      | A.Int | A.None -> L.build_call printf_func [| L.const_in_bounds_gep int_format_str [|L.const_int i32_t 0; L.const_int i32_t 0|]  ; (expr builder e) |]
+      | A.Int | A.Void -> L.build_call printf_func [| L.const_in_bounds_gep int_format_str [|L.const_int i32_t 0; L.const_int i32_t 0|]  ; (expr builder e) |]
       "printf" builder
       | A.Float -> L.build_call printf_func [| L.const_in_bounds_gep float_format_str [|L.const_int i32_t 0; L.const_int i32_t 0|]  ; (expr builder e) |]
       "printf" builder
@@ -611,7 +611,7 @@ List.fold_left series_pop_ty StringMap.empty [ A.Bool; A.Int; A.Float; A.String;
     let (adef, main_func) = StringMap.find a action_decls_map in
     let llargs = List.rev (List.map (expr builder) (List.rev args)) in
     let result = (match main_func.satyp with 
-                  A.None -> ""
+                  A.Void -> ""
                 | _ -> a ^ "_result") 
     in L.build_call adef (Array.of_list llargs) result builder
     | SBinop ((A.Float,_ ) as e1, op, e2) ->
@@ -684,7 +684,7 @@ let rec stmt builder = function
   | SExpr e -> ignore(expr builder e); builder
   | SReturn e -> ignore(match main_func.smtyp with (*Should be unused*)
                             (* Special "return nothing" instr *)
-                            A.None -> L.build_ret_void builder 
+                            A.Void -> L.build_ret_void builder 
                             (* Build return statement *)
                           | _ -> L.build_ret (expr builder e) builder );
                           builder

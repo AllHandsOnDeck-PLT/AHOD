@@ -1,5 +1,5 @@
 int a
-None b 
+void b 
 main:
 {
   b = 42

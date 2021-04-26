@@ -1,9 +1,9 @@
 int x
-when do None PLAY():
+when do void PLAY():
 {
   do PRINT("actions are cool")
 }
-when do None PLAYTWO():
+when do void PLAYTWO():
 {
   do PRINT("two actions are cooler")
 }

@@ -5,10 +5,10 @@ module StringMap = Map.Make(String)
 
 let check (globals, action_decls, main_decl) = 
   
-  (* Verify a list of bindings has no none types or duplicate names *)
+  (* Verify a list of bindings has no Void types or duplicate names *)
   let check_binds (kind : string) (binds : bind list) =
     List.iter (function
-      | (None, b) -> raise (Failure ("illegal None " ^ kind ^ " " ^ b))
+      | (Void, b) -> raise (Failure ("illegal Void " ^ kind ^ " " ^ b))
       | _ -> ()) binds;
     let rec dups = function
         [] -> ()
@@ -22,7 +22,7 @@ let check (globals, action_decls, main_decl) =
     
   let built_in_decls = 
     let add_bind map (name, ty) = StringMap.add name {
-      atyp = None;
+      atyp = Void;
       aname = name; 
       aparams = [(ty, "x")];
       alocals = []; abody = [] } map
@@ -80,7 +80,7 @@ let check (globals, action_decls, main_decl) =
       (*need to figure out typ, if name is defined*)
         | PlayerClassCall(pparams) ->  (Player, SPlayerClassCall(List.map check_expr pparams))
         | CardClassCall(pparams) ->  (Card, SCardClassCall(List.map check_expr pparams))
-        | AttrAssign(objname, attr, e) -> (None, SAttrAssign(objname, attr, check_expr e))
+        | AttrAssign(objname, attr, e) -> (Void, SAttrAssign(objname, attr, check_expr e))
         | AttrCall(objname, attr) ->  
           (match attr with 
           "name" -> (String, SAttrCall(objname, attr))
@@ -93,7 +93,7 @@ let check (globals, action_decls, main_decl) =
         | Iliteral i -> (Int, SIliteral(i))
         | Fliteral f -> (Float, SFliteral(f))
         | Bliteral b -> (Bool, SBliteral(b))
-        | Noexpr     -> (None, SNoexpr)
+        | Noexpr     -> (Void, SNoexpr)
         | Id s       -> (type_of_identifier s, SId s)
         | Assign(var, e) -> 
           let lt = type_of_identifier var
@@ -126,7 +126,7 @@ let check (globals, action_decls, main_decl) =
               | _ -> raise (
             Failure ("illegal binary operator " ))
               in (ty, SBinop((t1, e1'), op, (t2, e2')))
-        | PrintCall(e) -> (None,SPrintCall(check_expr e))
+        | PrintCall(e) -> (Void,SPrintCall(check_expr e))
         | ActionCall(aname, args) as acall -> 
           let ad = find_act aname in
           let param_length = List.length ad.aparams in
@@ -240,12 +240,12 @@ let check (globals, action_decls, main_decl) =
       | "faceup" -> (Bool, SAttrCall(objname, attr)) 
       | _ -> raise (Failure ("attribute not found")))
 		(*| ActionCall(aname, aparams) -> (String, SActionCall(aname, List.map check_expr aparams))*)
-    | AttrAssign(objname, attr, e) -> (None, SAttrAssign(objname, attr, check_expr e))
+    | AttrAssign(objname, attr, e) -> (Void, SAttrAssign(objname, attr, check_expr e))
 		| Sliteral s -> (String, SSliteral(s))
 		| Iliteral i -> (Int, SIliteral(i))
 		| Fliteral f -> (Float, SFliteral(f))
     | Bliteral b -> (Bool, SBliteral(b))
-    | Noexpr     -> (None, SNoexpr)
+    | Noexpr     -> (Void, SNoexpr)
     | Id s       -> (type_of_identifier s, SId s)
     | Assign(var, e) -> 
       let lt = type_of_identifier var
@@ -278,7 +278,7 @@ let check (globals, action_decls, main_decl) =
             | _ -> raise (
           Failure ("illegal binary operator " ))
             in (ty, SBinop((t1, e1'), op, (t2, e2')))
-      | PrintCall(e) -> (None,SPrintCall(check_expr e))
+      | PrintCall(e) -> (Void,SPrintCall(check_expr e))
       | ActionCall(aname, args) as acall -> 
         let ad = find_act aname in
         let param_length = List.length ad.aparams in

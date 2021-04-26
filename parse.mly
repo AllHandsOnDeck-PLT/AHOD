@@ -4,7 +4,7 @@ open Ast
 
 %token LPAREN RPAREN LBRACE RBRACE LSQUARE RSQUARE SERIESSIZE SERIESPUSH SERIESPOP SERIES CARD PLAYER COLON SEMI COMMA PLUS MINUS MULT DIVIDE ASSIGN FLOOR DOT NEWLINE
 %token NOT EQ NEQ LT LEQ GT GEQ AND OR
-%token RETURN IF ELIF ELSE FOR WHILE INT BOOL FLOAT NONE STRING RANGE WHEN DO LET BE WITH MAIN PRINT TIMES CONST
+%token RETURN IF ELIF ELSE FOR WHILE INT BOOL FLOAT VOID STRING RANGE WHEN DO LET BE WITH MAIN PRINT TIMES CONST
 %token CEND
 %token <int> ILIT
 %token <bool> BLIT
@@ -46,7 +46,7 @@ global_decl:
     
 main_decl:
     MAIN COLON cend_opt NEWLINE LBRACE cend_opt NEWLINE locals_list stmt_wrap RBRACE cend_opt NEWLINE {{ 
-    mtyp = None; 
+    mtyp = Void; 
     mparams = [];
     mlocals = $8;
     mbody = [$9] }}
@@ -115,7 +115,7 @@ typ:
     | BOOL                                          { Bool      }
     | FLOAT                                         { Float     }
     | STRING                                        { String    }
-    | NONE                                          { None      }
+    | VOID                                          { Void      }
     | SERIES LT typ GT                              { Series($3)}
     | PLAYER                                        { Player }
     | CARD                                          { Card }

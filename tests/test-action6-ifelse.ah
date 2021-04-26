@@ -1,4 +1,4 @@
-when do None PLAY():
+when do void PLAY():
 {
     if 3>5 :
     {
