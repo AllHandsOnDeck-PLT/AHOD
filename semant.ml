@@ -172,8 +172,8 @@ let check (globals, action_decls, main_decl) =
         string_of_typ act.typ ^ " in " ^ string_of_expr e)) *)
       | Block sl -> 
         let rec check_stmt_list = function
-            [Return _ as s] -> [check_stmt s]
-          | Return _ :: _   -> raise (Failure "nothing may follow a return")
+          (* [Return _ as s] -> [check_stmt s] *)
+          (* | Return _ :: _   -> raise (Failure "nothing may follow a return") *)
           | Block sl :: ss  -> check_stmt_list (sl @ ss) (* Flatten blocks *)
           | s :: ss         -> check_stmt s :: check_stmt_list ss
           | []              -> []
@@ -313,8 +313,8 @@ let check (globals, action_decls, main_decl) =
       string_of_typ act.typ ^ " in " ^ string_of_expr e)) *)
     | Block sl -> 
       let rec check_stmt_list = function
-          [Return _ as s] -> [check_stmt s]
-        | Return _ :: _   -> raise (Failure "nothing may follow a return")
+        (* [Return _ as s] -> [check_stmt s]
+        | Return _ :: _   -> raise (Failure "nothing may follow a return") *)
         | Block sl :: ss  -> check_stmt_list (sl @ ss) (* Flatten blocks *)
         | s :: ss         -> check_stmt s :: check_stmt_list ss
         | []              -> []

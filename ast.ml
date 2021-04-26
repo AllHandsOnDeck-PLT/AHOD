@@ -15,12 +15,10 @@ type expr =
   | Seriesliteral of expr list
   | PrintCall of expr 
   | ActionCall of string * expr list
-  | ExprActionCall of expr * string * expr list
   | Id of string
   | Assign of string * expr
   | Binop of expr * op * expr
   | Unop of uop * expr
-  | AttrCall of string * string 
   | SeriesGet of string * expr
   | SeriesSize of string
   | SeriesPop of string
@@ -29,16 +27,13 @@ type expr =
 type stmt =
   | Block of stmt list
   | Expr of expr
-  | Return of expr
+  (* | Return of expr *)
   | If of expr * stmt * stmt 
   | For of expr * expr * expr * stmt
-  | ForLit of string * expr * stmt 
+  (* | ForLit of string * expr * stmt  *)
   | While of expr * stmt
   | SeriesPush of string * expr
   | Nostmt
-
-type attr_decl = 
-  | OneAdecl of typ * string * expr 
 
 type main_decl = {
   mtyp : typ; 
@@ -92,8 +87,8 @@ let rec string_of_expr = function
   | Bliteral(true) -> "true"
   | Bliteral(false) -> "false"
   | Sliteral(l) -> l
-  | SeriesGet(id, e) ->  id ^ "[" ^ (string_of_expr e) ^ "]"
   | Seriesliteral(_) -> "series_literal"
+  | PrintCall(e) -> "do" ^ "PRINT" ^ "(" ^ string_of_expr e ^ ")"
   | ActionCall(f, el) ->
   "do " ^ f ^ "(" ^ String.concat ", " (List.map string_of_expr el) ^ ")"
   | Id(s) -> s
@@ -101,10 +96,8 @@ let rec string_of_expr = function
   | Binop(e1, o, e2) ->
   string_of_expr e1 ^ " " ^ string_of_op o ^ " " ^ string_of_expr e2
   | Unop(o, e) -> string_of_uop o ^ string_of_expr e
+  | SeriesGet(id, e) ->  id ^ "[" ^ (string_of_expr e) ^ "]"
   | SeriesSize(id) -> "series_size " ^ id
   | SeriesPop(id) -> "series_pop " ^ id
   | Noexpr -> ""
-  | ExprActionCall(exp, f, el) ->
-    string_of_expr exp ^ "do " ^ f ^ "(" ^ String.concat ", " (List.map string_of_expr el) ^ ")"
-  | AttrCall(f, el) ->
-    f ^ "." ^ el
+

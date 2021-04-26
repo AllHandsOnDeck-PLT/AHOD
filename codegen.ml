@@ -234,8 +234,6 @@ List.fold_left series_pop_ty StringMap.empty [ A.Bool; A.Int; A.Float; A.String 
                   A.None -> ""
                 | _ -> a ^ "_result") 
     in L.build_call adef (Array.of_list llargs) result builder
-    | SExprActionCall(exp, a, args) -> raise (Failure "Need to implement this class-dependent expression")
-    | SAttrCall(a, args) -> raise (Failure "Need to implement this class-dependent expression")
     | SBinop ((A.Float,_ ) as e1, op, e2) ->
     let e1' = expr builder e1
     and e2' = expr builder e2 in
@@ -505,8 +503,6 @@ List.fold_left series_pop_ty StringMap.empty [ A.Bool; A.Int; A.Float; A.String 
                   A.None -> ""
                 | _ -> a ^ "_result") 
     in L.build_call adef (Array.of_list llargs) result builder
-    | SExprActionCall(exp, a, args) -> raise (Failure "Need to implement this class-dependent expression")
-    | SAttrCall(a, args) -> raise (Failure "Need to implement this class-dependent expression")
     | SBinop ((A.Float,_ ) as e1, op, e2) ->
     let e1' = expr builder e1
     and e2' = expr builder e2 in
