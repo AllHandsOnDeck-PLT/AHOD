@@ -131,7 +131,7 @@ expr:
     | ID LSQUARE expr RSQUARE        { SeriesGet($1, $3) }
     | ID DOT SERIESSIZE LPAREN RPAREN { SeriesSize($1)}
     | ID DOT SERIESPOP LPAREN RPAREN { SeriesPop($1)}
-    | ID DOT ID ASSIGN expr           { AttrAssign($1, $3, $5) }
+    // | ID DOT ID ASSIGN expr           { AttrAssign($1, $3, $5) }
     | CEND                           { Noexpr }
     | expr PLUS   expr               { Binop($1, Add,     $3) } 
     | expr MINUS  expr               { Binop($1, Sub,     $3) }

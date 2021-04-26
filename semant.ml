@@ -80,7 +80,7 @@ let check (globals, action_decls, main_decl) =
       (*need to figure out typ, if name is defined*)
         | PlayerClassCall(pparams) ->  (Player, SPlayerClassCall(List.map check_expr pparams))
         | CardClassCall(pparams) ->  (Card, SCardClassCall(List.map check_expr pparams))
-        | AttrAssign(objname, attr, e) -> (Void, SAttrAssign(objname, attr, check_expr e))
+        (* | AttrAssign(objname, attr, e) -> (Void, SAttrAssign(objname, attr, check_expr e)) *)
         | AttrCall(objname, attr) ->  
           (match attr with 
           "name" -> (String, SAttrCall(objname, attr))
@@ -88,7 +88,6 @@ let check (globals, action_decls, main_decl) =
           | "type" -> (String, SAttrCall(objname, attr))
           | "faceup" -> (Bool, SAttrCall(objname, attr)) 
           | _ -> raise (Failure ("attribute not found")))
-        (* | ActionCall(aname, aparams) -> (String, SActionCall(aname, List.map check_expr aparams)) *)
         | Sliteral s -> (String, SSliteral(s))
         | Iliteral i -> (Int, SIliteral(i))
         | Fliteral f -> (Float, SFliteral(f))
@@ -239,8 +238,7 @@ let check (globals, action_decls, main_decl) =
       | "type" -> (String, SAttrCall(objname, attr))
       | "faceup" -> (Bool, SAttrCall(objname, attr)) 
       | _ -> raise (Failure ("attribute not found")))
-		(*| ActionCall(aname, aparams) -> (String, SActionCall(aname, List.map check_expr aparams))*)
-    | AttrAssign(objname, attr, e) -> (Void, SAttrAssign(objname, attr, check_expr e))
+    (* | AttrAssign(objname, attr, e) -> (Void, SAttrAssign(objname, attr, check_expr e)) *)
 		| Sliteral s -> (String, SSliteral(s))
 		| Iliteral i -> (Int, SIliteral(i))
 		| Fliteral f -> (Float, SFliteral(f))

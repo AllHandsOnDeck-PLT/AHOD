@@ -84,7 +84,7 @@ let translate (globals, action_decls, main_decl) =
   let getplayerscore_func : L.llvalue =
       L.declare_function "getplayerscore" getplayerscore_t the_module in
 
-  let setplayername_t : L.lltype =
+  (* let setplayername_t : L.lltype =
         L.function_type string_t [| player_t ; string_t |] in 
   let setplayername_func : L.llvalue =
       L.declare_function "setplayername" setplayername_t the_module in
@@ -92,7 +92,7 @@ let translate (globals, action_decls, main_decl) =
   let setplayerscore_t : L.lltype =
         L.function_type void_t [| player_t ; i32_t |] in 
   let setplayerscore_func : L.llvalue =
-      L.declare_function "setplayerscore" setplayerscore_t the_module in
+      L.declare_function "setplayerscore" setplayerscore_t the_module in *)
 
   (* ------------------------------------------------------------- *)
 
@@ -270,8 +270,8 @@ List.fold_left series_pop_ty StringMap.empty [ A.Bool; A.Int; A.Float; A.String;
     | SAssign (s, e) -> let e' = expr builder e in
                     ignore(L.build_store e' (lookup s) builder); e'
 
-    | SAttrAssign (objname, attr, e) -> let e' = expr builder e in
-    (L.build_call setplayername_func [|(L.build_load (lookup objname) objname builder) ; e'|] "setplayername" builder); e'
+    (* | SAttrAssign (objname, attr, e) -> let e' = expr builder e in
+    (L.build_call setplayername_func [|(L.build_load (lookup objname) objname builder) ; e'|] "setplayername" builder); e' *)
 
     | SPrintCall(e) ->
     (*don't do match here do SprintCall, makes sure it doesn't have list of args, pattern match on type
@@ -309,22 +309,6 @@ List.fold_left series_pop_ty StringMap.empty [ A.Bool; A.Int; A.Float; A.String;
                   A.Void -> ""
                 | _ -> a ^ "_result") 
     in L.build_call adef (Array.of_list llargs) result builder
-
-    | SPlayerClassCall(e) ->
-    L.build_call playercall_func (Array.of_list (List.map (expr builder) (e))) "playercall" builder
-
-    | SCardClassCall(e) ->
-    L.build_call cardcall_func (Array.of_list (List.map (expr builder) (e))) "cardcall" builder
-
-    | SAttrCall(objname, attr) -> 
-      (match attr with
-      "name" -> L.build_call getplayername_func [|(L.build_load (lookup objname) objname builder)|] "getplayername" builder
-      | "score" -> L.build_call getplayerscore_func [|(L.build_load (lookup objname) objname builder)|] "getplayerscore" builder
-      | "type" -> L.build_call getcardtype_func [|(L.build_load (lookup objname) objname builder)|] "getcardtype" builder
-      | "faceup" -> L.build_call getcardfaceup_func [|(L.build_load (lookup objname) objname builder)|] "getcardfaceup" builder
-      | _ -> raise (Failure "attribute is not supported")
-      )
-
     | SBinop ((A.Float,_ ) as e1, op, e2) ->
     let e1' = expr builder e1
     and e2' = expr builder e2 in
@@ -590,8 +574,8 @@ List.fold_left series_pop_ty StringMap.empty [ A.Bool; A.Int; A.Float; A.String;
       "printf" builder
       | _ -> raise (Failure "Print of this type is not supported") (* Potentially need to support Class, Series, and None cases *)
       )
-    | SAttrAssign (objname, attr, e) -> let e' = expr builder e in
-    (L.build_call setplayername_func [|(L.build_load (lookup objname) objname builder) ; e'|] "setplayername" builder); e'
+    (* | SAttrAssign (objname, attr, e) -> let e' = expr builder e in
+    (L.build_call setplayername_func [|(L.build_load (lookup objname) objname builder) ; e'|] "setplayername" builder); e' *)
 
     | SPlayerClassCall(e) ->
     L.build_call playercall_func (Array.of_list (List.map (expr builder) (e))) "playercall" builder
