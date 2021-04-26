@@ -1,0 +1,6 @@
+Card card
+main:
+{
+  card = Card("R5", true) 
+  do PRINT(true)
+}

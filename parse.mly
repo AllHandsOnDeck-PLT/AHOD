@@ -172,10 +172,10 @@ call_action:
 
 call_class: 
     | PLAYER LPAREN args_list_opt RPAREN            { PlayerClassCall($3) } 
-    | CARD LPAREN args_list_opt RPAREN            { CClassCall($3) } 
+    | CARD LPAREN args_list_opt RPAREN            { CardClassCall($3) } 
 
 call_attr:
-    ID DOT ID      { PlayerAttrCall($1, $3) }
+    ID DOT ID      { AttrCall($1, $3) }
 
 expr_opt:
     /* nothing */      { Noexpr }

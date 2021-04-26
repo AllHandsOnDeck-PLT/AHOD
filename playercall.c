@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 
 struct Player 
 {
@@ -34,4 +35,29 @@ char *getplayername(struct Player *player)
 int getplayerscore(struct Player *player)
 {
   return player->score;
+}
+
+struct Card 
+{
+  char *type;
+  bool faceup;
+};
+
+struct Card *cardcall(char* type, bool faceup)
+{
+  struct Card *c;
+  c = (struct Card *) malloc(sizeof(struct Card));
+  c->type = type;
+  c->faceup = faceup;
+  return c;
+}
+
+char *getcardtype(struct Card *card)
+{
+  return card->type;
+}
+
+bool getcardfaceup(struct Card *card)
+{
+  return card->faceup;
 }

@@ -15,7 +15,8 @@ and sx =
   | SBinop of sexpr * op * sexpr
   | SClassCall of string * sexpr list
   | SPlayerClassCall of sexpr list
-  | SPlayerAttrCall of string * string 
+  | SCardClassCall of sexpr list
+  | SAttrCall of string * string 
   | SNoexpr
 
 type sstmt =

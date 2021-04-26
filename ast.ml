@@ -18,9 +18,9 @@ type expr =
   | Assign of string * expr
   | Binop of expr * op * expr (*need to add binop*)
   | PlayerClassCall of expr list
-  | CClassCall of expr list
+  | CardClassCall of expr list
  (*| ClassCall of string * expr list*)
-  | PlayerAttrCall of string * string 
+  | AttrCall of string * string 
   | SeriesGet of string * expr
   | Noexpr
 

@@ -22,7 +22,8 @@ let translate (globals, action_decls, main_stmt) =
 	 and string_t    = L.pointer_type (L.i8_type context)
    and void_t      = L.void_type   context 
    and series_t t  = L.struct_type context [| L.pointer_type (L.i32_type context); (L.pointer_type t) |]
-   and player_t  = L.struct_type context [| (L.pointer_type (L.i8_type context)); (L.i32_type context) |]
+   and player_t    = L.struct_type context [| (L.pointer_type (L.i8_type context)); (L.i32_type context) |]
+   and card_t      = L.struct_type context [| (L.pointer_type (L.i8_type context)); (L.i1_type context) |]
    (*struct_set_body  class_t *)
   in
 
@@ -33,7 +34,8 @@ let translate (globals, action_decls, main_stmt) =
     | A.String -> string_t
     | A.None -> void_t
     | A.Series t -> series_t (ltype_of_typ t)
-    | A.ClassID -> player_t 
+    | A.Player -> player_t 
+    | A.Card -> card_t 
     in
     let type_str t = match t with
         A.Int -> "int"
@@ -89,6 +91,7 @@ let translate (globals, action_decls, main_stmt) =
       (* ======================== initialized the class ========================= *)
       (* unsure about class_type *)
       | A.Player -> L.const_struct context ([|L.const_pointer_null (L.pointer_type(L.i8_type context)) ; L.const_pointer_null (L.i32_type context)|])
+      | A.Card -> L.const_struct context ([|L.const_pointer_null (L.pointer_type(L.i8_type context)) ; L.const_pointer_null (L.i1_type context)|])
       (* ======================== initialized the class ========================= *)
       | _ -> L.const_int (ltype_of_typ t) 0
     in StringMap.add n (L.define_global n init the_module) m in
@@ -139,6 +142,7 @@ let printf_t : L.lltype =
 let printf_func : L.llvalue = 
     L.declare_function "printf" printf_t the_module in
 
+(* ------------------------------------------------------------- *)
 let playercall_t : L.lltype =
       L.function_type player_t [| string_t ; i32_t |] in 
   let playercall_func : L.llvalue =
@@ -153,6 +157,25 @@ let getplayerscore_t : L.lltype =
       L.function_type i32_t [| player_t |] in 
   let getplayerscore_func : L.llvalue =
       L.declare_function "getplayerscore" getplayerscore_t the_module in
+
+(* ------------------------------------------------------------- *)
+
+let cardcall_t : L.lltype =
+      L.function_type card_t [| string_t ; i1_t |] in 
+  let cardcall_func : L.llvalue =
+      L.declare_function "cardcall" cardcall_t the_module in
+
+let getcardtype_t : L.lltype =
+      L.function_type string_t [| card_t |] in 
+  let getcardtype_func : L.llvalue =
+      L.declare_function "getcardtype" getcardtype_t the_module in
+
+let getcardfaceup_t : L.lltype =
+      L.function_type i1_t [| card_t |] in 
+  let getcardfaceup_func : L.llvalue =
+      L.declare_function "getcardfaceup" getcardfaceup_t the_module in
+
+(* ------------------------------------------------------------- *)
 
 let series_add : L.llvalue StringMap.t = 
   let series_add_ty m typ =
@@ -215,10 +238,15 @@ let rec expr builder ((_, e) : sexpr) = match e with
   | SPlayerClassCall(e) ->
     L.build_call playercall_func (Array.of_list (List.map (expr builder) (e))) "playercall" builder
 
-  | SPlayerAttrCall(objname, attr) -> 
+  | SCardClassCall(e) ->
+    L.build_call cardcall_func (Array.of_list (List.map (expr builder) (e))) "cardcall" builder
+
+  | SAttrCall(objname, attr) -> 
   (match attr with
   "name" -> L.build_call getplayername_func [|(L.build_load (lookup objname) objname builder)|] "getplayername" builder
   | "score" -> L.build_call getplayerscore_func [|(L.build_load (lookup objname) objname builder)|] "getplayerscore" builder
+  | "type" -> L.build_call getcardtype_func [|(L.build_load (lookup objname) objname builder)|] "getcardtype" builder
+  | "faceup" -> L.build_call getcardfaceup_func [|(L.build_load (lookup objname) objname builder)|] "getcardfaceup" builder
   )
 
   (*| SPlayerAttrCall(objname, attr) -> 

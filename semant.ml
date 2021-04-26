@@ -34,10 +34,13 @@ let check (globals, action_decls, main_stmt) =
 	let rec check_expr = function
 		(*need to figure out typ, if name is defined*)
     | PlayerClassCall(pparams) ->  (Player, SPlayerClassCall(List.map check_expr pparams))
-    | PlayerAttrCall(objname, attr) ->  
+    | CardClassCall(pparams) ->  (Card, SCardClassCall(List.map check_expr pparams))
+    | AttrCall(objname, attr) ->  
       (match attr with 
-      "name" -> (String, SPlayerAttrCall(objname, attr))
-      | "score" -> (Int, SPlayerAttrCall(objname, attr)) 
+      "name" -> (String, SAttrCall(objname, attr))
+      | "score" -> (Int, SAttrCall(objname, attr)) 
+      | "type" -> (String, SAttrCall(objname, attr))
+      | "faceup" -> (Bool, SAttrCall(objname, attr)) 
       | _ -> raise (Failure ("attribute not found")))
 		| ActionCall(aname, aparams) -> (String, SActionCall(aname, List.map check_expr aparams))
 		| Sliteral s -> (String, SSliteral(s))
