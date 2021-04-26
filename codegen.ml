@@ -214,12 +214,19 @@ let rec expr builder ((_, e) : sexpr) = match e with
                           ignore(L.build_store e' (lookup_class s) builder); e'*)
   | SPlayerClassCall(e) ->
     L.build_call playercall_func (Array.of_list (List.map (expr builder) (e))) "playercall" builder
-  
+
   | SPlayerAttrCall(objname, attr) -> 
+  (match attr with
+  "name" -> L.build_call getplayername_func [|(L.build_load (lookup objname) objname builder)|] "getplayername" builder
+  | "score" -> L.build_call getplayerscore_func [|(L.build_load (lookup objname) objname builder)|] "getplayerscore" builder
+  )
+
+  (*| SPlayerAttrCall(objname, attr) -> 
   (match attr with
   "name" -> L.build_call getplayername_func [|L.const_pointer_null (L.pointer_type(L.i8_type context)) ; L.const_pointer_null (L.i32_type context)|] "getplayername" builder
   | "score" -> L.build_call getplayerscore_func [|L.const_pointer_null (L.pointer_type(L.i8_type context)) ; L.const_pointer_null (L.i32_type context)|] "getplayerscore" builder
-  )
+  )*)
+
   (*AttL.build_in_bounds_gep arr [|L.const_int i32_t 0; L.const_int i32_t 0|] "arrptr" builder*)
   (*| SPlayerAttrCall(objname, attr) -> 
   (match attr with
