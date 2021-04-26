@@ -169,8 +169,8 @@ let init_series builder series_ptr series_type =
       ignore(L.build_store (L.const_int i32_t 0) size_ptr builder);
       ignore(L.build_store size_ptr size_ptr_ptr builder);
   let series_ptr = L.build_struct_gep series_ptr 1 "series" builder in (* init array (series) *)
-    (* TODO: allocate nothing and have series grow dynamically as necessary when pushing into the series *)
-    let p = L.build_array_alloca (ltype_of_typ series_type) (L.const_int i32_t 1028) "p" builder in (*change number?*)
+    (* fails when there's []*)
+    let p = L.build_array_alloca (ltype_of_typ series_type) (L.const_int i32_t 1028) "p" builder in
     ignore(L.build_store p series_ptr builder);
 in
 
@@ -440,8 +440,8 @@ let init_series builder series_ptr series_type =
       ignore(L.build_store (L.const_int i32_t 0) size_ptr builder);
       ignore(L.build_store size_ptr size_ptr_ptr builder);
   let series_ptr = L.build_struct_gep series_ptr 1 "series" builder in (* init array (series) *)
-    (* TODO: allocate nothing and have series grow dynamically as necessary when pushing into the series *)
-    let p = L.build_array_alloca (ltype_of_typ series_type) (L.const_int i32_t 1028) "p" builder in (*change number?*)
+    (* fails when a = [] *)
+    let p = L.build_array_alloca (ltype_of_typ series_type) (L.const_int i32_t 1028) "p" builder in 
     ignore(L.build_store p series_ptr builder);
 in
 
