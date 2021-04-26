@@ -1,10 +1,5 @@
 %{
 open Ast
-
-let frst (a,_,_) = a;;
-let scnd (_,b,_) = b;;
-let trd (_,_,c) = c;;
-
 %}
 
 %token LPAREN RPAREN LBRACE RBRACE LSQUARE RSQUARE SERIESADD SERIES COLON SEMI COMMA PLUS MINUS MULT DIVIDE ASSIGN MOD POWER FLOOR DOT DOTDOT DOTDOTDOT NEWLINE
@@ -39,7 +34,6 @@ let trd (_,_,c) = c;;
 
 program:
     decls main_decl EOF { (fst $1, snd $1, $2) }
-    /*main_decl decls EOF { ($1, fst $2, snd $2) }*/
 
 decls:
     /*nothing*/      { ([], []) }
@@ -47,28 +41,15 @@ decls:
     // | decls class_decl { (fst $1, List.rev ($2::snd $1)) }
     | decls action_decl { (fst $1, List.rev ($2::snd $1)) }
 
-
-/*decls:
-     nothing      { ([], []) }
-    | decls global_decl { (List.rev ($2::frst $1), scnd $1, trd $1) }
-    | decls class_decl  { (List.rev ($2::fst $1), snd $1) }
-    | decls action_decl { (fst $1, List.rev ($2::snd $1)) }
-*/
- 
 global_decl:
     typ ID NEWLINE { ($1, $2) }
     
 main_decl:
-    MAIN COLON stmt { $3 }
-/*
-main_decl:
-    typ MAIN COLON NEWLINE LBRACE NEWLINE locals_list stmt_wrap RBRACE NEWLINE {{ 
-      mtyp = $1;
-      mname = $2;
-      mlocals = $7;
-      abody = [$8] }}
-*/
-    /*MAIN COLON stmt_block { $3 } */
+    MAIN COLON NEWLINE LBRACE NEWLINE locals_list stmt_wrap RBRACE NEWLINE {{ 
+    mtyp = None; 
+    mparams = [];
+    mlocals = $6;
+    mbody = [$7] }}
 
 class_decl:
     LET CLASSID LPAREN params_list RPAREN BE COLON class_block     
@@ -77,12 +58,6 @@ class_decl:
       cparams = $4; 
       actions = fst $8;
       attributes = snd $8 }}
-
-    /*LET CLASSID LPAREN params_list RPAREN BE COLON class_block        
-    {{ 
-      cname = $2;
-      cparams = $4;
-      attributes = $8 }}*/
 
 action_decl: 
     WHEN DO typ ACTIONID LPAREN params_list_opt RPAREN COLON NEWLINE LBRACE NEWLINE locals_list stmt_wrap RBRACE NEWLINE 
@@ -102,9 +77,6 @@ class_decl_list:
   | attr_decl                       { ([], [$1]) }
   | class_decl_list action_decl     { (List.rev ($2::fst $1), snd $1) }
   | class_decl_list attr_decl       { (fst $1, List.rev ($2::snd $1)) }
-  /*
-  | attr_decl                       { [$1] }
-  | class_decl_list attr_decl       { List.rev ($2::$1) }*/
 
 attr_decl:
     | typ ID COLON expr NEWLINE { OneAdecl($1, $2, $4)}
@@ -120,9 +92,6 @@ params_list:
 param:
       typ ID                       { $1, $2 }
 
-/*stmt_block:
-    NEWLINE LBRACE NEWLINE locals_list stmt_list RBRACE NEWLINE              { Block(List.rev $4, List.rev $5) }
-*/
 stmt_block:
     NEWLINE LBRACE NEWLINE stmt_list RBRACE NEWLINE              { Block(List.rev $4) }
 
@@ -139,18 +108,12 @@ stmt_list:
 
 stmt:
     | stmt_block                            { $1 }
-    //| NEWLINE LBRACE NEWLINE stmt_list RBRACE NEWLINE  { Block(List.rev $4) }
     | expr NEWLINE                          { Expr $1 } 
-    // | PASS NEWLINE                       { }
     | RETURN expr_opt NEWLINE               { Return $2 }
     | if_stmt                               { $1 }
     | FOR LPAREN expr SEMI expr SEMI expr RPAREN COLON stmt { For($3, $5, $7, $10)   }
     | FOR ID IN expr COLON stmt       { ForLit($2, $4, $6) } 
     | WHILE expr COLON stmt          { While($2, $4) }
-
-    /*| FOR LPAREN expr SEMI expr SEMI expr RPAREN COLON stmt_block  { For($3, $5, $7, $10)   }
-    | FOR ID IN expr COLON stmt_block       { ForLit($2, $4, $6) } 
-    | WHILE expr COLON stmt_block          { While($2, $4) } */
     | ID DOT SERIESADD LPAREN expr RPAREN   { SeriesAdd($1, $5)}
 
 if_stmt:

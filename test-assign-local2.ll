@@ -5,14 +5,20 @@ source_filename = "AHOD"
 @str.1 = global [4 x i8] c"%d\0A\00"
 @str.2 = global [4 x i8] c"%g\0A\00"
 @str.3 = global [4 x i8] c"%d\0A\00"
+@z = global i32 0
 
 declare i32 @printf(i8*, ...)
 
 define void @PLAY() {
 entry:
   %x = alloca i32
+  %y = alloca i32
   store i32 3, i32* %x
-  %printf = call i32 (i8*, ...) @printf(i8* getelementptr inbounds ([4 x i8], [4 x i8]* @str.1, i32 0, i32 0), i32 3)
+  store i32 4, i32* %y
+  %x1 = load i32, i32* %x
+  %printf = call i32 (i8*, ...) @printf(i8* getelementptr inbounds ([4 x i8], [4 x i8]* @str.1, i32 0, i32 0), i32 %x1)
+  %y2 = load i32, i32* %y
+  %printf3 = call i32 (i8*, ...) @printf(i8* getelementptr inbounds ([4 x i8], [4 x i8]* @str.1, i32 0, i32 0), i32 %y2)
   ret void
 }
 
@@ -156,6 +162,19 @@ entry:
   ret i8* %series_array_element_ptr
 }
 
+define i32 @main() {
+entry:
+  %a = alloca i32
+  store i32 3, i32* %a
+  store i32 5, i32* @z
+  %z = load i32, i32* @z
+  %printf = call i32 (i8*, ...) @printf(i8* getelementptr inbounds ([4 x i8], [4 x i8]* @str.1, i32 0, i32 0), i32 %z)
+  %a1 = load i32, i32* %a
+  %printf2 = call i32 (i8*, ...) @printf(i8* getelementptr inbounds ([4 x i8], [4 x i8]* @str.1, i32 0, i32 0), i32 %a1)
+  call void @PLAY()
+  ret i32 0
+}
+
 define void @series_addbool.4({ i32*, i1* }*, i1) {
 entry:
   %series_ptr_alloc = alloca { i32*, i1* }*
@@ -294,10 +313,4 @@ entry:
   %series_arry_element_ptr = getelementptr i8*, i8** %array_load, i32 %idx_load
   %series_array_element_ptr = load i8*, i8** %series_arry_element_ptr
   ret i8* %series_array_element_ptr
-}
-
-define i32 @main() {
-entry:
-  call void @PLAY()
-  ret i32 0
 }

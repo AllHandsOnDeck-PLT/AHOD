@@ -1,0 +1,13 @@
+when do None PLAY():
+{
+    int i
+    for (i = 0 ; i < 5; i = i + 1):
+    {
+    do PRINT(i)
+    }
+}
+
+main:
+{
+    do PLAY()
+}

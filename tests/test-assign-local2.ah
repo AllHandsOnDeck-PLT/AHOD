@@ -1,3 +1,4 @@
+int z 
 when do None PLAY():
 {
   int x
@@ -9,5 +10,10 @@ when do None PLAY():
 }
 main:
 {
+  int a
+  a = 3
+  z = 5 
+  do PRINT(z)
+  do PRINT(a)
   do PLAY()
 }

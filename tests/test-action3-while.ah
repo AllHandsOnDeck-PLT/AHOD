@@ -1,0 +1,12 @@
+when do None PLAY():
+{
+    while 3>5:
+    {
+    do PRINT(0)
+    }
+    do PRINT(1)
+} 
+main:
+{
+    do PLAY()
+}

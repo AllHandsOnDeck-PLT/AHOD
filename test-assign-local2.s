@@ -6,14 +6,24 @@
 PLAY:                                   # @PLAY
 	.cfi_startproc
 # %bb.0:                                # %entry
-	pushq	%rax
+	pushq	%rbx
 	.cfi_def_cfa_offset 16
-	movl	$3, 4(%rsp)
-	movq	str.1@GOTPCREL(%rip), %rdi
+	subq	$16, %rsp
+	.cfi_def_cfa_offset 32
+	.cfi_offset %rbx, -16
+	movl	$3, 12(%rsp)
+	movl	$4, 8(%rsp)
+	movq	str.1@GOTPCREL(%rip), %rbx
 	movl	$3, %esi
 	xorl	%eax, %eax
+	movq	%rbx, %rdi
 	callq	printf@PLT
-	popq	%rax
+	movl	8(%rsp), %esi
+	xorl	%eax, %eax
+	movq	%rbx, %rdi
+	callq	printf@PLT
+	addq	$16, %rsp
+	popq	%rbx
 	retq
 .Lfunc_end0:
 	.size	PLAY, .Lfunc_end0-PLAY
@@ -164,6 +174,38 @@ series_getstr:                          # @series_getstr
 	.size	series_getstr, .Lfunc_end8-series_getstr
 	.cfi_endproc
                                         # -- End function
+	.globl	main                    # -- Begin function main
+	.p2align	4, 0x90
+	.type	main,@function
+main:                                   # @main
+	.cfi_startproc
+# %bb.0:                                # %entry
+	pushq	%rbx
+	.cfi_def_cfa_offset 16
+	subq	$16, %rsp
+	.cfi_def_cfa_offset 32
+	.cfi_offset %rbx, -16
+	movl	$3, 12(%rsp)
+	movq	z@GOTPCREL(%rip), %rax
+	movl	$5, (%rax)
+	movq	str.1@GOTPCREL(%rip), %rbx
+	movl	$5, %esi
+	xorl	%eax, %eax
+	movq	%rbx, %rdi
+	callq	printf@PLT
+	movl	12(%rsp), %esi
+	xorl	%eax, %eax
+	movq	%rbx, %rdi
+	callq	printf@PLT
+	callq	PLAY@PLT
+	xorl	%eax, %eax
+	addq	$16, %rsp
+	popq	%rbx
+	retq
+.Lfunc_end9:
+	.size	main, .Lfunc_end9-main
+	.cfi_endproc
+                                        # -- End function
 	.globl	series_addbool.4        # -- Begin function series_addbool.4
 	.p2align	4, 0x90
 	.type	series_addbool.4,@function
@@ -181,8 +223,8 @@ series_addbool.4:                       # @series_addbool.4
 	movb	-9(%rsp), %al
 	movb	%al, (%rcx,%rdx)
 	retq
-.Lfunc_end9:
-	.size	series_addbool.4, .Lfunc_end9-series_addbool.4
+.Lfunc_end10:
+	.size	series_addbool.4, .Lfunc_end10-series_addbool.4
 	.cfi_endproc
                                         # -- End function
 	.globl	series_addint.5         # -- Begin function series_addint.5
@@ -201,8 +243,8 @@ series_addint.5:                        # @series_addint.5
 	movl	-12(%rsp), %eax
 	movl	%eax, (%rcx,%rdx,4)
 	retq
-.Lfunc_end10:
-	.size	series_addint.5, .Lfunc_end10-series_addint.5
+.Lfunc_end11:
+	.size	series_addint.5, .Lfunc_end11-series_addint.5
 	.cfi_endproc
                                         # -- End function
 	.globl	series_addfloat.6       # -- Begin function series_addfloat.6
@@ -221,8 +263,8 @@ series_addfloat.6:                      # @series_addfloat.6
 	movsd	-16(%rsp), %xmm0        # xmm0 = mem[0],zero
 	movsd	%xmm0, (%rcx,%rdx,8)
 	retq
-.Lfunc_end11:
-	.size	series_addfloat.6, .Lfunc_end11-series_addfloat.6
+.Lfunc_end12:
+	.size	series_addfloat.6, .Lfunc_end12-series_addfloat.6
 	.cfi_endproc
                                         # -- End function
 	.globl	series_addstr.7         # -- Begin function series_addstr.7
@@ -241,8 +283,8 @@ series_addstr.7:                        # @series_addstr.7
 	movq	-16(%rsp), %rax
 	movq	%rax, (%rcx,%rdx,8)
 	retq
-.Lfunc_end12:
-	.size	series_addstr.7, .Lfunc_end12-series_addstr.7
+.Lfunc_end13:
+	.size	series_addstr.7, .Lfunc_end13-series_addstr.7
 	.cfi_endproc
                                         # -- End function
 	.globl	series_getbool.8        # -- Begin function series_getbool.8
@@ -257,8 +299,8 @@ series_getbool.8:                       # @series_getbool.8
 	movslq	-12(%rsp), %rcx
 	movb	(%rax,%rcx), %al
 	retq
-.Lfunc_end13:
-	.size	series_getbool.8, .Lfunc_end13-series_getbool.8
+.Lfunc_end14:
+	.size	series_getbool.8, .Lfunc_end14-series_getbool.8
 	.cfi_endproc
                                         # -- End function
 	.globl	series_getint.9         # -- Begin function series_getint.9
@@ -273,8 +315,8 @@ series_getint.9:                        # @series_getint.9
 	movslq	-12(%rsp), %rcx
 	movl	(%rax,%rcx,4), %eax
 	retq
-.Lfunc_end14:
-	.size	series_getint.9, .Lfunc_end14-series_getint.9
+.Lfunc_end15:
+	.size	series_getint.9, .Lfunc_end15-series_getint.9
 	.cfi_endproc
                                         # -- End function
 	.globl	series_getfloat.10      # -- Begin function series_getfloat.10
@@ -289,8 +331,8 @@ series_getfloat.10:                     # @series_getfloat.10
 	movslq	-12(%rsp), %rcx
 	movsd	(%rax,%rcx,8), %xmm0    # xmm0 = mem[0],zero
 	retq
-.Lfunc_end15:
-	.size	series_getfloat.10, .Lfunc_end15-series_getfloat.10
+.Lfunc_end16:
+	.size	series_getfloat.10, .Lfunc_end16-series_getfloat.10
 	.cfi_endproc
                                         # -- End function
 	.globl	series_getstr.11        # -- Begin function series_getstr.11
@@ -305,24 +347,8 @@ series_getstr.11:                       # @series_getstr.11
 	movslq	-12(%rsp), %rcx
 	movq	(%rax,%rcx,8), %rax
 	retq
-.Lfunc_end16:
-	.size	series_getstr.11, .Lfunc_end16-series_getstr.11
-	.cfi_endproc
-                                        # -- End function
-	.globl	main                    # -- Begin function main
-	.p2align	4, 0x90
-	.type	main,@function
-main:                                   # @main
-	.cfi_startproc
-# %bb.0:                                # %entry
-	pushq	%rax
-	.cfi_def_cfa_offset 16
-	callq	PLAY@PLT
-	xorl	%eax, %eax
-	popq	%rcx
-	retq
 .Lfunc_end17:
-	.size	main, .Lfunc_end17-main
+	.size	series_getstr.11, .Lfunc_end17-series_getstr.11
 	.cfi_endproc
                                         # -- End function
 	.type	str,@object             # @str
@@ -349,6 +375,14 @@ str.2:
 str.3:
 	.asciz	"%d\n"
 	.size	str.3, 4
+
+	.type	z,@object               # @z
+	.bss
+	.globl	z
+	.p2align	2
+z:
+	.long	0                       # 0x0
+	.size	z, 4
 
 
 	.section	".note.GNU-stack","",@progbits

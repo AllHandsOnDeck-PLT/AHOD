@@ -1,0 +1,11 @@
+when do None PLAY():
+{
+    if 3<5 :
+    {  
+    do PRINT(1)
+    }
+} 
+main:
+{
+    do PLAY()
+}

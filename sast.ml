@@ -31,6 +31,13 @@ type sstmt =
 type sattr_decl = 
   | SOneAdecl of typ * string * sexpr 
 
+type smain_decl = {
+  smtyp : typ; 
+  smparams : bind list; 
+  smlocals : bind list;
+  smbody: sstmt list;
+}
+
 type saction_decl = {
   (* sentitytyp : typ;
   sentityid : string; *)
@@ -49,7 +56,7 @@ type sclass_decl = {
 }
 
 (* type sprogram = bind list * sclass_decl list * sstmt  *)
-type sprogram = bind list * saction_decl list * sstmt 
+type sprogram = bind list * saction_decl list * smain_decl 
 
 (* Pretty-printing functions *)
 
