@@ -80,6 +80,7 @@ let check (globals, action_decls, main_decl) =
       (*need to figure out typ, if name is defined*)
         | PlayerClassCall(pparams) ->  (Player, SPlayerClassCall(List.map check_expr pparams))
         | CardClassCall(pparams) ->  (Card, SCardClassCall(List.map check_expr pparams))
+        | AttrAssign(objname, attr, e) -> (None, SAttrAssign(objname, attr, check_expr e))
         | AttrCall(objname, attr) ->  
           (match attr with 
           "name" -> (String, SAttrCall(objname, attr))

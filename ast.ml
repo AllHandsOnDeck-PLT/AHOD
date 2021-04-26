@@ -18,6 +18,7 @@ type expr =
   | ActionCall of string * expr list
   | Id of string
   | Assign of string * expr
+  | AttrAssign of string * string * expr
   | Binop of expr * op * expr
   | Unop of uop * expr
   | PlayerClassCall of expr list
@@ -105,6 +106,7 @@ let rec string_of_expr = function
   | AttrCall(cls,fld) -> cls ^ "." ^ fld
   | Id(s) -> s
   | Assign(v, e) -> v ^ " = " ^ string_of_expr e
+  | AttrAssign(s, v, e) ->  s ^ "." ^ v ^ " = " ^ string_of_expr e
   | Binop(e1, o, e2) ->
   string_of_expr e1 ^ " " ^ string_of_op o ^ " " ^ string_of_expr e2
   | Unop(o, e) -> string_of_uop o ^ string_of_expr e

@@ -1,0 +1,6 @@
+main: 
+{
+    series<int> a 
+    a = [1]
+    a.push("banana")
+}
