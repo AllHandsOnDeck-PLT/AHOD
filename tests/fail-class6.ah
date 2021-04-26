@@ -1,0 +1,5 @@
+Card card
+main:
+{
+  card = Card(1, "name") 
+}

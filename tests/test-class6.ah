@@ -1,0 +1,8 @@
+main:
+{
+  Card card
+  card = Card("R5", true, 5) 
+  do PRINT(card.type)
+  do PRINT(card.faceup)
+  do PRINT(card.value)
+}
