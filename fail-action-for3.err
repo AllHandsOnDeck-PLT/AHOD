@@ -1,0 +1,4 @@
+Branch condition is not 'i1' type!
+  br i32 %i2, label %while_body, label %merge
+  %i2 = load i32, i32* %i
+LLVM ERROR: Broken module found, compilation aborted!

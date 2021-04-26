@@ -1,0 +1,10 @@
+when do void NOTHINGACT():
+{
+  return
+}
+
+main: 
+{
+  int i
+  i = do NOTHINGACT() /* Fail: assigning a void to an integer */
+}

@@ -1,0 +1,42 @@
+1,20d0
+< Hello, and welcome to our Blackjack Simulator
+< First things first let us welcome our player for the evening
+< Stephen
+< There are 5 cards in the hand. A Hit Request
+< Card:
+< R3
+< Current Score of:
+< 3
+< Another hit request
+< Card:
+< B2
+< Current Score of:
+< 5
+< Looks like we stop here for tonight. Time to see what the next cards were
+< Card:
+< R6
+< That is a high value card
+< Could have had a higher score of: 
+< 11
+< Card:
+22,34c2,6
+< That is a high value card
+< Could have had a higher score of: 
+< 14
+< Card:
+< R9
+< That is a high value card
+< Good that you stopped otherwise you would have a score of: 
+< 23
+< Card:
+< B9
+< That is a high value card
+< Good that you stopped otherwise you would have a score of: 
+< 32
+---
+> 1
+> R6
+> 0
+> R7
+> 1
+\ No newline at end of file
