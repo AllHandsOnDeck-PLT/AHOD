@@ -13,7 +13,6 @@ and sx =
   | SSeriesPop of typ * string  
   | SPrintCall of sexpr  
   | SActionCall of string * sexpr list  
-  | SExprActionCall of sexpr * string * sexpr list
   | SId of string
   | SAssign of string * sexpr
   | SAttrAssign of string * string * sexpr
@@ -31,7 +30,7 @@ type sstmt =
   | SReturn of sexpr
   | SIf of sexpr * sstmt * sstmt 
   | SFor of sexpr * sexpr * sexpr * sstmt
-  | SForLit of string * sexpr * sstmt 
+  (* | SForLit of string * sexpr * sstmt  *)
   | SWhile of sexpr * sstmt
   | SSeriesPush of string * sexpr 
 
@@ -67,6 +66,7 @@ let rec string_of_sexpr (t, e) =
   | SSeriesGet(_, id, e) -> id ^ "[" ^ (string_of_sexpr e) ^ "]"
   | SSeriesSize(_, id) -> "series_size " ^ id
   | SSeriesPop(_, id) -> "series_pop " ^ id
+  | SPrintCall(e) -> "do" ^ "PRINT" ^ "(" ^ string_of_sexpr e ^ ")"
   | SActionCall(f, el) ->
   "do " ^f ^ "(" ^ String.concat ", " (List.map string_of_sexpr el) ^ ")"
   | SId(s) -> s
@@ -75,9 +75,14 @@ let rec string_of_sexpr (t, e) =
   | SBinop(e1, o, e2) ->
       string_of_sexpr e1 ^ " " ^ string_of_op o ^ " " ^ string_of_sexpr e2
   | SUnop(o, e) -> string_of_uop o ^ string_of_sexpr e
-  | SNoexpr -> ""
-  | SExprActionCall(exp, f, el) ->
-    string_of_sexpr exp ^ "do " ^ f ^ "(" ^ String.concat ", " (List.map string_of_sexpr el) ^ ")"
-  | SAttrCall(f, el) ->
-    f ^ "." ^ el
-          ) ^ ")"  
+  | SNoexpr -> "")
+  
+let rec string_of_sstmt = function
+  SBlock(stmts) -> "{\n" ^ String.concat "" (List.map string_of_sstmt stmts) ^ "\n}"
+  | SExpr(exp) -> string_of_sexpr exp ^ "\n"
+  | SReturn(exp) -> "return" ^ string_of_sexpr exp ^ "\n"
+  | SIf(exp, s1, s2) -> "if " ^ string_of_sexpr exp  ^ ":\n" ^ string_of_sstmt s1 ^ string_of_sstmt s2
+  | SFor(e1, e2, e3, s) -> "for (" ^ string_of_sexpr e1 ^ ";" ^  string_of_sexpr e2 ^ ";" ^ 
+                    string_of_sexpr e3 ^ "):\n" ^ string_of_sstmt s
+  | SWhile(exp, stmt) -> "while " ^ string_of_sexpr exp ^ ":\n" ^ string_of_sstmt stmt
+  | SSeriesPush(id, exp) -> id ^ "." ^ "push" ^ "(" ^ string_of_sexpr exp ^ ")"

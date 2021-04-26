@@ -44,21 +44,21 @@ cend_opt: /*comment */
 global_decl:
     typ ID cend_opt NEWLINE { ($1, $2)}
     
-main_decl:/*cend_opt? */ 
-    MAIN COLON cend_opt NEWLINE LBRACE NEWLINE locals_list stmt_wrap RBRACE NEWLINE {{ 
+main_decl:
+    MAIN COLON cend_opt NEWLINE LBRACE cend_opt NEWLINE locals_list stmt_wrap RBRACE cend_opt NEWLINE {{ 
     mtyp = None; 
     mparams = [];
-    mlocals = $7;
-    mbody = [$8] }}
+    mlocals = $8;
+    mbody = [$9] }}
 
 action_decl: 
-    WHEN DO typ ACTIONID LPAREN params_list_opt RPAREN COLON NEWLINE LBRACE NEWLINE locals_list stmt_wrap RBRACE NEWLINE 
+    WHEN DO typ ACTIONID LPAREN params_list_opt RPAREN COLON cend_opt NEWLINE LBRACE cend_opt NEWLINE locals_list stmt_wrap RBRACE cend_opt NEWLINE 
     {{ 
       atyp = $3;
       aname = $4;
       aparams = List.rev $6; 
-      alocals = List.rev $12;
-      abody = [$13] }}
+      alocals = List.rev $14;
+      abody = [$15] }}
 
 params_list_opt: 
     |params_list    {$1}
@@ -71,7 +71,7 @@ params_list:
 param:
       typ ID                       { $1, $2 }
 
-stmt_block: /* doesn't have comment optional before first newline, causes reduce reduce but added cend_opt btwn most instances of stmt_block*/
+stmt_block:
     NEWLINE LBRACE cend_opt NEWLINE stmt_list RBRACE cend_opt NEWLINE              { Block(List.rev $5) }
 
 locals_list:
@@ -87,8 +87,8 @@ stmt_list:
 
 stmt:
     | stmt_block                                { $1 }
-    | expr cend_opt NEWLINE                     { Expr $1} 
-    | RETURN expr_opt NEWLINE               { Return $2} /* doesn't have comment optional causes shift reduce*/
+    | expr cend_opt NEWLINE                  { Expr $1} 
+    | RETURN expr_opt NEWLINE               { Return $2} /*doesn't have comment optional causes shift reduce */
     | if_stmt                               { $1 }
     | FOR LPAREN expr SEMI expr SEMI expr RPAREN COLON cend_opt stmt_block  { For($3, $5, $7, $11)   }
     /* | FOR ID IN expr COLON stmt_block       { ForLit($2, $4, $6) }  */
@@ -165,7 +165,6 @@ call_print:
 
 call_action:
     | DO ACTIONID LPAREN args_list_opt RPAREN        { ActionCall($2, $4) } 
-    | expr DO ACTIONID LPAREN args_list_opt RPAREN   { ExprActionCall($1, $3, $5) } 
 
 call_class: 
     | PLAYER LPAREN args_list_opt RPAREN            { PlayerClassCall($3) } 

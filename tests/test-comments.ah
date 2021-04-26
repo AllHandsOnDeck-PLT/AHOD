@@ -1,7 +1,12 @@
 int a /* nothing should be printed out */
+when do None PLAY(): /*test*/
+{/*test*/
+  do PRINT("actions are cool")/*test*/
+}/*test*/
 main: /*comments everywhere */
   { /* woo */ 
     /* only single line comments, decieving huh*/ 
+    do PLAY()
     a = 1 /* comment and code woah */
     /*test*/
   } /* woo */ 

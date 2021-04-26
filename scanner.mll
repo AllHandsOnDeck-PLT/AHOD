@@ -27,8 +27,6 @@ rule token = parse
 | '-'      { MINUS }
 | '*'      { MULT }
 | '/'      { DIVIDE }
-(* | '%'      { MOD }
-| "**"     { POWER } *)
 | '.'      { DOT }
 | '='      { ASSIGN }
 | "=="     { EQ }
@@ -45,7 +43,6 @@ rule token = parse
 | "elif"   { ELIF }
 | "else"   { ELSE }
 | "for"    { FOR }
-(* | "in"     { IN } *)
 | "while"  { WHILE }
 | "when"   { WHEN }
 | "do"     { DO }
@@ -66,11 +63,7 @@ rule token = parse
 | "main"   { MAIN }
 | digits as lxm { ILIT(int_of_string lxm) }
 | ['-']? (digits '.'  digit* ( ['e' 'E'] ['+' '-']? digits )?) as lxm { FLIT(lxm) }
-(*| [('"' _* '"') (''' _* ''')] as  lxm { SLIT(lxm) }*)
 | '"' ([' '-'!' '#'-'&' '('-'[' ']'-'~' 'a'-'z'' ' 'A'-'Z' '0'-'9']* as lxm) '"' { SLIT(lxm) }
-(* | '"' (['a'-'z' 'A'-'Z' '0'-'9']* as lxm) '"' { SLIT(lxm) } *)
-(*| '"' [' '-'!' '#'-'&' '('-'[' ']'-'~' 't' 'r' 'n' '\'' '"' '\\']* as lxm '"' { SLIT(lxm) }*)
-(* how to represent single apostrophe?*)
 | ['a'-'z']['a'-'z' '0'-'9' '_']*                     as lxm { ID(lxm) } 
 | ['A'-'Z']['A'-'Z' '0'-'9' '_']*                     as actionID { ACTIONID(actionID) }
 | eof { EOF }

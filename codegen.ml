@@ -181,8 +181,8 @@ let init_series builder series_ptr series_type =
       ignore(L.build_store (L.const_int i32_t 0) size_ptr builder);
       ignore(L.build_store size_ptr size_ptr_ptr builder);
   let series_ptr = L.build_struct_gep series_ptr 1 "series" builder in (* init array (series) *)
-    (* TODO: allocate nothing and have series grow dynamically as necessary when pushing into the series *)
-    let p = L.build_array_alloca (ltype_of_typ series_type) (L.const_int i32_t 1028) "p" builder in (*change number?*)
+    (* fails when there's []*)
+    let p = L.build_array_alloca (ltype_of_typ series_type) (L.const_int i32_t 1028) "p" builder in
     ignore(L.build_store p series_ptr builder);
 in
 
@@ -311,8 +311,6 @@ List.fold_left series_pop_ty StringMap.empty [ A.Bool; A.Int; A.Float; A.String;
       | "faceup" -> L.build_call getcardfaceup_func [|(L.build_load (lookup objname) objname builder)|] "getcardfaceup" builder
       )
 
-    | SExprActionCall(exp, a, args) -> raise (Failure "Need to implement this class-dependent expression")
-
     | SBinop ((A.Float,_ ) as e1, op, e2) ->
     let e1' = expr builder e1
     and e2' = expr builder e2 in
@@ -380,6 +378,12 @@ in
 let rec stmt builder = function
 	| SBlock stmt_list -> List.fold_left stmt builder stmt_list 
   | SExpr e -> ignore(expr builder e); builder
+  | SReturn e -> ignore(match adecl.satyp with
+                            (* Special "return nothing" instr *)
+                            A.None -> L.build_ret_void builder 
+                            (* Build return statement *)
+                          | _ -> L.build_ret (expr builder e) builder );
+                          builder
   | SSeriesPush (id, e) -> 
       ignore(L.build_call (StringMap.find (type_str (fst e)) series_push) [| (lookup id); (expr builder e) |] "" builder); builder 
   | SIf (predicate, then_stmt, else_stmt) ->
@@ -409,12 +413,11 @@ let rec stmt builder = function
     L.builder_at_end context merge_bb
     | SFor (e1, e2, e3, body) -> stmt builder
     ( SBlock [SExpr e1 ; SWhile (e2, SBlock [body ; SExpr e3]) ] )
-    (*| SForLit ( e1, e2, body) -> stmt builder
-    ( SBlock [SExpr e1 ; SWhile (e2, SBlock [body ; SExpr e]) ] ) *)
+
     in
 
 
-    let _ = stmt builder (SBlock adecl.sabody) in 
+    let builder = stmt builder (SBlock adecl.sabody) in 
       add_terminal builder (match adecl.satyp with
               A.None -> L.build_ret_void
             | A.Float -> L.build_ret (L.const_float float_t 0.0)
@@ -468,8 +471,8 @@ let init_series builder series_ptr series_type =
       ignore(L.build_store (L.const_int i32_t 0) size_ptr builder);
       ignore(L.build_store size_ptr size_ptr_ptr builder);
   let series_ptr = L.build_struct_gep series_ptr 1 "series" builder in (* init array (series) *)
-    (* TODO: allocate nothing and have series grow dynamically as necessary when pushing into the series *)
-    let p = L.build_array_alloca (ltype_of_typ series_type) (L.const_int i32_t 1028) "p" builder in (*change number?*)
+    (* fails when a = [] *)
+    let p = L.build_array_alloca (ltype_of_typ series_type) (L.const_int i32_t 1028) "p" builder in 
     ignore(L.build_store p series_ptr builder);
 in
 
@@ -595,8 +598,6 @@ List.fold_left series_pop_ty StringMap.empty [ A.Bool; A.Int; A.Float; A.String;
                   A.None -> ""
                 | _ -> a ^ "_result") 
     in L.build_call adef (Array.of_list llargs) result builder
-    | SExprActionCall(exp, a, args) -> raise (Failure "Need to implement this class-dependent expression")
-    | SAttrCall(a, args) -> raise (Failure "Need to implement this class-dependent expression")
     | SBinop ((A.Float,_ ) as e1, op, e2) ->
       let e1' = expr builder e1
       and e2' = expr builder e2 in

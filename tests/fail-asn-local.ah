@@ -1,0 +1,7 @@
+main: 
+{
+    int i 
+    i = 1 
+    do PRINT(i)
+    j = 0 /* uh oh j undefined */
+}
