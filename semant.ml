@@ -94,7 +94,7 @@ let check (globals, action_decls, main_decl) =
         | Bliteral b -> (Bool, SBliteral(b))
         | Noexpr     -> (None, SNoexpr)
         | Id s       -> (type_of_identifier s, SId s)
-        | Assign(var, e) as ex -> 
+        | Assign(var, e) -> 
           let lt = type_of_identifier var
           and (rt, e') = check_expr e in
           let err = "illegal assignment " ^ string_of_typ lt ^ " = " ^ 
@@ -109,7 +109,7 @@ let check (globals, action_decls, main_decl) =
                                     string_of_uop op ^ string_of_typ t ^
                                     " in " ^ string_of_expr ex))
             in (ty, SUnop(op, (t, e')))
-          | Binop(e1, op, e2) as e -> 
+          | Binop(e1, op, e2) -> 
               let (t1, e1') = check_expr e1 
               and (t2, e2') = check_expr e2 in
               (* All binary operators require operands of the same type *)
@@ -125,7 +125,7 @@ let check (globals, action_decls, main_decl) =
               | _ -> raise (
             Failure ("illegal binary operator " ))
               in (ty, SBinop((t1, e1'), op, (t2, e2')))
-        | PrintCall(e) as print -> (None,SPrintCall(check_expr e))
+        | PrintCall(e) -> (None,SPrintCall(check_expr e))
         | ActionCall(aname, args) as acall -> 
           let ad = find_act aname in
           let param_length = List.length ad.aparams in
@@ -175,14 +175,15 @@ let check (globals, action_decls, main_decl) =
       | While(p, s) -> SWhile(check_expr p, check_stmt s)
       | For(e1, e2, e3, st) ->
         SFor(check_expr e1, check_expr e2, check_expr e3, check_stmt st)
-      (*| Return e -> let (t, e') = check_expr e in
-        if t = act.typ then SReturn (t, e') 
-        else raise (Failure ("return gives " ^ string_of_typ t ^ " expected " ^
-        string_of_typ act.typ ^ " in " ^ string_of_expr e)) *)
+      | Return e -> let (t, e') = check_expr e in
+        if t = main.mtyp then SReturn (t, e') 
+        else raise (
+	        Failure ("return gives " ^ string_of_typ t ^ " expected " ^
+		    string_of_typ main.mtyp ^ " in " ^ string_of_expr e))
       | Block sl -> 
         let rec check_stmt_list = function
-          (* [Return _ as s] -> [check_stmt s] *)
-          (* | Return _ :: _   -> raise (Failure "nothing may follow a return") *)
+           [Return _ as s] -> [check_stmt s]
+          | Return _ :: _   -> raise (Failure "nothing may follow a return")
           | Block sl :: ss  -> check_stmt_list (sl @ ss) (* Flatten blocks *)
           | s :: ss         -> check_stmt s :: check_stmt_list ss
           | []              -> []
@@ -243,7 +244,7 @@ let check (globals, action_decls, main_decl) =
     | Bliteral b -> (Bool, SBliteral(b))
     | Noexpr     -> (None, SNoexpr)
     | Id s       -> (type_of_identifier s, SId s)
-    | Assign(var, e) as ex -> 
+    | Assign(var, e) -> 
       let lt = type_of_identifier var
       and (rt, e') = check_expr e in
       let err = "illegal assignment " ^ string_of_typ lt ^ " = " ^ 
@@ -258,7 +259,7 @@ let check (globals, action_decls, main_decl) =
                                   string_of_uop op ^ string_of_typ t ^
                                   " in " ^ string_of_expr ex))
           in (ty, SUnop(op, (t, e')))
-    | Binop(e1, op, e2) as e -> 
+    | Binop(e1, op, e2) -> 
           let (t1, e1') = check_expr e1 
           and (t2, e2') = check_expr e2 in
           (* All binary operators require operands of the same type *)
@@ -274,7 +275,7 @@ let check (globals, action_decls, main_decl) =
             | _ -> raise (
           Failure ("illegal binary operator " ))
             in (ty, SBinop((t1, e1'), op, (t2, e2')))
-      | PrintCall(e) as print -> (None,SPrintCall(check_expr e))
+      | PrintCall(e) -> (None,SPrintCall(check_expr e))
       | ActionCall(aname, args) as acall -> 
         let ad = find_act aname in
         let param_length = List.length ad.aparams in
@@ -325,18 +326,14 @@ let check (globals, action_decls, main_decl) =
     | Return e -> let (t, e') = check_expr e in
         if t = act.atyp then SReturn (t, e') 
         else raise (
-	  Failure ("return gives " ^ string_of_typ t ^ " expected " ^
-		   string_of_typ act.atyp ^ " in " ^ string_of_expr e))
+	        Failure ("return gives " ^ string_of_typ t ^ " expected " ^
+		    string_of_typ act.atyp ^ " in " ^ string_of_expr e))
     | For(e1, e2, e3, st) ->
       SFor(check_expr e1, check_expr e2, check_expr e3, check_stmt st)
-    (*| Return e -> let (t, e') = check_expr e in
-      if t = act.typ then SReturn (t, e') 
-      else raise (Failure ("return gives " ^ string_of_typ t ^ " expected " ^
-      string_of_typ act.typ ^ " in " ^ string_of_expr e)) *)
     | Block sl -> 
       let rec check_stmt_list = function
-        (* [Return _ as s] -> [check_stmt s]
-        | Return _ :: _   -> raise (Failure "nothing may follow a return") *)
+        [Return _ as s] -> [check_stmt s]
+        | Return _ :: _   -> raise (Failure "nothing may follow a return")
         | Block sl :: ss  -> check_stmt_list (sl @ ss) (* Flatten blocks *)
         | s :: ss         -> check_stmt s :: check_stmt_list ss
         | []              -> []
