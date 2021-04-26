@@ -31,6 +31,15 @@ type sstmt =
 type sattr_decl = 
   | SOneAdecl of typ * string * sexpr 
 
+
+type smain_decl = {
+  saname : string;
+  satyp : typ; 
+  saparams : bind list;
+  salocals : bind list;
+  sabody: sstmt list;
+}
+
 type saction_decl = {
   (* sentitytyp : typ;
   sentityid : string; *)
@@ -49,7 +58,7 @@ type sclass_decl = {
 }
 
 (* type sprogram = bind list * sclass_decl list * sstmt  *)
-type sprogram = bind list * saction_decl list * sstmt 
+type sprogram = bind list * saction_decl list * saction_decl 
 
 (* Pretty-printing functions *)
 

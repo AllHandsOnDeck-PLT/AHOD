@@ -58,17 +58,16 @@ decls:
 global_decl:
     typ ID NEWLINE { ($1, $2) }
     
+/* main_decl:
+    MAIN COLON stmt { $3 } */
+
 main_decl:
-    MAIN COLON stmt { $3 }
-/*
-main_decl:
-    typ MAIN COLON NEWLINE LBRACE NEWLINE locals_list stmt_wrap RBRACE NEWLINE {{ 
-      mtyp = $1;
-      mname = $2;
-      mlocals = $7;
-      abody = [$8] }}
-*/
-    /*MAIN COLON stmt_block { $3 } */
+    MAIN COLON NEWLINE LBRACE NEWLINE locals_list stmt_wrap RBRACE NEWLINE {{ 
+      atyp = None;
+      aname = "main";
+      aparams = [];
+      alocals = $6;
+      abody = [$7] }}
 
 class_decl:
     LET CLASSID LPAREN params_list RPAREN BE COLON class_block     

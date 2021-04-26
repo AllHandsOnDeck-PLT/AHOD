@@ -40,6 +40,14 @@ type attr_decl =
   attributes : attr_decl list;
 }*)
 
+type main_decl = {
+  atyp : typ; 
+  aname : string;
+  aparams : bind list;
+  alocals : bind list;
+  abody: stmt list;
+}
+
 type action_decl = {
   (* entitytyp : typ;
   entityid : string; *)
@@ -58,7 +66,7 @@ type class_decl = {
 }
 
 (* type program = bind list * class_decl list * stmt *)
-type program = bind list * action_decl list * stmt
+type program = bind list * action_decl list * action_decl
 
 (*  Pretty-printing functions *)
 let string_of_op = function
