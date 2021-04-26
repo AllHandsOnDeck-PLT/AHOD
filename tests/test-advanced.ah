@@ -1,0 +1,16 @@
+when do series<Card> CREATEPILE():
+{
+    Card card1
+    card1 = Card("R5", true)
+    return [card1] 
+} 
+main:
+{
+    series<Card> cards
+    Card card 
+    cards = do CREATEPILE()
+    card = cards[0]
+    do PRINT(card.type)
+    do PRINT(card.faceup)
+}
+
