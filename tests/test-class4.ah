@@ -1,9 +1,13 @@
 Player player
 main:
 {
-  player = Player("bob", 0) 
+  string name
+  int score
+  name = "bob"
+  score = 0
+  player = Player(name, score) 
   do PRINT(player.name)
   do PRINT(player.score)
   /*player.score = 1*/
-  do PRINT(player.score)
+  /*do PRINT(player.score)*/
 }
