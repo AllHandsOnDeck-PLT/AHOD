@@ -240,6 +240,7 @@ let check (globals, action_decls, main_decl) =
       | "faceup" -> (Bool, SAttrCall(objname, attr)) 
       | _ -> raise (Failure ("attribute not found")))
 		(*| ActionCall(aname, aparams) -> (String, SActionCall(aname, List.map check_expr aparams))*)
+    | AttrAssign(objname, attr, e) -> (None, SAttrAssign(objname, attr, check_expr e))
 		| Sliteral s -> (String, SSliteral(s))
 		| Iliteral i -> (Int, SIliteral(i))
 		| Fliteral f -> (Float, SFliteral(f))

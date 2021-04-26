@@ -322,6 +322,7 @@ List.fold_left series_pop_ty StringMap.empty [ A.Bool; A.Int; A.Float; A.String;
       | "score" -> L.build_call getplayerscore_func [|(L.build_load (lookup objname) objname builder)|] "getplayerscore" builder
       | "type" -> L.build_call getcardtype_func [|(L.build_load (lookup objname) objname builder)|] "getcardtype" builder
       | "faceup" -> L.build_call getcardfaceup_func [|(L.build_load (lookup objname) objname builder)|] "getcardfaceup" builder
+      | _ -> raise (Failure "attribute is not supported")
       )
 
     | SBinop ((A.Float,_ ) as e1, op, e2) ->
