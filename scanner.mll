@@ -6,7 +6,7 @@ let digits = digit+
 
 rule token = parse
   [' ' '\t' '\r' ] { token lexbuf } (* Whitespace *)
-| '#'     { comment lexbuf }           (* Comments *)
+| "/*"     { comment lexbuf }           (* Comments *)
 | ('\n' [' ']*)+	   { NEWLINE }
 | '('      { LPAREN }
 | ')'      { RPAREN }
@@ -14,10 +14,10 @@ rule token = parse
 | '}'      { RBRACE }
 | '['      { LSQUARE }
 | ']'      { RSQUARE }
-| "add"    { SERIESADD }
+| "push"   { SERIESPUSH }
+| "pop"    { SERIESPOP }
+| "size"   { SERIESSIZE }
 | "series" { SERIES }
-(*| '<'      { LBRACK }*)
-(*| '>'      { RBRACK }*)
 | ':'      { COLON }
 | ';'      { SEMI }
 | ','      { COMMA }
@@ -25,11 +25,9 @@ rule token = parse
 | '-'      { MINUS }
 | '*'      { MULT }
 | '/'      { DIVIDE }
-| '%'      { MOD }
-| "**"     { POWER }
+(* | '%'      { MOD }
+| "**"     { POWER } *)
 | '.'      { DOT }
-| ".."     { DOTDOT }
-| "..."    { DOTDOTDOT }
 | '='      { ASSIGN }
 | "=="     { EQ }
 | "!="     { NEQ }
@@ -45,7 +43,7 @@ rule token = parse
 | "elif"   { ELIF }
 | "else"   { ELSE }
 | "for"    { FOR }
-| "in"     { IN }
+(* | "in"     { IN } *)
 | "while"  { WHILE }
 | "when"   { WHEN }
 | "do"     { DO }
@@ -53,7 +51,6 @@ rule token = parse
 | "be"     { BE }
 | "with"   { WITH }
 | "times"  { TIMES }
-| "pass"   { PASS }
 | "const"  { CONST }
 | "return" { RETURN }
 | "int"    { INT }
@@ -61,7 +58,6 @@ rule token = parse
 | "string" { STRING }
 | "float"  { FLOAT }
 | "None"   { NONE }
-| "external" { EXTERNAL }
 | "true"   { BLIT(true)  }
 | "false"  { BLIT(false) }
 | "PRINT"   { PRINT }
@@ -75,10 +71,10 @@ rule token = parse
 (* how to represent single apostrophe?*)
 | ['a'-'z']['a'-'z' '0'-'9' '_']*                     as lxm { ID(lxm) } 
 | ['A'-'Z']['A'-'Z' '0'-'9' '_']*                     as actionID { ACTIONID(actionID) }
-| ['A'-'Z']['a'-'z' '0'-'9']*                     as classID { CLASSID(classID) } 
 | eof { EOF }
 | _ as char { raise (Failure("illegal character " ^ Char.escaped char)) }
 
 and comment = parse
-  '\n' { token lexbuf }
-| _    { comment lexbuf }
+  "*/"  { CEND }
+|  "\n" { token lexbuf }
+| _     { comment lexbuf }

@@ -1,0 +1,7 @@
+series<int> a
+main:
+  {
+    a = [2, 3, 4]
+    a.pop()
+    do PRINT(a.size())
+  }

@@ -1,7 +1,9 @@
 type op = Add | Sub | Mult | Div | Equal | Neq | Less | Leq | Greater | Geq |
-          And | Or | Mod
+          And | Or 
 
-type typ = Int | Float | Bool | String | None | ClassID | Series of typ
+type uop = Neg | Not
+          
+type typ = Int | Float | Bool | String | None | Series of typ
 
 type bind = typ * string
 
@@ -16,10 +18,12 @@ type expr =
   | ExprActionCall of expr * string * expr list
   | Id of string
   | Assign of string * expr
-  | Binop of expr * op * expr (*need to add binop*)
-  | ClassCall of string * expr list
+  | Binop of expr * op * expr
+  | Unop of uop * expr
   | AttrCall of string * string 
   | SeriesGet of string * expr
+  | SeriesSize of string
+  | SeriesPop of string
   | Noexpr
 
 type stmt =
@@ -30,16 +34,11 @@ type stmt =
   | For of expr * expr * expr * stmt
   | ForLit of string * expr * stmt 
   | While of expr * stmt
-  | SeriesAdd of string * expr
+  | SeriesPush of string * expr
+  | Nostmt
 
 type attr_decl = 
   | OneAdecl of typ * string * expr 
-
-(*type class_decl = {
-  cname : string;
-  cparams : bind list;
-  attributes : attr_decl list;
-}*)
 
 type main_decl = {
   mtyp : typ; 
@@ -58,14 +57,6 @@ type action_decl = {
   abody: stmt list;
 }
 
-type class_decl = {
-  cname : string;
-  cparams : bind list;
-  actions : action_decl list;
-  attributes : attr_decl list;
-}
-
-(* type program = bind list * class_decl list * stmt *)
 type program = bind list * action_decl list * main_decl
 
 (*  Pretty-printing functions *)
@@ -82,7 +73,10 @@ let string_of_op = function
   | Geq -> ">="
   | And -> "and"
   | Or -> "or"
-  | Mod -> "%"
+
+let string_of_uop = function
+  Neg -> "-"
+  | Not -> "!"
 
 let rec string_of_typ = function
     Int -> "int"
@@ -91,7 +85,6 @@ let rec string_of_typ = function
   | String -> "string"
   | None -> "none"
   | Series x -> "series<" ^ (string_of_typ x) ^ ">"
-  | ClassID -> "ClassID"
 
 let rec string_of_expr = function
     Iliteral(l) -> string_of_int l
@@ -101,17 +94,17 @@ let rec string_of_expr = function
   | Sliteral(l) -> l
   | SeriesGet(id, e) ->  id ^ "[" ^ (string_of_expr e) ^ "]"
   | Seriesliteral(_) -> "series_literal"
-  | Id(s) -> s
-  | Binop(e1, o, e2) ->
-      string_of_expr e1 ^ " " ^ string_of_op o ^ " " ^ string_of_expr e2
-  | Assign(v, e) -> v ^ " = " ^ string_of_expr e
   | ActionCall(f, el) ->
-    "do " ^ f ^ "(" ^ String.concat ", " (List.map string_of_expr el) ^ ")"
+  "do " ^ f ^ "(" ^ String.concat ", " (List.map string_of_expr el) ^ ")"
+  | Id(s) -> s
+  | Assign(v, e) -> v ^ " = " ^ string_of_expr e
+  | Binop(e1, o, e2) ->
+  string_of_expr e1 ^ " " ^ string_of_op o ^ " " ^ string_of_expr e2
+  | Unop(o, e) -> string_of_uop o ^ string_of_expr e
+  | SeriesSize(id) -> "series_size " ^ id
+  | SeriesPop(id) -> "series_pop " ^ id
   | Noexpr -> ""
-
   | ExprActionCall(exp, f, el) ->
     string_of_expr exp ^ "do " ^ f ^ "(" ^ String.concat ", " (List.map string_of_expr el) ^ ")"
-  | ClassCall(f, el) ->
-      f ^ "(" ^ String.concat ", " (List.map string_of_expr el) ^ ")"
   | AttrCall(f, el) ->
     f ^ "." ^ el

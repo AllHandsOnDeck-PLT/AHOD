@@ -1,0 +1,6 @@
+series<int> a
+main:
+  {
+    a = [2, 3, 4]
+    do PRINT(a.size())
+  }

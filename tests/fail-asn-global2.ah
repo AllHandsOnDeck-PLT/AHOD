@@ -1,0 +1,6 @@
+int a
+None b 
+main:
+{
+  b = 42
+}
