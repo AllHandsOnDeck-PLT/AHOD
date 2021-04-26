@@ -1,0 +1,25 @@
+series<string> deck
+series<string> hand
+int i
+main:
+{
+    /* This is a comment */
+    deck = ["d","e","f","g"]
+    hand = ["a","b","c"] /* this is another comment */
+    hand.push(deck.pop()) /* deck.pop() gives 'e' */
+    hand.push(deck.pop()) /* deck.pop() gives 'f' */
+    
+    /* hand = ["a", "b", "c", "f", "g"] */
+    /* deck = ["d","e"] */
+
+    do PRINT("hand is now:")
+    for  (i = 0; i < hand.size(); i = i + 1):
+    {
+    do PRINT(hand[i])
+    }
+    do PRINT("deck is now:")
+    for  (i = 0; i < deck.size(); i = i + 1):
+    {
+    do PRINT(deck[i])
+    }
+}
