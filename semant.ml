@@ -145,7 +145,6 @@ let check (globals, action_decls, main_decl) =
             let (t', _) = check_expr (List.hd vals) in
             let map_func lit = check_expr lit in
             let vals' = List.map map_func vals in
-            (* TODO: check if all vals are same type *)
             (Series t', SSeriesliteral(t', vals'))
         | SeriesGet (var, e) -> 
             let (t, e') = check_expr e in
@@ -222,7 +221,7 @@ let check (globals, action_decls, main_decl) =
       with Not_found -> raise (Failure ("undeclared identifier " ^ s))
     in
 
-   (* Check if id is a list and return list type *)
+   (* Check if id is a series and return series type *)
    let check_series_type id = 
     match (type_of_identifier id) with 
       Series t -> t
@@ -265,9 +264,7 @@ let check (globals, action_decls, main_decl) =
     | Binop(e1, op, e2) -> 
           let (t1, e1') = check_expr e1 
           and (t2, e2') = check_expr e2 in
-          (* All binary operators require operands of the same type *)
           let same = t1 = t2 in
-          (* Determine expression type based on operator and operand types *)
           let ty = match op with
             Add | Sub | Mult | Div when same && t1 = Int   -> Int
             | Add | Sub | Mult | Div when same && t1 = Float -> Float
@@ -297,7 +294,6 @@ let check (globals, action_decls, main_decl) =
           let (t', _) = check_expr (List.hd vals) in
           let map_func lit = check_expr lit in
           let vals' = List.map map_func vals in
-          (* TODO: check if all vals are same type *)
           (Series t', SSeriesliteral(t', vals'))
       | SeriesGet (var, e) -> 
           let (t, e') = check_expr e in
