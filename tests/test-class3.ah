@@ -1,9 +1,10 @@
 Card card
 main:
 {
-  card = Card("R5", true) 
+  card = Card("R5", true, 5) 
   do PRINT(card.type)
   do PRINT(card.faceup)
-  card = Card("R5", false)
+  do PRINT(card.value)
+  card = Card("R5", false, 5)
   do PRINT(card.faceup)
 }

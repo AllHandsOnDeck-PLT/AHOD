@@ -1,7 +1,7 @@
 when do series<Card> CREATEPILE():
 {
     Card card1
-    card1 = Card("R5", true)
+    card1 = Card("R5", true, 5)
     return [card1] 
 } 
 main:
@@ -13,4 +13,3 @@ main:
     do PRINT(card.type)
     do PRINT(card.faceup)
 }
-

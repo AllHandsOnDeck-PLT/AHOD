@@ -8,14 +8,15 @@ main:
 {
   string red5
   red5 = "R5"
-  card1 = Card(red5, true)
-  card2 = Card("R6", false)
-  card3 = Card("R7", true)
+  card1 = Card(red5, true, 5)
+  card2 = Card("R6", false, 6)
+  card3 = Card("R7", true, 7)
   deck = [card1, card2, card3]
   for  (i = 0; i < deck.size(); i = i + 1):
   {
   	type1 = deck[i]
     do PRINT(type1.type)
     do PRINT(type1.faceup)
+    do PRINT(type1.value)
   }
 }

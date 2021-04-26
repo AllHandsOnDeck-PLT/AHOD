@@ -78,8 +78,18 @@ let check (globals, action_decls, main_decl) =
 
     let rec check_expr = function
       (*need to figure out typ, if name is defined*)
-        | PlayerClassCall(pparams) ->  (Player, SPlayerClassCall(List.map check_expr pparams))
-        | CardClassCall(pparams) ->  (Card, SCardClassCall(List.map check_expr pparams))
+        | PlayerClassCall(pparams) as pcall ->  
+          let constructor_len = 2 in
+          if List.length pparams != constructor_len then
+          raise (Failure ("expecting " ^ string_of_int constructor_len ^ 
+                            " arguments in " ^ string_of_expr pcall))
+          else (Player, SPlayerClassCall(List.map check_expr pparams))
+        | CardClassCall(pparams) as ccall ->  
+          let constructor_len = 3 in
+          if List.length pparams != constructor_len then
+          raise (Failure ("expecting " ^ string_of_int constructor_len ^ 
+                            " arguments in " ^ string_of_expr ccall))
+          else (Card, SCardClassCall(List.map check_expr pparams)) 
         (* | AttrAssign(objname, attr, e) -> (Void, SAttrAssign(objname, attr, check_expr e)) *)
         | AttrCall(objname, attr) ->  
           (match attr with 
