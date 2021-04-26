@@ -18,6 +18,8 @@ rule token = parse
 | "pop"    { SERIESPOP }
 | "size"   { SERIESSIZE }
 | "series" { SERIES }
+| "Player" { PLAYER }
+| "Card"   { CARD }
 | ':'      { COLON }
 | ';'      { SEMI }
 | ','      { COMMA }

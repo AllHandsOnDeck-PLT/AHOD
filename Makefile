@@ -8,7 +8,7 @@ test : all testall.sh
 # to test linking external code
 
 .PHONY : all
-all : AHOD.native 
+all : AHOD.native playercall.o
 
 # "make microc.native" compiles the compiler
 #
@@ -23,7 +23,10 @@ AHOD.native :
 
 # "make clean" removes all generated files
 
+playercall : playercall.c
+	cc -o playercall -DBUILD_TEST playercall.c
+
 .PHONY : clean
 clean :
 	ocamlbuild -clean
-	rm -rf testall.log ocamlllvm *.diff .ll .native
+	rm -rf testall.log ocamlllvm *.diff .ll .native *.o

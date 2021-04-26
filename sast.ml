@@ -18,6 +18,9 @@ and sx =
   | SAssign of string * sexpr
   | SBinop of sexpr * op * sexpr
   | SUnop of uop * sexpr
+  | SClassCall of string * sexpr list
+  | SPlayerClassCall of sexpr list
+  | SCardClassCall of sexpr list
   | SAttrCall of string * string 
   | SNoexpr
 
@@ -30,9 +33,6 @@ type sstmt =
   | SForLit of string * sexpr * sstmt 
   | SWhile of sexpr * sstmt
   | SSeriesPush of string * sexpr 
-
-type sattr_decl = 
-  | SOneAdecl of typ * string * sexpr 
 
 type smain_decl = {
   smtyp : typ; 

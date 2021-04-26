@@ -94,7 +94,7 @@ Check() {
     generatedfiles="$generatedfiles ${basename}.ll ${basename}.s ${basename}.exe ${basename}.out" &&
     Run "$AHOD" "$1" ">" "${basename}.ll" &&
     Run "$LLC" "-relocation-model=pic" "${basename}.ll" ">" "${basename}.s" &&
-    Run "$CC" "-o" "${basename}.exe" "${basename}.s" &&
+    Run "$CC" "-o" "${basename}.exe" "${basename}.s" "playercall.o" &&
     Run "./${basename}.exe" > "${basename}.out" &&
     Compare ${basename}.out ${reffile}.out ${basename}.diff
 
@@ -164,6 +164,13 @@ LLIFail() {
 }
 
 which "$LLI" >> $globallog || LLIFail
+
+if [ ! -f playercall.o ]
+then
+    echo "Could not find playercall.o"
+    echo "Try \"make playercall.o\""
+    exit 1
+fi
 
 if [ $# -ge 1 ]
 then
