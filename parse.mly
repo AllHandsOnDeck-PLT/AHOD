@@ -125,12 +125,13 @@ expr:
     | FLIT                           { Fliteral($1) } 
     | BLIT                           { Bliteral($1) } 
     | SLIT 	                         { Sliteral($1) }
+    | ID                             { Id($1) } 
+    | ID ASSIGN expr                 { Assign($1, $3) }
     | LSQUARE args_list_opt RSQUARE  { Seriesliteral($2) }
     | ID LSQUARE expr RSQUARE        { SeriesGet($1, $3) }
     | ID DOT SERIESSIZE LPAREN RPAREN { SeriesSize($1)}
     | ID DOT SERIESPOP LPAREN RPAREN { SeriesPop($1)}
-    | ID                             { Id($1) } 
-    | ID ASSIGN expr                 { Assign($1, $3) }
+    | ID DOT ID ASSIGN expr           { AttrAssign($1, $3, $5) }
     | CEND                           { Noexpr }
     | expr PLUS   expr               { Binop($1, Add,     $3) } 
     | expr MINUS  expr               { Binop($1, Sub,     $3) }
@@ -146,7 +147,7 @@ expr:
     | expr GEQ    expr               { Binop($1, Geq,     $3) }
     | MINUS expr %prec NOT           { Unop(Neg, $2)          }
     | NOT expr                       { Unop(Not, $2)          }
-    | call_print                    { $1 } 
+    | call_print                     { $1 } 
     | call_class                     { $1 } 
     | call_action                    { $1 } 
     | call_attr                      { $1 }
