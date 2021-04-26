@@ -272,8 +272,9 @@ List.fold_left series_pop_ty StringMap.empty [ A.Bool; A.Int; A.Float; A.String;
 
     | SAttrAssign (objname, attr, e) -> let e' = expr builder e in 
     (match attr with 
-    "name" -> (L.build_call setplayername_func [|(L.build_load (lookup objname) objname builder) ; e'|] "setplayername" builder); e'
-    | "score" -> (L.build_call setplayerscore_func [|(L.build_load (lookup objname) objname builder) ; e'|] "setplayerscore" builder); e'
+    "name" -> ignore(L.build_call setplayername_func [|(L.build_load (lookup objname) objname builder) ; e'|] "setplayername" builder); e'
+    | "score" -> ignore(L.build_call setplayerscore_func [|(L.build_load (lookup objname) objname builder) ; e'|] "setplayerscore" builder); e'
+    | _ -> raise (Failure "Attribute does not exist") 
     )
 
     | SPrintCall(e) ->
@@ -312,21 +313,6 @@ List.fold_left series_pop_ty StringMap.empty [ A.Bool; A.Int; A.Float; A.String;
                   A.Void -> ""
                 | _ -> a ^ "_result") 
     in L.build_call adef (Array.of_list llargs) result builder
-
-    | SPlayerClassCall(e) ->
-    L.build_call playercall_func (Array.of_list (List.map (expr builder) (e))) "playercall" builder
-
-    | SCardClassCall(e) ->
-    L.build_call cardcall_func (Array.of_list (List.map (expr builder) (e))) "cardcall" builder
-
-    | SAttrCall(objname, attr) -> 
-      (match attr with
-      "name" -> L.build_call getplayername_func [|(L.build_load (lookup objname) objname builder)|] "getplayername" builder
-      | "score" -> L.build_call getplayerscore_func [|(L.build_load (lookup objname) objname builder)|] "getplayerscore" builder
-      | "type" -> L.build_call getcardtype_func [|(L.build_load (lookup objname) objname builder)|] "getcardtype" builder
-      | "faceup" -> L.build_call getcardfaceup_func [|(L.build_load (lookup objname) objname builder)|] "getcardfaceup" builder
-      | _ -> raise (Failure "attribute is not supported")
-      )
 
     | SBinop ((A.Float,_ ) as e1, op, e2) ->
     let e1' = expr builder e1
@@ -595,8 +581,9 @@ List.fold_left series_pop_ty StringMap.empty [ A.Bool; A.Int; A.Float; A.String;
       )
     | SAttrAssign (objname, attr, e) -> let e' = expr builder e in
     (match attr with 
-    "name" -> (L.build_call setplayername_func [|(L.build_load (lookup objname) objname builder) ; e'|] "setplayername" builder); e'
-    | "score" -> (L.build_call setplayerscore_func [|(L.build_load (lookup objname) objname builder) ; e'|] "setplayerscore" builder); e'
+    "name" -> ignore(L.build_call setplayername_func [|(L.build_load (lookup objname) objname builder) ; e'|] "setplayername" builder); e'
+    | "score" -> ignore(L.build_call setplayerscore_func [|(L.build_load (lookup objname) objname builder) ; e'|] "setplayerscore" builder); e'
+    | _ -> raise (Failure "Attribute does not exist") 
     )
 
     | SPlayerClassCall(e) ->
