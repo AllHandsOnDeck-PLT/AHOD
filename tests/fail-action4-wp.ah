@@ -1,0 +1,8 @@
+when do int B(int x):
+{
+    return 3
+}
+main:
+{
+    do B("hello again") 
+}

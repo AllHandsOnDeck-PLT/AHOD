@@ -1,0 +1,8 @@
+when do string ALLSTAR(string x):
+{
+    return "the world said hi" 
+}
+main:
+{
+    do ALLSTAR("Somebody","Once","Told","Me") 
+}

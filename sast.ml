@@ -17,7 +17,6 @@ and sx =
   | SAssign of string * sexpr
   | SBinop of sexpr * op * sexpr
   | SUnop of uop * sexpr
-  | SClassCall of string * sexpr list
   | SPlayerClassCall of sexpr list
   | SCardClassCall of sexpr list
   | SAttrCall of string * string 
@@ -32,6 +31,7 @@ type sstmt =
   (* | SForLit of string * sexpr * sstmt  *)
   | SWhile of sexpr * sstmt
   | SSeriesPush of string * sexpr 
+  | SNostmt
 
 type smain_decl = {
   smtyp : typ; 
@@ -68,6 +68,11 @@ let rec string_of_sexpr (t, e) =
   | SPrintCall(e) -> "do" ^ "PRINT" ^ "(" ^ string_of_sexpr e ^ ")"
   | SActionCall(f, el) ->
   "do " ^f ^ "(" ^ String.concat ", " (List.map string_of_sexpr el) ^ ")"
+  | SPlayerClassCall(el) ->
+    "Player (" ^ String.concat ", " (List.map string_of_sexpr el) ^ ")"
+  | SCardClassCall(el) ->
+    "Card (" ^ String.concat ", " (List.map string_of_sexpr el) ^ ")"
+  | SAttrCall(cls,fld) -> cls ^ "." ^ fld
   | SId(s) -> s
   | SAssign(v, e) -> v ^ " = " ^ string_of_sexpr e
   | SBinop(e1, o, e2) ->
@@ -84,3 +89,4 @@ let rec string_of_sstmt = function
                     string_of_sexpr e3 ^ "):\n" ^ string_of_sstmt s
   | SWhile(exp, stmt) -> "while " ^ string_of_sexpr exp ^ ":\n" ^ string_of_sstmt stmt
   | SSeriesPush(id, exp) -> id ^ "." ^ "push" ^ "(" ^ string_of_sexpr exp ^ ")"
+  | SNostmt -> ""

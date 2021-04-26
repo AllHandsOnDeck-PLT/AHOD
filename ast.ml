@@ -22,7 +22,6 @@ type expr =
   | Unop of uop * expr
   | PlayerClassCall of expr list
   | CardClassCall of expr list
- (*| ClassCall of string * expr list*)
   | AttrCall of string * string 
   | SeriesGet of string * expr
   | SeriesSize of string
@@ -99,6 +98,11 @@ let rec string_of_expr = function
   | PrintCall(e) -> "do" ^ "PRINT" ^ "(" ^ string_of_expr e ^ ")"
   | ActionCall(f, el) ->
   "do " ^ f ^ "(" ^ String.concat ", " (List.map string_of_expr el) ^ ")"
+  | PlayerClassCall(el) ->
+    "Player (" ^ String.concat ", " (List.map string_of_expr el) ^ ")"
+  | CardClassCall(el) ->
+    "Card (" ^ String.concat ", " (List.map string_of_expr el) ^ ")"
+  | AttrCall(cls,fld) -> cls ^ "." ^ fld
   | Id(s) -> s
   | Assign(v, e) -> v ^ " = " ^ string_of_expr e
   | Binop(e1, o, e2) ->
@@ -118,3 +122,4 @@ let rec string_of_stmt = function
                       string_of_expr e3 ^ "):\n" ^ string_of_stmt s
   | While(exp, stmt) -> "while " ^ string_of_expr exp ^ ":\n" ^ string_of_stmt stmt
   | SeriesPush(id, exp) -> id ^ "." ^ "push" ^ "(" ^ string_of_expr exp ^ ")"
+  | Nostmt -> ""

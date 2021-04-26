@@ -1,7 +1,6 @@
 module L = Llvm
 module A = Ast
 open Sast
-open Hashtbl
 
 module StringMap = Map.Make(String)
 
@@ -273,6 +272,20 @@ List.fold_left series_pop_ty StringMap.empty [ A.Bool; A.Int; A.Float; A.String 
     "printf" builder
     | _ -> raise (Failure "Print of this type is not supported") (* Potentially need to support Class, Series, and None cases *)
     )
+    | SPlayerClassCall(e) ->
+      L.build_call playercall_func (Array.of_list (List.map (expr builder) (e))) "playercall" builder
+  
+    | SCardClassCall(e) ->
+      L.build_call cardcall_func (Array.of_list (List.map (expr builder) (e))) "cardcall" builder
+  
+    | SAttrCall(objname, attr) -> 
+      (match attr with
+      "name" -> L.build_call getplayername_func [|(L.build_load (lookup objname) objname builder)|] "getplayername" builder
+      | "score" -> L.build_call getplayerscore_func [|(L.build_load (lookup objname) objname builder)|] "getplayerscore" builder
+      | "type" -> L.build_call getcardtype_func [|(L.build_load (lookup objname) objname builder)|] "getcardtype" builder
+      | "faceup" -> L.build_call getcardfaceup_func [|(L.build_load (lookup objname) objname builder)|] "getcardfaceup" builder
+      | _ -> raise (Failure "attribute is not supported")  (*make test to see if right error thrown, do check in semant*) 
+      )
     | SActionCall(a, args) ->
     let (adef, main_func) = StringMap.find a action_decls_map in
     let llargs = List.rev (List.map (expr builder) (List.rev args)) in
@@ -382,6 +395,7 @@ let rec stmt builder = function
     L.builder_at_end context merge_bb
     | SFor (e1, e2, e3, body) -> stmt builder
     ( SBlock [SExpr e1 ; SWhile (e2, SBlock [body ; SExpr e3]) ] )
+  | SNostmt -> builder
 
     in
 
@@ -556,6 +570,7 @@ List.fold_left series_pop_ty StringMap.empty [ A.Bool; A.Int; A.Float; A.String 
       | "score" -> L.build_call getplayerscore_func [|(L.build_load (lookup objname) objname builder)|] "getplayerscore" builder
       | "type" -> L.build_call getcardtype_func [|(L.build_load (lookup objname) objname builder)|] "getcardtype" builder
       | "faceup" -> L.build_call getcardfaceup_func [|(L.build_load (lookup objname) objname builder)|] "getcardfaceup" builder
+      | _ -> raise (Failure "attribute is not supported")
       )
 
     | SActionCall(a, args) ->
@@ -633,6 +648,12 @@ let add_terminal builder instr =
 let rec stmt builder = function
 	| SBlock stmt_list -> List.fold_left stmt builder stmt_list 
   | SExpr e -> ignore(expr builder e); builder
+  | SReturn e -> ignore(match main_func.smtyp with (*Should be unused*)
+                            (* Special "return nothing" instr *)
+                            A.None -> L.build_ret_void builder 
+                            (* Build return statement *)
+                          | _ -> L.build_ret (expr builder e) builder );
+                          builder
   | SSeriesPush (id, e) -> 
       ignore(L.build_call (StringMap.find (type_str (fst e)) series_push) [| (lookup id); (expr builder e) |] "" builder); builder 
   | SIf (predicate, then_stmt, else_stmt) ->
@@ -665,6 +686,7 @@ let rec stmt builder = function
     L.builder_at_end context merge_bb
     | SFor (e1, e2, e3, body) -> stmt builder
     ( SBlock [SExpr e1 ; SWhile (e2, SBlock [body ; SExpr e3]) ] )
+  | SNostmt -> builder
     (*| SForLit ( e1, e2, body) -> stmt builder
     ( SBlock [SExpr e1 ; SWhile (e2, SBlock [body ; SExpr e]) ] ) *)
     in

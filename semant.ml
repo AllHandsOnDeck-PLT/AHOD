@@ -166,7 +166,7 @@ let check (globals, action_decls, main_decl) =
        in if t' != (check_series_type l) then raise (Failure err) else (t', e') 
      in
 
-    let rec check_stmt = function (*currently only suuports one input -- support for map *)
+    let rec check_stmt = function (*currently only supports one input -- support for map *)
       Expr e -> SExpr (check_expr e) 
       | SeriesPush (var, e) -> 
         let _ = check_series_type var in
@@ -178,7 +178,7 @@ let check (globals, action_decls, main_decl) =
       | Return e -> let (t, e') = check_expr e in
         if t = main.mtyp then SReturn (t, e') 
         else raise (
-	        Failure ("return gives " ^ string_of_typ t ^ " expected " ^
+	        Failure ("Main does not support return of " ^ string_of_typ t ^ " expected " ^
 		    string_of_typ main.mtyp ^ " in " ^ string_of_expr e))
       | Block sl -> 
         let rec check_stmt_list = function
@@ -187,7 +187,8 @@ let check (globals, action_decls, main_decl) =
           | Block sl :: ss  -> check_stmt_list (sl @ ss) (* Flatten blocks *)
           | s :: ss         -> check_stmt s :: check_stmt_list ss
           | []              -> []
-        in  SBlock(List.map check_stmt sl)
+        in  SBlock(check_stmt_list sl) (*(List.map check_stmt_list sl)*)
+      | Nostmt -> SNostmt
       in
     { 
       smtyp = main.mtyp; 
@@ -337,7 +338,8 @@ let check (globals, action_decls, main_decl) =
         | Block sl :: ss  -> check_stmt_list (sl @ ss) (* Flatten blocks *)
         | s :: ss         -> check_stmt s :: check_stmt_list ss
         | []              -> []
-      in  SBlock(List.map check_stmt sl)
+      in SBlock(check_stmt_list sl) (*(List.map check_stmt_list sl)*)
+    | Nostmt -> SNostmt
     in
     { 
       saname = act.aname; 
