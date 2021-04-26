@@ -81,14 +81,16 @@ struct Card
 {
   char *type;
   bool faceup;
+  int value;
 };
 
-struct Card *cardcall(char* type, bool faceup)
+struct Card *cardcall(char* type, bool faceup, int value)
 {
   struct Card *c;
   c = (struct Card *) malloc(sizeof(struct Card));
   c->type = type;
   c->faceup = faceup;
+  c->value = value;
   return c;
 }
 
@@ -100,4 +102,9 @@ char *getcardtype(struct Card *card)
 bool getcardfaceup(struct Card *card)
 {
   return card->faceup;
+}
+
+int getcardvalue(struct Card *card)
+{
+  return card->value;
 }
