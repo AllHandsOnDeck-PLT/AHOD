@@ -1,0 +1,13 @@
+when do string A(string x,int y):
+{
+    string z
+    z = x
+    do PRINT(y)
+    return z 
+}
+main:
+{
+    string w
+    w = do A("Ahoy Matey, to AHOD", 3) 
+    do PRINT(w)
+}

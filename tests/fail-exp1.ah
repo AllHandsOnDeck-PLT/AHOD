@@ -1,0 +1,4 @@
+main:
+  {
+  do PRINT(1 + "hi")
+  }

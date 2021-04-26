@@ -1,0 +1,7 @@
+series<int> a
+main:
+  {
+    a = [2] 
+    a.push(1)
+  	do PRINT(a["boop"])
+  }

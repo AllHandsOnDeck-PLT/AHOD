@@ -124,7 +124,7 @@ let check (globals, action_decls, main_decl) =
                         when same && (t1 = Int || t1 = Float) -> Bool
               | And | Or when same && t1 = Bool -> Bool
               | _ -> raise (
-            Failure ("illegal binary operator " ))
+                Failure ("illegal binary operator of " ^ string_of_op op ^"for " ^ string_of_typ t1 ^ " and " ^ string_of_typ t2))
               in (ty, SBinop((t1, e1'), op, (t2, e2')))
         | PrintCall(e) -> (Void,SPrintCall(check_expr e))
         | ActionCall(aname, args) as acall -> 
@@ -276,7 +276,7 @@ let check (globals, action_decls, main_decl) =
                       when same && (t1 = Int || t1 = Float) -> Bool
             | And | Or when same && t1 = Bool -> Bool
             | _ -> raise (
-          Failure ("illegal binary operator " ))
+              Failure ("illegal binary operator of " ^ string_of_op op ^"for " ^ string_of_typ t1 ^ " and " ^ string_of_typ t2))
             in (ty, SBinop((t1, e1'), op, (t2, e2')))
       | PrintCall(e) -> (Void,SPrintCall(check_expr e))
       | ActionCall(aname, args) as acall -> 

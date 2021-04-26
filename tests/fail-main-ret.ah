@@ -1,0 +1,6 @@
+main:
+{
+    string w
+    w = "Ahoy Matey, to the wonderse of AHOD"
+    return w
+}
