@@ -1,0 +1,54 @@
+int i
+series<Card> deck
+int score 
+when do void INTRO():
+{ 
+    do PRINT("Hello, and welcome to our Blackjack Simulator")
+    do PRINT("First things first let us welcome our player for the evening")
+} 
+when do series<Card> CREATEDECK(series<Card> deck):
+{ 
+    series<string> types
+    series<int> values 
+    int value
+    string type 
+    Card card
+    types = ["R3", "R9", "B9", "B2", "R3"]
+    values = [3, 9, 9, 2, 3]
+    for (i = 0; i < types.size(); i = i + 1):
+    {
+        type = types[i]
+        value = values[i]
+        card = Card(type, true,value)   
+        deck.push(card) 
+    }
+    return deck
+} 
+main:
+{
+    Card card
+    int currvalue
+    deck = [Card("R5", true,5)]
+    do INTRO()
+    deck = do CREATEDECK(deck)
+    do PRINT("There are 5 cards in the hand. A Hit Request")
+    card = deck[deck.size()-1]
+    score = 0 
+    currvalue = card.value 
+    do PRINT(card.type)
+    do PRINT("A 3 value not too bad")
+    score = score + currvalue
+    do PRINT(score)
+    deck.pop()
+    do PRINT("Another hit request")
+    card = deck[deck.size()-1] 
+    do PRINT(card.type)
+    deck.pop()
+    do PRINT("Looks like we stop here for tonight. Time to see what the next cards were")
+    for (i = 0 ; i < deck.size(); i = i + 1):
+    {
+        card = deck[i]
+        do PRINT(card.type)
+        /*do PRINT(card.faceup)*/
+    }
+}

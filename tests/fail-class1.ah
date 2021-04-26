@@ -1,0 +1,7 @@
+Player player
+main:
+{
+  player = Player(0, "bob") 
+  do PRINT(player.name)
+  do PRINT(player.score)
+}

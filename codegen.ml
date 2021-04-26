@@ -22,7 +22,7 @@ let translate (globals, action_decls, main_decl) =
    and void_t      = L.void_type   context 
    and series_t t  = L.struct_type context [| L.pointer_type (L.i32_type context); (L.pointer_type t) |]
    and player_t    = L.struct_type context [| (L.pointer_type (L.i8_type context)); (L.i32_type context) |]
-   and card_t      = L.struct_type context [| (L.pointer_type (L.i8_type context)); (L.i1_type context) |]
+   and card_t      = L.struct_type context [| (L.pointer_type (L.i8_type context)); (L.i1_type context); (L.i32_type context)|]
    (*struct_set_body  class_t *)
   in
 
@@ -57,7 +57,7 @@ let translate (globals, action_decls, main_decl) =
       (* ======================== initialized the class ========================= *)
       (* unsure about class_type *)
       | A.Player -> L.const_struct context ([|L.const_pointer_null (L.pointer_type(L.i8_type context)) ; L.const_pointer_null (L.i32_type context)|])
-      | A.Card -> L.const_struct context ([|L.const_pointer_null (L.pointer_type(L.i8_type context)) ; L.const_pointer_null (L.i1_type context)|])
+      | A.Card -> L.const_struct context ([|L.const_pointer_null (L.pointer_type(L.i8_type context)) ; L.const_pointer_null (L.i1_type context); L.const_pointer_null (L.i32_type context)|])
       (* ======================== initialized the class ========================= *)
       | _ -> L.const_int (ltype_of_typ t) 0
     in StringMap.add n (L.define_global n init the_module) m in
@@ -97,7 +97,7 @@ let translate (globals, action_decls, main_decl) =
   (* ------------------------------------------------------------- *)
 
   let cardcall_t : L.lltype =
-        L.function_type card_t [| string_t ; i1_t |] in 
+        L.function_type card_t [| string_t ; i1_t ; i32_t |] in 
   let cardcall_func : L.llvalue =
       L.declare_function "cardcall" cardcall_t the_module in
 
@@ -110,6 +110,10 @@ let translate (globals, action_decls, main_decl) =
         L.function_type i1_t [| card_t |] in 
   let getcardfaceup_func : L.llvalue =
       L.declare_function "getcardfaceup" getcardfaceup_t the_module in
+  let getcardvalue_t : L.lltype =
+      L.function_type i32_t [| card_t |] in 
+  let getcardvalue_func : L.llvalue =
+      L.declare_function "getcardvalue" getcardvalue_t the_module in
 
 (* ------------------------------------------------------------- *)
 
@@ -303,6 +307,7 @@ List.fold_left series_pop_ty StringMap.empty [ A.Bool; A.Int; A.Float; A.String;
       | "score" -> L.build_call getplayerscore_func [|(L.build_load (lookup objname) objname builder)|] "getplayerscore" builder
       | "type" -> L.build_call getcardtype_func [|(L.build_load (lookup objname) objname builder)|] "getcardtype" builder
       | "faceup" -> L.build_call getcardfaceup_func [|(L.build_load (lookup objname) objname builder)|] "getcardfaceup" builder
+      | "value" -> L.build_call getcardvalue_func [|(L.build_load (lookup objname) objname builder)|] "getcardvalue" builder
       | _ -> raise (Failure "attribute is not supported")  (*make test to see if right error thrown, do check in semant*) 
       )
     | SActionCall(a, args) ->
@@ -595,6 +600,7 @@ List.fold_left series_pop_ty StringMap.empty [ A.Bool; A.Int; A.Float; A.String;
       | "score" -> L.build_call getplayerscore_func [|(L.build_load (lookup objname) objname builder)|] "getplayerscore" builder
       | "type" -> L.build_call getcardtype_func [|(L.build_load (lookup objname) objname builder)|] "getcardtype" builder
       | "faceup" -> L.build_call getcardfaceup_func [|(L.build_load (lookup objname) objname builder)|] "getcardfaceup" builder
+      | "value" -> L.build_call getcardvalue_func [|(L.build_load (lookup objname) objname builder)|] "getcardvalue" builder
       | _ -> raise (Failure "attribute is not supported")
       )
 
