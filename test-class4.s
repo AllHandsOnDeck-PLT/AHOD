@@ -24,30 +24,30 @@ main:                                   # @main
 	movl	%edx, %esi
 	callq	getplayername@PLT
 	movq	%rax, %rcx
-	movq	str@GOTPCREL(%rip), %r14
+	movq	str@GOTPCREL(%rip), %rdi
 	xorl	%eax, %eax
-	movq	%r14, %rdi
 	movq	%rcx, %rsi
 	callq	printf@PLT
 	movq	(%rbx), %rdi
 	movl	8(%rbx), %esi
 	callq	getplayerscore@PLT
 	movl	%eax, %ecx
-	movq	str.1@GOTPCREL(%rip), %rdi
+	movq	str.1@GOTPCREL(%rip), %r14
 	xorl	%eax, %eax
+	movq	%r14, %rdi
 	movl	%ecx, %esi
 	callq	printf@PLT
 	movq	(%rbx), %rdi
 	movl	8(%rbx), %esi
-	leaq	.Lstr.5(%rip), %rdx
-	callq	setplayername@PLT
+	movl	$1, %edx
+	callq	setplayerscore@PLT
 	movq	(%rbx), %rdi
 	movl	8(%rbx), %esi
-	callq	getplayername@PLT
-	movq	%rax, %rcx
+	callq	getplayerscore@PLT
+	movl	%eax, %ecx
 	xorl	%eax, %eax
 	movq	%r14, %rdi
-	movq	%rcx, %rsi
+	movl	%ecx, %esi
 	callq	printf@PLT
 	xorl	%eax, %eax
 	addq	$8, %rsp
@@ -530,11 +530,6 @@ player:
 .Lstr.4:
 	.asciz	"bob"
 	.size	.Lstr.4, 4
-
-	.type	.Lstr.5,@object         # @str.5
-.Lstr.5:
-	.asciz	"kevin"
-	.size	.Lstr.5, 6
 
 
 	.section	".note.GNU-stack","",@progbits

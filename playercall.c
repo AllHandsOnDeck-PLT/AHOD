@@ -65,15 +65,16 @@ int getplayerscore(struct Player *player)
   return player->score;
 }
 
-char *setplayername(struct Player *player, char* name)
+void *setplayername(struct Player *player, char* name)
 {
   player->name = name;
-  return player->name;
+  return (void *)player->name;
 }
 
-void setplayerscore(struct Player *player, int score)
+int setplayerscore(struct Player *player, int score)
 {
   player->score = score;
+  return player->score;
 }
 
 struct Card 

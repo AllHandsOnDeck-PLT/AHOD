@@ -7,7 +7,6 @@ source_filename = "AHOD"
 @str.3 = global [4 x i8] c"%d\0A\00"
 @player = global { i8*, i32 } zeroinitializer
 @str.4 = private unnamed_addr constant [4 x i8] c"bob\00"
-@str.5 = private unnamed_addr constant [6 x i8] c"kevin\00"
 
 declare i32 @printf(i8*, ...)
 
@@ -19,7 +18,7 @@ declare i32 @getplayerscore({ i8*, i32 })
 
 declare i8* @setplayername({ i8*, i32 }, i8*)
 
-declare void @setplayerscore({ i8*, i32 }, i32)
+declare i32 @setplayerscore({ i8*, i32 }, i32)
 
 declare { i8*, i1 } @cardcall(i8*, i1)
 
@@ -38,10 +37,10 @@ entry:
   %getplayerscore = call i32 @getplayerscore({ i8*, i32 } %player1)
   %printf2 = call i32 (i8*, ...) @printf(i8* getelementptr inbounds ([4 x i8], [4 x i8]* @str.1, i32 0, i32 0), i32 %getplayerscore)
   %player3 = load { i8*, i32 }, { i8*, i32 }* @player
-  %setplayername = call i8* @setplayername({ i8*, i32 } %player3, i8* getelementptr inbounds ([6 x i8], [6 x i8]* @str.5, i32 0, i32 0))
+  %setplayerscore = call i32 @setplayerscore({ i8*, i32 } %player3, i32 1)
   %player4 = load { i8*, i32 }, { i8*, i32 }* @player
-  %getplayername5 = call i8* @getplayername({ i8*, i32 } %player4)
-  %printf6 = call i32 (i8*, ...) @printf(i8* getelementptr inbounds ([4 x i8], [4 x i8]* @str, i32 0, i32 0), i8* %getplayername5)
+  %getplayerscore5 = call i32 @getplayerscore({ i8*, i32 } %player4)
+  %printf6 = call i32 (i8*, ...) @printf(i8* getelementptr inbounds ([4 x i8], [4 x i8]* @str.1, i32 0, i32 0), i32 %getplayerscore5)
   ret i32 0
 }
 
