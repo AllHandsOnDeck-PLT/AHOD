@@ -39,7 +39,7 @@ let check (globals, action_decls, main_decl) = (*changed from class_decls to act
       aname = name; 
       aparams = [(ty, "x")];
       alocals = []; abody = [] } map
-    in List.fold_left add_bind StringMap.empty [ ("PRINT", Int)]
+    in List.fold_left add_bind StringMap.empty []
   in
  
   let add_action map ad = 
@@ -120,6 +120,7 @@ let check (globals, action_decls, main_decl) = (*changed from class_decls to act
               | _ -> raise (
             Failure ("illegal binary operator " ))
               in (ty, SBinop((t1, e1'), op, (t2, e2')))
+        | PrintCall(e) as print -> (None,SPrintCall(check_expr e))
         | ActionCall(aname, args) as acall -> 
           let ad = find_act aname in
           let param_length = List.length ad.aparams in
@@ -245,6 +246,7 @@ let check (globals, action_decls, main_decl) = (*changed from class_decls to act
               | _ -> raise (
             Failure ("illegal binary operator " ))
               in (ty, SBinop((t1, e1'), op, (t2, e2')))
+        | PrintCall(e) as print -> (None,SPrintCall(check_expr e))
         | ActionCall(aname, args) as acall -> 
           let ad = find_act aname in
           let param_length = List.length ad.aparams in

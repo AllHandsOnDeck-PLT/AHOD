@@ -175,18 +175,21 @@ let translate (globals, action_decls, main_decl) =
           | SNoexpr     -> L.const_int i32_t 0
           | SAssign (s, e) -> let e' = expr builder e in
                                   ignore(L.build_store e' (lookup s) builder); e'
-          | SActionCall("PRINT", [e]) ->
-            (match fst e with 
-            A.String -> L.build_call printf_func [| L.const_in_bounds_gep str_format_str [|L.const_int i32_t 0; L.const_int i32_t 0|] ; (expr builder e) |]
-            "printf" builder
-            | A.Int | A.None -> L.build_call printf_func [| L.const_in_bounds_gep int_format_str [|L.const_int i32_t 0; L.const_int i32_t 0|]  ; (expr builder e) |]
-            "printf" builder
-            | A.Float -> L.build_call printf_func [| L.const_in_bounds_gep float_format_str [|L.const_int i32_t 0; L.const_int i32_t 0|]  ; (expr builder e) |]
-            "printf" builder
-            | A.Bool -> L.build_call printf_func [| L.const_in_bounds_gep bool_format_str [|L.const_int i32_t 0; L.const_int i32_t 0|]  ; (expr builder e) |]
-            "printf" builder
-            | _ -> raise (Failure "Print of this type is not supported") (* Potentially need to support Class and None cases *)
-            )
+          | SPrintCall(e) ->
+          (*don't do match here do SprintCall, makes sure it doesn't have list of args, pattern match on type
+          do different versions 4-5 patterns for each type. don't need the PRINT, comes with type expression pair
+          match in 1st element of *)
+          (match fst e with 
+          A.String -> L.build_call printf_func [| L.const_in_bounds_gep str_format_str [|L.const_int i32_t 0; L.const_int i32_t 0|] ; (expr builder e) |]
+          "printf" builder
+          | A.Int | A.None -> L.build_call printf_func [| L.const_in_bounds_gep int_format_str [|L.const_int i32_t 0; L.const_int i32_t 0|]  ; (expr builder e) |]
+          "printf" builder
+          | A.Float -> L.build_call printf_func [| L.const_in_bounds_gep float_format_str [|L.const_int i32_t 0; L.const_int i32_t 0|]  ; (expr builder e) |]
+          "printf" builder
+          | A.Bool -> L.build_call printf_func [| L.const_in_bounds_gep bool_format_str [|L.const_int i32_t 0; L.const_int i32_t 0|]  ; (expr builder e) |]
+          "printf" builder
+          | _ -> raise (Failure "Print of this type is not supported") (* Potentially need to support Class, Series, and None cases *)
+          )
           | SActionCall(a, args) ->
             let (adef, adecl) = StringMap.find a action_decls_map in
             let llargs = List.rev (List.map (expr builder) (List.rev args)) in
@@ -398,7 +401,10 @@ let translate (globals, action_decls, main_decl) =
     | SNoexpr     -> L.const_int i32_t 0
     | SAssign (s, e) -> let e' = expr builder e in
                     ignore(L.build_store e' (lookup s) builder); e'
-    | SActionCall("PRINT", [e]) ->
+    | SPrintCall(e) ->
+    (*don't do match here do SprintCall, makes sure it doesn't have list of args, pattern match on type
+    do different versions 4-5 patterns for each type. don't need the PRINT, comes with type expression pair
+    match in 1st element of *)
     (match fst e with 
     A.String -> L.build_call printf_func [| L.const_in_bounds_gep str_format_str [|L.const_int i32_t 0; L.const_int i32_t 0|] ; (expr builder e) |]
     "printf" builder
@@ -408,7 +414,7 @@ let translate (globals, action_decls, main_decl) =
     "printf" builder
     | A.Bool -> L.build_call printf_func [| L.const_in_bounds_gep bool_format_str [|L.const_int i32_t 0; L.const_int i32_t 0|]  ; (expr builder e) |]
     "printf" builder
-    | _ -> raise (Failure "Print of this type is not supported") (* Potentially need to support Class and None cases *)
+    | _ -> raise (Failure "Print of this type is not supported") (* Potentially need to support Class, Series, and None cases *)
     )
     | SActionCall(a, args) ->
     let (adef, main_func) = StringMap.find a action_decls_map in

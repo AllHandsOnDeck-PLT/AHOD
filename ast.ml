@@ -11,6 +11,7 @@ type expr =
   | Bliteral of bool
   | Sliteral of string
   | Seriesliteral of expr list
+  | PrintCall of expr 
   | ActionCall of string * expr list
   | ExprActionCall of expr * string * expr list
   | Id of string

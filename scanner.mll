@@ -64,6 +64,7 @@ rule token = parse
 | "external" { EXTERNAL }
 | "true"   { BLIT(true)  }
 | "false"  { BLIT(false) }
+| "PRINT"   { PRINT }
 | "main"   { MAIN }
 | digits as lxm { ILIT(int_of_string lxm) }
 | ['-']? (digits '.'  digit* ( ['e' 'E'] ['+' '-']? digits )?) as lxm { FLIT(lxm) }
