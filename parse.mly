@@ -175,7 +175,6 @@ call_print:
 
 call_action:
     | DO ACTIONID LPAREN args_list_opt RPAREN        { ActionCall($2, $4) } 
-    | expr DO ACTIONID LPAREN args_list_opt RPAREN   { ExprActionCall($1, $3, $5) } 
 
 call_attr:
     ID DOT ID      { AttrCall($1, $3) }

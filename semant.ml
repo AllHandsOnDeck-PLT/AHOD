@@ -305,6 +305,11 @@ let check (globals, action_decls, main_decl) =
       SSeriesPush(var, check_match_series_type_expr var e) 
     | If(p, b1, b2) -> SIf(check_expr p, check_stmt b1, check_stmt b2)
     | While(p, s) -> SWhile(check_expr p, check_stmt s)
+    | Return e -> let (t, e') = check_expr e in
+        if t = act.atyp then SReturn (t, e') 
+        else raise (
+	  Failure ("return gives " ^ string_of_typ t ^ " expected " ^
+		   string_of_typ act.atyp ^ " in " ^ string_of_expr e))
     | For(e1, e2, e3, st) ->
       SFor(check_expr e1, check_expr e2, check_expr e3, check_stmt st)
     (*| Return e -> let (t, e') = check_expr e in

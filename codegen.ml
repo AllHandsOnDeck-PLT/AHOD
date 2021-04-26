@@ -303,6 +303,12 @@ in
 let rec stmt builder = function
 	| SBlock stmt_list -> List.fold_left stmt builder stmt_list 
   | SExpr e -> ignore(expr builder e); builder
+  | SReturn e -> ignore(match adecl.satyp with
+                            (* Special "return nothing" instr *)
+                            A.None -> L.build_ret_void builder 
+                            (* Build return statement *)
+                          | _ -> L.build_ret (expr builder e) builder );
+                          builder
   | SSeriesPush (id, e) -> 
       ignore(L.build_call (StringMap.find (type_str (fst e)) series_push) [| (lookup id); (expr builder e) |] "" builder); builder 
   | SIf (predicate, then_stmt, else_stmt) ->
@@ -335,12 +341,11 @@ let rec stmt builder = function
     L.builder_at_end context merge_bb
     | SFor (e1, e2, e3, body) -> stmt builder
     ( SBlock [SExpr e1 ; SWhile (e2, SBlock [body ; SExpr e3]) ] )
-    (*| SForLit ( e1, e2, body) -> stmt builder
-    ( SBlock [SExpr e1 ; SWhile (e2, SBlock [body ; SExpr e]) ] ) *)
+
     in
 
 
-    let _ = stmt builder (SBlock adecl.sabody) in 
+    let builder = stmt builder (SBlock adecl.sabody) in 
       add_terminal builder (match adecl.satyp with
               A.None -> L.build_ret_void
             | A.Float -> L.build_ret (L.const_float float_t 0.0)

@@ -108,3 +108,13 @@ let rec string_of_expr = function
     string_of_expr exp ^ "do " ^ f ^ "(" ^ String.concat ", " (List.map string_of_expr el) ^ ")"
   | AttrCall(f, el) ->
     f ^ "." ^ el
+
+let rec string_of_stmt = function
+  Block(stmts) -> "{\n" ^ String.concat "" (List.map string_of_stmt stmts) ^ "\n}"
+  | Expr(exp) -> string_of_expr exp ^ "\n"
+  | Return(exp) -> "return" ^ string_of_expr exp ^ "\n"
+  | If(exp, s1, s2) -> "if " ^ string_of_expr exp  ^ ":\n" ^ string_of_stmt s1 ^ string_of_stmt s2
+  | For(e1, e2, e3, s) -> "for (" ^ string_of_expr e1 ^ ";" ^  string_of_expr e2 ^ ";" ^ 
+                      string_of_expr e3 ^ "):\n" ^ string_of_stmt s
+  | While(exp, stmt) -> "while " ^ string_of_expr exp ^ ":\n" ^ string_of_stmt stmt
+  | SeriesPush(id, exp) -> id ^ "." ^ "push" ^ "(" ^ string_of_expr exp ^ ")"
