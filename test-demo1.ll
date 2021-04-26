@@ -22,10 +22,6 @@ declare i8* @getplayername({ i8*, i32 })
 
 declare i32 @getplayerscore({ i8*, i32 })
 
-declare i8* @setplayername({ i8*, i32 }, i8*)
-
-declare void @setplayerscore({ i8*, i32 }, i32)
-
 declare { i8*, i1 } @cardcall(i8*, i1)
 
 declare i8* @getcardtype({ i8*, i1 })

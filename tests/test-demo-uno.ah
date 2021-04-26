@@ -1,0 +1,59 @@
+int i
+series<Card> deck
+series<Card> players
+Card card
+Player player
+int num_players
+series<int> scores
+when do series<Card> CREATEDECK(series<Card> deck):
+{ 
+    series<string> types 
+    string type 
+    types = ["R0", "R1", "R2", "R3", "R4"]
+    deck.pop() 
+    for (i = 0; i < types.size(); i = i + 1):
+    {
+        type = types[i]
+        card = Card(type, true)   
+        deck.push(card) 
+    }
+    return deck
+} 
+when do series<Card> CREATEPLAYERS(series<Card> players, series<string> names):
+{ 
+    string name
+    players.pop()  
+    for (i = 0; i < num_players; i = i + 1):
+    {
+        name = names[i]
+        player = Player(name, 0)   
+        players.push(player) 
+    }
+    return players
+} 
+when do INIT():
+{
+    series<string> names
+    deck = [Card("D0", true)]
+    deck = do CREATEDECK(deck)
+    for (i = 0 ; i < 5; i = i + 1):
+    {
+        card = deck[i]
+        do PRINT(card.type)
+        do PRINT(card.faceup)
+    }
+    players = [Player("P0", 0)]
+    names = ["bob", "carla"]
+    players = do CREATEPLAYERS(players, names)
+    for (i = 0 ; i < num_players; i = i + 1):
+    {
+        player = Player[i]
+        do PRINT(player.name)
+        do PRINT(player.score)
+    }
+}
+main:
+{
+    num_players = 2
+    do INIT()
+}
