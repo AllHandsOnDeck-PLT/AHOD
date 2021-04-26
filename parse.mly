@@ -147,7 +147,7 @@ stmt:
     | RETURN expr_opt NEWLINE               { Return $2 }
     | if_stmt                               { $1 }
     | FOR LPAREN expr SEMI expr SEMI expr RPAREN COLON stmt { For($3, $5, $7, $10)   }
-    | FOR ID IN expr COLON stmt       { ForLit($2, $4, $6) } 
+    // | FOR ID IN expr COLON stmt       { ForLit($2, $4, $6) } 
     | WHILE expr COLON stmt          { While($2, $4) }
 
     /*| FOR LPAREN expr SEMI expr SEMI expr RPAREN COLON stmt_block  { For($3, $5, $7, $10)   }

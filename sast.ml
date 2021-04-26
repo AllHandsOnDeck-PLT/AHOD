@@ -24,7 +24,7 @@ type sstmt =
   | SReturn of sexpr
   | SIf of sexpr * sstmt * sstmt 
   | SFor of sexpr * sexpr * sexpr * sstmt
-  | SForLit of string * sexpr * sstmt 
+  (* | SForLit of string * sexpr * sstmt  *)
   | SWhile of sexpr * sstmt
   | SSeriesAdd of string * sexpr 
 
@@ -75,4 +75,14 @@ let rec string_of_sexpr (t, e) =
       f ^ "(" ^ String.concat ", " (List.map string_of_sexpr el) ^ ")"
   | SAttrCall(f, el) ->
     f ^ "." ^ el
-          ) ^ ")"  
+          ) ^ ")"
+
+let rec string_of_sstmt = function
+    SBlock(stmts) -> "{\n" ^ String.concat "" (List.map string_of_sstmt stmts) ^ "\n}"
+  | SExpr(exp) -> string_of_sexpr exp ^ "\n"
+  | SReturn(exp) -> "return" ^ string_of_sexpr exp ^ "\n"
+  | SIf(exp, s1, s2) -> "if " ^ string_of_sexpr exp  ^ ":\n" ^ string_of_sstmt s1 ^ string_of_sstmt s2
+  | SFor(e1, e2, e3, s) -> "for (" ^ string_of_sexpr e1 ^ ";" ^  string_of_sexpr e2 ^ ";" ^ 
+                        string_of_sexpr e3 ^ "):\n" ^ string_of_sstmt s
+  | SWhile(exp, stmt) -> "while " ^ string_of_sexpr exp ^ ":\n" ^ string_of_sstmt stmt
+  | SSeriesAdd(id, exp) -> id ^ "." ^ "push" ^ "(" ^ string_of_sexpr exp ^ ")"
