@@ -1,0 +1,31 @@
+int w
+string x
+bool y 
+float z 
+when do int A():
+{
+  return 3
+}
+when do string B():
+{
+  return "some plt fun"
+}
+when do bool C():
+{
+  return true
+}
+when do float D():
+{
+  return 3.5
+}
+main:
+{
+  w = do A() 
+  do PRINT(w)
+  x = do B() 
+  do PRINT(x)
+  y = do C() 
+  do PRINT(y)
+  z = do D() 
+  do PRINT(z)
+}

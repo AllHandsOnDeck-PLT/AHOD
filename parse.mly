@@ -2,7 +2,7 @@
 open Ast
 %}
 
-%token LPAREN RPAREN LBRACE RBRACE LSQUARE RSQUARE SERIESSIZE SERIESPUSH SERIESPOP SERIES COLON SEMI COMMA PLUS MINUS MULT DIVIDE ASSIGN FLOOR DOT NEWLINE
+%token LPAREN RPAREN LBRACE RBRACE LSQUARE RSQUARE SERIESSIZE SERIESPUSH SERIESPOP SERIES CARD PLAYER COLON SEMI COMMA PLUS MINUS MULT DIVIDE ASSIGN FLOOR DOT NEWLINE
 %token NOT EQ NEQ LT LEQ GT GEQ AND OR
 %token RETURN IF ELIF ELSE FOR WHILE INT BOOL FLOAT NONE STRING RANGE WHEN DO LET BE WITH MAIN PRINT TIMES CONST
 %token CEND
@@ -87,8 +87,8 @@ stmt_list:
 
 stmt:
     | stmt_block                                { $1 }
-    | expr cend_opt NEWLINE                     { Expr $1} 
-    /* | RETURN expr_opt NEWLINE               { Return $2} doesn't have comment optional causes shift reduce */
+    | expr cend_opt NEWLINE                  { Expr $1} 
+    | RETURN expr_opt NEWLINE               { Return $2} /*doesn't have comment optional causes shift reduce */
     | if_stmt                               { $1 }
     | FOR LPAREN expr SEMI expr SEMI expr RPAREN COLON cend_opt stmt_block  { For($3, $5, $7, $11)   }
     /* | FOR ID IN expr COLON stmt_block       { ForLit($2, $4, $6) }  */
@@ -111,17 +111,16 @@ else_block:
       ELSE COLON cend_opt stmt_block     { $4 }
 
 typ:
-    | INT               { Int       }
-    | BOOL              { Bool      }
-    | FLOAT             { Float     }
-    | STRING            { String    }
-    | NONE              { None      }
-    | SERIES LT typ GT  { Series($3)}
+    | INT                                           { Int       }
+    | BOOL                                          { Bool      }
+    | FLOAT                                         { Float     }
+    | STRING                                        { String    }
+    | NONE                                          { None      }
+    | SERIES LT typ GT                              { Series($3)}
+    | PLAYER                                        { Player }
+    | CARD                                          { Card }
 
 expr:
-    | call_print                     { $1 } 
-    | call_action                    { $1 } 
-    /* | call_attr                      { $1 } */
     | ILIT                           { Iliteral($1) } 
     | FLIT                           { Fliteral($1) } 
     | BLIT                           { Bliteral($1) } 
@@ -147,6 +146,10 @@ expr:
     | expr GEQ    expr               { Binop($1, Geq,     $3) }
     | MINUS expr %prec NOT           { Unop(Neg, $2)          }
     | NOT expr                       { Unop(Not, $2)          }
+    | call_print                    { $1 } 
+    | call_class                     { $1 } 
+    | call_action                    { $1 } 
+    | call_attr                      { $1 }
 
 args_list_opt:
     /*nothing */                  { [] }
@@ -161,11 +164,14 @@ call_print:
 
 call_action:
     | DO ACTIONID LPAREN args_list_opt RPAREN        { ActionCall($2, $4) } 
-    /* | expr DO ACTIONID LPAREN args_list_opt RPAREN   { ExprActionCall($1, $3, $5) }  */
 
-/* call_attr:
-    ID DOT ID      { AttrCall($1, $3) } */
-  
-/* expr_opt:
-    nothing        { Noexpr }
-    | expr             { $1 }  */
+call_class: 
+    | PLAYER LPAREN args_list_opt RPAREN            { PlayerClassCall($3) } 
+    | CARD LPAREN args_list_opt RPAREN            { CardClassCall($3) } 
+
+call_attr:
+    ID DOT ID      { AttrCall($1, $3) }
+
+expr_opt:
+    /* nothing */      { Noexpr }
+    | expr             { $1 }

@@ -3,9 +3,10 @@ type op = Add | Sub | Mult | Div | Equal | Neq | Less | Leq | Greater | Geq |
 
 type uop = Neg | Not
           
-type typ = Int | Float | Bool | String | None | Series of typ
+type typ = Int | Float | Bool | String | None | Series of typ | Player | Card
 
 type bind = typ * string
+          
 
 type expr =
   | Iliteral of int
@@ -19,15 +20,20 @@ type expr =
   | Assign of string * expr
   | Binop of expr * op * expr
   | Unop of uop * expr
+  | PlayerClassCall of expr list
+  | CardClassCall of expr list
+ (*| ClassCall of string * expr list*)
+  | AttrCall of string * string 
   | SeriesGet of string * expr
   | SeriesSize of string
   | SeriesPop of string
   | Noexpr
 
+
 type stmt =
   | Block of stmt list
   | Expr of expr
-  (* | Return of expr *)
+  | Return of expr
   | If of expr * stmt * stmt 
   | For of expr * expr * expr * stmt
   (* | ForLit of string * expr * stmt  *)
@@ -80,6 +86,8 @@ let rec string_of_typ = function
   | String -> "string"
   | None -> "none"
   | Series x -> "series<" ^ (string_of_typ x) ^ ">"
+  | Player -> "player"
+  | Card -> "card"
 
 let rec string_of_expr = function
     Iliteral(l) -> string_of_int l
@@ -101,3 +109,12 @@ let rec string_of_expr = function
   | SeriesPop(id) -> "series_pop " ^ id
   | Noexpr -> ""
 
+let rec string_of_stmt = function
+  Block(stmts) -> "{\n" ^ String.concat "" (List.map string_of_stmt stmts) ^ "\n}"
+  | Expr(exp) -> string_of_expr exp ^ "\n"
+  | Return(exp) -> "return" ^ string_of_expr exp ^ "\n"
+  | If(exp, s1, s2) -> "if " ^ string_of_expr exp  ^ ":\n" ^ string_of_stmt s1 ^ string_of_stmt s2
+  | For(e1, e2, e3, s) -> "for (" ^ string_of_expr e1 ^ ";" ^  string_of_expr e2 ^ ";" ^ 
+                      string_of_expr e3 ^ "):\n" ^ string_of_stmt s
+  | While(exp, stmt) -> "while " ^ string_of_expr exp ^ ":\n" ^ string_of_stmt stmt
+  | SeriesPush(id, exp) -> id ^ "." ^ "push" ^ "(" ^ string_of_expr exp ^ ")"

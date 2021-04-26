@@ -1,12 +1,8 @@
+Card card
 main:
-  {
+{
+  card = Card("R5", true) 
+  do PRINT(card.type)
+  do PRINT(card.faceup)
+}
 
-  player = Player("bob")
-  }
-
-Player player
-
-let Player(string name) be:
-  {
-  string name: name
-  }
