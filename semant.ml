@@ -78,6 +78,15 @@ let check (globals, action_decls, main_decl) =
 
     let rec check_expr = function
       (*need to figure out typ, if name is defined*)
+        | PlayerClassCall(pparams) ->  (Player, SPlayerClassCall(List.map check_expr pparams))
+        | CardClassCall(pparams) ->  (Card, SCardClassCall(List.map check_expr pparams))
+        | AttrCall(objname, attr) ->  
+          (match attr with 
+          "name" -> (String, SAttrCall(objname, attr))
+          | "score" -> (Int, SAttrCall(objname, attr)) 
+          | "type" -> (String, SAttrCall(objname, attr))
+          | "faceup" -> (Bool, SAttrCall(objname, attr)) 
+          | _ -> raise (Failure ("attribute not found")))
         (* | ActionCall(aname, aparams) -> (String, SActionCall(aname, List.map check_expr aparams)) *)
         | Sliteral s -> (String, SSliteral(s))
         | Iliteral i -> (Int, SIliteral(i))
@@ -218,21 +227,29 @@ let check (globals, action_decls, main_decl) =
   in
 
   let rec check_expr = function
-    (*need to figure out typ, if name is defined*)
-      (* | ActionCall(aname, aparams) -> (String, SActionCall(aname, List.map check_expr aparams)) *)
-      | Sliteral s -> (String, SSliteral(s))
-      | Iliteral i -> (Int, SIliteral(i))
-      | Fliteral f -> (Float, SFliteral(f))
-      | Bliteral b -> (Bool, SBliteral(b))
-      | Noexpr     -> (None, SNoexpr)
-      | Id s       -> (type_of_identifier s, SId s)
-      | Assign(var, e) as ex -> 
-        let lt = type_of_identifier var
-        and (rt, e') = check_expr e in
-        let err = "illegal assignment " ^ string_of_typ lt ^ " = " ^ 
-              string_of_typ rt 
-        in (check_assign lt rt err, SAssign(var, (rt, e')))
-        | Unop(op, e) as ex -> 
+    | PlayerClassCall(pparams) ->  (Player, SPlayerClassCall(List.map check_expr pparams))
+    | CardClassCall(pparams) ->  (Card, SCardClassCall(List.map check_expr pparams))
+    | AttrCall(objname, attr) ->  
+      (match attr with 
+      "name" -> (String, SAttrCall(objname, attr))
+      | "score" -> (Int, SAttrCall(objname, attr)) 
+      | "type" -> (String, SAttrCall(objname, attr))
+      | "faceup" -> (Bool, SAttrCall(objname, attr)) 
+      | _ -> raise (Failure ("attribute not found")))
+		(*| ActionCall(aname, aparams) -> (String, SActionCall(aname, List.map check_expr aparams))*)
+		| Sliteral s -> (String, SSliteral(s))
+		| Iliteral i -> (Int, SIliteral(i))
+		| Fliteral f -> (Float, SFliteral(f))
+    | Bliteral b -> (Bool, SBliteral(b))
+    | Noexpr     -> (None, SNoexpr)
+    | Id s       -> (type_of_identifier s, SId s)
+    | Assign(var, e) as ex -> 
+      let lt = type_of_identifier var
+      and (rt, e') = check_expr e in
+      let err = "illegal assignment " ^ string_of_typ lt ^ " = " ^ 
+             string_of_typ rt 
+      in (check_assign lt rt err, SAssign(var, (rt, e')))
+    | Unop(op, e) as ex -> 
           let (t, e') = check_expr e in
           let ty = match op with
             Neg when t = Int || t = Float -> t
@@ -241,14 +258,14 @@ let check (globals, action_decls, main_decl) =
                                   string_of_uop op ^ string_of_typ t ^
                                   " in " ^ string_of_expr ex))
           in (ty, SUnop(op, (t, e')))
-        | Binop(e1, op, e2) as e -> 
-            let (t1, e1') = check_expr e1 
-            and (t2, e2') = check_expr e2 in
-            (* All binary operators require operands of the same type *)
-            let same = t1 = t2 in
-            (* Determine expression type based on operator and operand types *)
-            let ty = match op with
-              Add | Sub | Mult | Div when same && t1 = Int   -> Int
+    | Binop(e1, op, e2) as e -> 
+          let (t1, e1') = check_expr e1 
+          and (t2, e2') = check_expr e2 in
+          (* All binary operators require operands of the same type *)
+          let same = t1 = t2 in
+          (* Determine expression type based on operator and operand types *)
+          let ty = match op with
+            Add | Sub | Mult | Div when same && t1 = Int   -> Int
             | Add | Sub | Mult | Div when same && t1 = Float -> Float
             | Equal | Neq            when same               -> Bool
             | Less | Leq | Greater | Geq

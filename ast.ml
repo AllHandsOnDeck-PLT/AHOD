@@ -3,9 +3,10 @@ type op = Add | Sub | Mult | Div | Equal | Neq | Less | Leq | Greater | Geq |
 
 type uop = Neg | Not
           
-type typ = Int | Float | Bool | String | None | Series of typ
+type typ = Int | Float | Bool | String | None | Series of typ | Player | Card
 
 type bind = typ * string
+          
 
 type expr =
   | Iliteral of int
@@ -20,11 +21,15 @@ type expr =
   | Assign of string * expr
   | Binop of expr * op * expr
   | Unop of uop * expr
+  | PlayerClassCall of expr list
+  | CardClassCall of expr list
+ (*| ClassCall of string * expr list*)
   | AttrCall of string * string 
   | SeriesGet of string * expr
   | SeriesSize of string
   | SeriesPop of string
   | Noexpr
+
 
 type stmt =
   | Block of stmt list
@@ -36,9 +41,6 @@ type stmt =
   | While of expr * stmt
   | SeriesPush of string * expr
   | Nostmt
-
-type attr_decl = 
-  | OneAdecl of typ * string * expr 
 
 type main_decl = {
   mtyp : typ; 
@@ -85,6 +87,8 @@ let rec string_of_typ = function
   | String -> "string"
   | None -> "none"
   | Series x -> "series<" ^ (string_of_typ x) ^ ">"
+  | Player -> "player"
+  | Card -> "card"
 
 let rec string_of_expr = function
     Iliteral(l) -> string_of_int l

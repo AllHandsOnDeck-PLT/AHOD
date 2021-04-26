@@ -2,7 +2,7 @@
 open Ast
 %}
 
-%token LPAREN RPAREN LBRACE RBRACE LSQUARE RSQUARE SERIESSIZE SERIESPUSH SERIESPOP SERIES COLON SEMI COMMA PLUS MINUS MULT DIVIDE ASSIGN FLOOR DOT NEWLINE
+%token LPAREN RPAREN LBRACE RBRACE LSQUARE RSQUARE SERIESSIZE SERIESPUSH SERIESPOP SERIES CARD PLAYER COLON SEMI COMMA PLUS MINUS MULT DIVIDE ASSIGN FLOOR DOT NEWLINE
 %token NOT EQ NEQ LT LEQ GT GEQ AND OR
 %token RETURN IF ELIF ELSE FOR WHILE INT BOOL FLOAT NONE STRING RANGE WHEN DO LET BE WITH MAIN PRINT TIMES CONST
 %token CEND
@@ -35,7 +35,6 @@ program:
 decls:
     /*nothing*/      { ([], []) }
     | decls global_decl  { (List.rev ($2::fst $1), snd $1) }
-    // | decls class_decl { (fst $1, List.rev ($2::snd $1)) }
     | decls action_decl { (fst $1, List.rev ($2::snd $1)) }
 
 cend_opt: /*comment */ 
@@ -60,19 +59,6 @@ action_decl:
       aparams = List.rev $6; 
       alocals = List.rev $12;
       abody = [$13] }}
-
-/*add locals into action _decl and main */
-class_block:
-    NEWLINE LBRACE NEWLINE class_decl_list RBRACE NEWLINE { $4 }
-
-class_decl_list:
-  | action_decl                     { ([$1], []) }
-  | attr_decl                       { ([], [$1]) }
-  | class_decl_list action_decl     { (List.rev ($2::fst $1), snd $1) }
-  | class_decl_list attr_decl       { (fst $1, List.rev ($2::snd $1)) }
-
-attr_decl:
-    | typ ID COLON expr NEWLINE { OneAdecl($1, $2, $4)}
 
 params_list_opt: 
     |params_list    {$1}
@@ -125,17 +111,16 @@ else_block:
       ELSE COLON cend_opt stmt_block     { $4 }
 
 typ:
-    | INT               { Int       }
-    | BOOL              { Bool      }
-    | FLOAT             { Float     }
-    | STRING            { String    }
-    | NONE              { None      }
-    | SERIES LT typ GT  { Series($3)}
+    | INT                                           { Int       }
+    | BOOL                                          { Bool      }
+    | FLOAT                                         { Float     }
+    | STRING                                        { String    }
+    | NONE                                          { None      }
+    | SERIES LT typ GT                              { Series($3)}
+    | PLAYER                                        { Player }
+    | CARD                                          { Card }
 
 expr:
-    | call_print                    { $1 } 
-    | call_action                    { $1 } 
-    | call_attr        { $1 }
     | ILIT                           { Iliteral($1) } 
     | FLIT                           { Fliteral($1) } 
     | BLIT                           { Bliteral($1) } 
@@ -161,6 +146,10 @@ expr:
     | expr GEQ    expr               { Binop($1, Geq,     $3) }
     | MINUS expr %prec NOT           { Unop(Neg, $2)          }
     | NOT expr                       { Unop(Not, $2)          }
+    | call_print                    { $1 } 
+    | call_class                     { $1 } 
+    | call_action                    { $1 } 
+    | call_attr                      { $1 }
 
 args_list_opt:
     /*nothing */                  { [] }
@@ -176,9 +165,13 @@ call_print:
 call_action:
     | DO ACTIONID LPAREN args_list_opt RPAREN        { ActionCall($2, $4) } 
 
+call_class: 
+    | PLAYER LPAREN args_list_opt RPAREN            { PlayerClassCall($3) } 
+    | CARD LPAREN args_list_opt RPAREN            { CardClassCall($3) } 
+
 call_attr:
     ID DOT ID      { AttrCall($1, $3) }
-  
+
 expr_opt:
     /* nothing */      { Noexpr }
     | expr             { $1 }
