@@ -1,0 +1,397 @@
+/usr/local/opt/llvm/bin/lli
+
+###### Testing test-action
+./AHOD.native tests/test-action.ah > test-action.ll
+llc -relocation-model=pic test-action.ll > test-action.s
+cc -o test-action.exe test-action.s playercall.o
+./test-action.exe
+diff -b test-action.out tests/test-action.out > test-action.diff
+###### SUCCESS
+
+###### Testing test-action2
+./AHOD.native tests/test-action2.ah > test-action2.ll
+llc -relocation-model=pic test-action2.ll > test-action2.s
+cc -o test-action2.exe test-action2.s playercall.o
+./test-action2.exe
+diff -b test-action2.out tests/test-action2.out > test-action2.diff
+###### SUCCESS
+
+###### Testing test-action3-while
+./AHOD.native tests/test-action3-while.ah > test-action3-while.ll
+llc -relocation-model=pic test-action3-while.ll > test-action3-while.s
+cc -o test-action3-while.exe test-action3-while.s playercall.o
+./test-action3-while.exe
+diff -b test-action3-while.out tests/test-action3-while.out > test-action3-while.diff
+###### SUCCESS
+
+###### Testing test-action4-for
+./AHOD.native tests/test-action4-for.ah > test-action4-for.ll
+llc -relocation-model=pic test-action4-for.ll > test-action4-for.s
+cc -o test-action4-for.exe test-action4-for.s playercall.o
+./test-action4-for.exe
+diff -b test-action4-for.out tests/test-action4-for.out > test-action4-for.diff
+###### SUCCESS
+
+###### Testing test-action5-if
+./AHOD.native tests/test-action5-if.ah > test-action5-if.ll
+llc -relocation-model=pic test-action5-if.ll > test-action5-if.s
+cc -o test-action5-if.exe test-action5-if.s playercall.o
+./test-action5-if.exe
+diff -b test-action5-if.out tests/test-action5-if.out > test-action5-if.diff
+###### SUCCESS
+
+###### Testing test-action6-ifelse
+./AHOD.native tests/test-action6-ifelse.ah > test-action6-ifelse.ll
+llc -relocation-model=pic test-action6-ifelse.ll > test-action6-ifelse.s
+cc -o test-action6-ifelse.exe test-action6-ifelse.s playercall.o
+./test-action6-ifelse.exe
+diff -b test-action6-ifelse.out tests/test-action6-ifelse.out > test-action6-ifelse.diff
+###### SUCCESS
+
+###### Testing test-action7-params
+./AHOD.native tests/test-action7-params.ah > test-action7-params.ll
+llc -relocation-model=pic test-action7-params.ll > test-action7-params.s
+cc -o test-action7-params.exe test-action7-params.s playercall.o
+./test-action7-params.exe
+diff -b test-action7-params.out tests/test-action7-params.out > test-action7-params.diff
+###### SUCCESS
+
+###### Testing test-advanced
+./AHOD.native tests/test-advanced.ah > test-advanced.ll
+llc -relocation-model=pic test-advanced.ll > test-advanced.s
+cc -o test-advanced.exe test-advanced.s playercall.o
+./test-advanced.exe
+diff -b test-advanced.out tests/test-advanced.out > test-advanced.diff
+###### SUCCESS
+
+###### Testing test-assign-global
+./AHOD.native tests/test-assign-global.ah > test-assign-global.ll
+llc -relocation-model=pic test-assign-global.ll > test-assign-global.s
+cc -o test-assign-global.exe test-assign-global.s playercall.o
+./test-assign-global.exe
+diff -b test-assign-global.out tests/test-assign-global.out > test-assign-global.diff
+###### SUCCESS
+
+###### Testing test-assign-local
+./AHOD.native tests/test-assign-local.ah > test-assign-local.ll
+llc -relocation-model=pic test-assign-local.ll > test-assign-local.s
+cc -o test-assign-local.exe test-assign-local.s playercall.o
+./test-assign-local.exe
+diff -b test-assign-local.out tests/test-assign-local.out > test-assign-local.diff
+###### SUCCESS
+
+###### Testing test-assign-local2
+./AHOD.native tests/test-assign-local2.ah > test-assign-local2.ll
+llc -relocation-model=pic test-assign-local2.ll > test-assign-local2.s
+cc -o test-assign-local2.exe test-assign-local2.s playercall.o
+./test-assign-local2.exe
+diff -b test-assign-local2.out tests/test-assign-local2.out > test-assign-local2.diff
+###### SUCCESS
+
+###### Testing test-basic
+./AHOD.native tests/test-basic.ah > test-basic.ll
+llc -relocation-model=pic test-basic.ll > test-basic.s
+cc -o test-basic.exe test-basic.s playercall.o
+./test-basic.exe
+diff -b test-basic.out tests/test-basic.out > test-basic.diff
+###### SUCCESS
+
+###### Testing test-binop
+./AHOD.native tests/test-binop.ah > test-binop.ll
+llc -relocation-model=pic test-binop.ll > test-binop.s
+cc -o test-binop.exe test-binop.s playercall.o
+./test-binop.exe
+diff -b test-binop.out tests/test-binop.out > test-binop.diff
+###### SUCCESS
+
+###### Testing test-bjsim
+./AHOD.native tests/test-bjsim.ah > test-bjsim.ll
+llc -relocation-model=pic test-bjsim.ll > test-bjsim.s
+cc -o test-bjsim.exe test-bjsim.s playercall.o
+./test-bjsim.exe
+diff -b test-bjsim.out tests/test-bjsim.out > test-bjsim.diff
+###### SUCCESS
+
+###### Testing test-class1
+./AHOD.native tests/test-class1.ah > test-class1.ll
+llc -relocation-model=pic test-class1.ll > test-class1.s
+cc -o test-class1.exe test-class1.s playercall.o
+./test-class1.exe
+diff -b test-class1.out tests/test-class1.out > test-class1.diff
+###### SUCCESS
+
+###### Testing test-class2
+./AHOD.native tests/test-class2.ah > test-class2.ll
+llc -relocation-model=pic test-class2.ll > test-class2.s
+cc -o test-class2.exe test-class2.s playercall.o
+./test-class2.exe
+diff -b test-class2.out tests/test-class2.out > test-class2.diff
+###### SUCCESS
+
+###### Testing test-class3
+./AHOD.native tests/test-class3.ah > test-class3.ll
+llc -relocation-model=pic test-class3.ll > test-class3.s
+cc -o test-class3.exe test-class3.s playercall.o
+./test-class3.exe
+diff -b test-class3.out tests/test-class3.out > test-class3.diff
+###### SUCCESS
+
+###### Testing test-class4
+./AHOD.native tests/test-class4.ah > test-class4.ll
+llc -relocation-model=pic test-class4.ll > test-class4.s
+cc -o test-class4.exe test-class4.s playercall.o
+./test-class4.exe
+diff -b test-class4.out tests/test-class4.out > test-class4.diff
+###### SUCCESS
+
+###### Testing test-class5
+./AHOD.native tests/test-class5.ah > test-class5.ll
+llc -relocation-model=pic test-class5.ll > test-class5.s
+cc -o test-class5.exe test-class5.s playercall.o
+./test-class5.exe
+diff -b test-class5.out tests/test-class5.out > test-class5.diff
+###### SUCCESS
+
+###### Testing test-class6
+./AHOD.native tests/test-class6.ah > test-class6.ll
+Fatal error: exception Stdlib.Parsing.Parse_error
+###### FAILED
+
+###### Testing test-comments
+./AHOD.native tests/test-comments.ah > test-comments.ll
+llc -relocation-model=pic test-comments.ll > test-comments.s
+cc -o test-comments.exe test-comments.s playercall.o
+./test-comments.exe
+diff -b test-comments.out tests/test-comments.out > test-comments.diff
+###### SUCCESS
+
+###### Testing test-demo-uno
+./AHOD.native tests/test-demo-uno.ah > test-demo-uno.ll
+Fatal error: exception Stdlib.Parsing.Parse_error
+###### FAILED
+
+###### Testing test-demo1
+./AHOD.native tests/test-demo1.ah > test-demo1.ll
+Fatal error: exception Failure("expecting 3 arguments in Card (D0, true)")
+###### FAILED
+
+###### Testing test-for1
+./AHOD.native tests/test-for1.ah > test-for1.ll
+llc -relocation-model=pic test-for1.ll > test-for1.s
+cc -o test-for1.exe test-for1.s playercall.o
+./test-for1.exe
+diff -b test-for1.out tests/test-for1.out > test-for1.diff
+###### SUCCESS
+
+###### Testing test-for2
+./AHOD.native tests/test-for2.ah > test-for2.ll
+llc -relocation-model=pic test-for2.ll > test-for2.s
+cc -o test-for2.exe test-for2.s playercall.o
+./test-for2.exe
+diff -b test-for2.out tests/test-for2.out > test-for2.diff
+###### SUCCESS
+
+###### Testing test-helloworld
+./AHOD.native tests/test-helloworld.ah > test-helloworld.ll
+llc -relocation-model=pic test-helloworld.ll > test-helloworld.s
+cc -o test-helloworld.exe test-helloworld.s playercall.o
+./test-helloworld.exe
+diff -b test-helloworld.out tests/test-helloworld.out > test-helloworld.diff
+###### SUCCESS
+
+###### Testing test-if-else
+./AHOD.native tests/test-if-else.ah > test-if-else.ll
+llc -relocation-model=pic test-if-else.ll > test-if-else.s
+cc -o test-if-else.exe test-if-else.s playercall.o
+./test-if-else.exe
+diff -b test-if-else.out tests/test-if-else.out > test-if-else.diff
+###### SUCCESS
+
+###### Testing test-if
+./AHOD.native tests/test-if.ah > test-if.ll
+llc -relocation-model=pic test-if.ll > test-if.s
+cc -o test-if.exe test-if.s playercall.o
+./test-if.exe
+diff -b test-if.out tests/test-if.out > test-if.diff
+###### SUCCESS
+
+###### Testing test-printint
+./AHOD.native tests/test-printint.ah > test-printint.ll
+llc -relocation-model=pic test-printint.ll > test-printint.s
+cc -o test-printint.exe test-printint.s playercall.o
+./test-printint.exe
+diff -b test-printint.out tests/test-printint.out > test-printint.diff
+###### SUCCESS
+
+###### Testing test-return
+./AHOD.native tests/test-return.ah > test-return.ll
+llc -relocation-model=pic test-return.ll > test-return.s
+cc -o test-return.exe test-return.s playercall.o
+./test-return.exe
+diff -b test-return.out tests/test-return.out > test-return.diff
+###### SUCCESS
+
+###### Testing test-series
+./AHOD.native tests/test-series.ah > test-series.ll
+llc -relocation-model=pic test-series.ll > test-series.s
+cc -o test-series.exe test-series.s playercall.o
+./test-series.exe
+diff -b test-series.out tests/test-series.out > test-series.diff
+###### SUCCESS
+
+###### Testing test-series2
+./AHOD.native tests/test-series2.ah > test-series2.ll
+llc -relocation-model=pic test-series2.ll > test-series2.s
+cc -o test-series2.exe test-series2.s playercall.o
+./test-series2.exe
+diff -b test-series2.out tests/test-series2.out > test-series2.diff
+###### SUCCESS
+
+###### Testing test-series3
+./AHOD.native tests/test-series3.ah > test-series3.ll
+llc -relocation-model=pic test-series3.ll > test-series3.s
+cc -o test-series3.exe test-series3.s playercall.o
+./test-series3.exe
+diff -b test-series3.out tests/test-series3.out > test-series3.diff
+###### SUCCESS
+
+###### Testing test-series4
+./AHOD.native tests/test-series4.ah > test-series4.ll
+llc -relocation-model=pic test-series4.ll > test-series4.s
+cc -o test-series4.exe test-series4.s playercall.o
+./test-series4.exe
+diff -b test-series4.out tests/test-series4.out > test-series4.diff
+###### SUCCESS
+
+###### Testing test-series5-fr
+./AHOD.native tests/test-series5-fr.ah > test-series5-fr.ll
+llc -relocation-model=pic test-series5-fr.ll > test-series5-fr.s
+cc -o test-series5-fr.exe test-series5-fr.s playercall.o
+./test-series5-fr.exe
+diff -b test-series5-fr.out tests/test-series5-fr.out > test-series5-fr.diff
+###### SUCCESS
+
+###### Testing test-while-gcd
+./AHOD.native tests/test-while-gcd.ah > test-while-gcd.ll
+llc -relocation-model=pic test-while-gcd.ll > test-while-gcd.s
+cc -o test-while-gcd.exe test-while-gcd.s playercall.o
+./test-while-gcd.exe
+diff -b test-while-gcd.out tests/test-while-gcd.out > test-while-gcd.diff
+###### SUCCESS
+
+###### Testing test-while1
+./AHOD.native tests/test-while1.ah > test-while1.ll
+llc -relocation-model=pic test-while1.ll > test-while1.s
+cc -o test-while1.exe test-while1.s playercall.o
+./test-while1.exe
+diff -b test-while1.out tests/test-while1.out > test-while1.diff
+###### SUCCESS
+
+###### Testing test-while2
+./AHOD.native tests/test-while2.ah > test-while2.ll
+llc -relocation-model=pic test-while2.ll > test-while2.s
+cc -o test-while2.exe test-while2.s playercall.o
+./test-while2.exe
+diff -b test-while2.out tests/test-while2.out > test-while2.diff
+###### SUCCESS
+
+###### Testing fail-action-for1
+./AHOD.native < tests/fail-action-for1.ah 2> fail-action-for1.err >> testall.log
+diff -b fail-action-for1.err tests/fail-action-for1.err > fail-action-for1.diff
+###### SUCCESS
+
+###### Testing fail-action-for2
+./AHOD.native < tests/fail-action-for2.ah 2> fail-action-for2.err >> testall.log
+diff -b fail-action-for2.err tests/fail-action-for2.err > fail-action-for2.diff
+###### SUCCESS
+
+###### Testing fail-action1-no
+./AHOD.native < tests/fail-action1-no.ah 2> fail-action1-no.err >> testall.log
+diff -b fail-action1-no.err tests/fail-action1-no.err > fail-action1-no.diff
+###### SUCCESS
+
+###### Testing fail-action2-num
+./AHOD.native < tests/fail-action2-num.ah 2> fail-action2-num.err >> testall.log
+diff -b fail-action2-num.err tests/fail-action2-num.err > fail-action2-num.diff
+###### SUCCESS
+
+###### Testing fail-action3-ret
+./AHOD.native < tests/fail-action3-ret.ah 2> fail-action3-ret.err >> testall.log
+diff -b fail-action3-ret.err tests/fail-action3-ret.err > fail-action3-ret.diff
+###### SUCCESS
+
+###### Testing fail-action4-wp
+./AHOD.native < tests/fail-action4-wp.ah 2> fail-action4-wp.err >> testall.log
+diff -b fail-action4-wp.err tests/fail-action4-wp.err > fail-action4-wp.diff
+###### SUCCESS
+
+###### Testing fail-asn-global
+./AHOD.native < tests/fail-asn-global.ah 2> fail-asn-global.err >> testall.log
+diff -b fail-asn-global.err tests/fail-asn-global.err > fail-asn-global.diff
+###### SUCCESS
+
+###### Testing fail-asn-global2
+./AHOD.native < tests/fail-asn-global2.ah 2> fail-asn-global2.err >> testall.log
+diff -b fail-asn-global2.err tests/fail-asn-global2.err > fail-asn-global2.diff
+###### SUCCESS
+
+###### Testing fail-asn-global3
+./AHOD.native < tests/fail-asn-global3.ah 2> fail-asn-global3.err >> testall.log
+diff -b fail-asn-global3.err tests/fail-asn-global3.err > fail-asn-global3.diff
+###### SUCCESS
+
+###### Testing fail-asn-local
+./AHOD.native < tests/fail-asn-local.ah 2> fail-asn-local.err >> testall.log
+diff -b fail-asn-local.err tests/fail-asn-local.err > fail-asn-local.diff
+###### SUCCESS
+
+###### Testing fail-class1
+./AHOD.native < tests/fail-class1.ah 2> fail-class1.err >> testall.log
+diff -b fail-class1.err tests/fail-class1.err > fail-class1.diff
+###### SUCCESS
+
+###### Testing fail-class2
+./AHOD.native < tests/fail-class2.ah 2> fail-class2.err >> testall.log
+diff -b fail-class2.err tests/fail-class2.err > fail-class2.diff
+###### SUCCESS
+
+###### Testing fail-class3
+./AHOD.native < tests/fail-class3.ah 2> fail-class3.err >> testall.log
+diff -b fail-class3.err tests/fail-class3.err > fail-class3.diff
+###### SUCCESS
+
+###### Testing fail-class4
+./AHOD.native < tests/fail-class4.ah 2> fail-class4.err >> testall.log
+diff -b fail-class4.err tests/fail-class4.err > fail-class4.diff
+###### SUCCESS
+
+###### Testing fail-class5
+./AHOD.native < tests/fail-class5.ah 2> fail-class5.err >> testall.log
+./testall.sh: line 73: 11215 Abort trap: 6           ./AHOD.native < tests/fail-class5.ah 2> fail-class5.err >> testall.log
+diff -b fail-class5.err tests/fail-class5.err > fail-class5.diff
+###### SUCCESS
+
+###### Testing fail-class6
+./AHOD.native < tests/fail-class6.ah 2> fail-class6.err >> testall.log
+diff -b fail-class6.err tests/fail-class6.err > fail-class6.diff
+###### SUCCESS
+
+###### Testing fail-exp1
+./AHOD.native < tests/fail-exp1.ah 2> fail-exp1.err >> testall.log
+diff -b fail-exp1.err tests/fail-exp1.err > fail-exp1.diff
+###### SUCCESS
+
+###### Testing fail-main-ret
+./AHOD.native < tests/fail-main-ret.ah 2> fail-main-ret.err >> testall.log
+diff -b fail-main-ret.err tests/fail-main-ret.err > fail-main-ret.diff
+###### SUCCESS
+
+###### Testing fail-series
+./AHOD.native < tests/fail-series.ah 2> fail-series.err >> testall.log
+diff -b fail-series.err tests/fail-series.err > fail-series.diff
+###### SUCCESS
+
+###### Testing fail-series2
+./AHOD.native < tests/fail-series2.ah 2> fail-series2.err >> testall.log
+diff -b fail-series2.err tests/fail-series2.err > fail-series2.diff
+###### SUCCESS

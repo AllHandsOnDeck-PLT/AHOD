@@ -1,0 +1,5 @@
+Player player
+main:
+{
+  player = Player(1, "bob") 
+}
