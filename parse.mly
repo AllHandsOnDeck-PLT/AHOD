@@ -78,7 +78,8 @@ locals_list:
     | locals_list global_decl              {$2 :: $1 }
 
 stmt_wrap: 
-    stmt_list                               { Block(List.rev $1) }
+    | /*nothing */                            {Block([])}
+    | stmt_list                               { Block(List.rev $1) }
 
 stmt_list: 
     stmt                                     { [$1]     }

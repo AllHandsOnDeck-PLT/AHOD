@@ -1,0 +1,12 @@
+when do void PLAY():
+{
+    int i
+    for (i = 0; i < 10 ; i = j + 1): /*j not defined*/
+    {
+    do PRINT("uh oh failure")
+    }
+}
+main:
+{
+    do PLAY()
+}

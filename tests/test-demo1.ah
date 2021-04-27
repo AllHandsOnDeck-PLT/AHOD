@@ -9,7 +9,7 @@ when do series<Card> CREATEDECK(series<Card> deck):
     for (i = 0; i < types.size(); i = i + 1):
     {
         type = types[i]
-        card = Card(type, true)   
+        card = Card(type, true, 5)   
         deck.push(card) 
     }
     return deck
@@ -19,7 +19,7 @@ main:
     Card card
     /*card = Card("R0", true)*/
     /*deck = [card]*/
-    deck = [Card("D0", true)]
+    deck = [Card("D0", true, 5)]
     deck = do CREATEDECK(deck)
     for (i = 0 ; i < 5; i = i + 1):
     {

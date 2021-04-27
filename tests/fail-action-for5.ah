@@ -1,0 +1,12 @@
+when do void PLAY():
+{
+    int i
+    for (i = 0; i < 10 ; i = j + 1): 
+    {
+        do PLAY2() /* no such method */
+    }
+}
+main:
+{
+    do PLAY()
+}
