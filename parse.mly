@@ -32,13 +32,13 @@ program:
     decls main_decl EOF     { (fst $1, snd $1, $2) }
 
 decls:
-    /*nothing*/             { ([], [])                        }
+    | /*nothing*/           { ([], [])                        }
     | decls global_decl     { (List.rev ($2::fst $1), snd $1) }
     | decls action_decl     { (fst $1, List.rev ($2::snd $1)) }
 
 cend_opt: /*comment */ 
-    /*nothing */ { Noexpr } 
-    | CEND       { Noexpr }
+    | /*nothing */      { Noexpr } 
+    | CEND              { Noexpr }
 
 global_decl:
     typ ID cend_opt NEWLINE { ($1, $2)}
@@ -60,29 +60,29 @@ action_decl:
       abody = [$15] }}
 
 params_list_opt: 
-    |params_list    {$1}
-    | /*Nothing*/   {[]}
+    | params_list    {$1}
+    | /*Nothing*/    {[]}
 
 params_list:
-    param                          { [$1]   } 
+    | param                        { [$1]   } 
     | params_list COMMA param      { $3::$1 }
 
 param:
-      typ ID                       { $1, $2 }
+    | typ ID                       { $1, $2 }
 
 stmt_block:
-    NEWLINE LBRACE cend_opt NEWLINE stmt_list RBRACE cend_opt NEWLINE              { Block(List.rev $5) }
+    | NEWLINE LBRACE cend_opt NEWLINE stmt_list RBRACE cend_opt NEWLINE              { Block(List.rev $5) }
 
 locals_list:
-    | /*nothing */                         {[]       }
-    | locals_list global_decl              {$2 :: $1 }
+    | /*nothing */                           {[]       }
+    | locals_list global_decl                {$2 :: $1 }
 
 stmt_wrap: 
-    | /*nothing */                            {Block([])}
-    | stmt_list                               { Block(List.rev $1) }
+    | /*nothing */                           { Block([])          }
+    | stmt_list                              { Block(List.rev $1) }
 
 stmt_list: 
-    stmt                                     { [$1]     }
+    | stmt                                   { [$1]     }
     | stmt_list stmt                         { $2 :: $1 }
 
 stmt:
@@ -98,11 +98,11 @@ if_stmt:
     | IF expr COLON cend_opt stmt_block else_block_opt   { If($2, $5, $6) }
 
 else_block_opt:
-      /* nothing */      { Block([]) }
-      | else_block       { $1 }
+    | /* nothing */      { Block([]) }
+    | else_block         { $1        }
 
 else_block:
-      ELSE COLON cend_opt stmt_block     { $4 }
+    | ELSE COLON cend_opt stmt_block     { $4 }
 
 typ:
     | INT                                           { Int       }
@@ -146,11 +146,11 @@ expr:
     | call_attr                         { $1 }
 
 args_list_opt:
-    /*nothing */                  { []          }
+    | /*nothing */                { []          }
     | args_list                   { List.rev $1 }
 
 args_list:
-    expr                            { [$1]     } 
+    | expr                          { [$1]     } 
     | args_list COMMA expr          { $3 :: $1 }
 
 call_print:
@@ -164,8 +164,8 @@ call_class:
     | CARD LPAREN args_list_opt RPAREN              { CardClassCall($3  ) } 
 
 call_attr:
-    ID DOT ID      { AttrCall($1, $3) }
+    | ID DOT ID      { AttrCall($1, $3) }
 
 expr_opt:
-    /* nothing */      { Noexpr }
-    | expr             { $1     }
+    | /* nothing */      { Noexpr }
+    | expr               { $1     }
