@@ -1,0 +1,7 @@
+when do void B(string a, string a):
+{
+}
+main:
+{
+    do B("uh", "oh") 
+}

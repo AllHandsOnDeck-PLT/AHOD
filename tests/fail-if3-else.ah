@@ -1,0 +1,11 @@
+main:
+{
+    if false:
+    {
+        do PRINT("it is working")
+    }
+    else:
+    {
+        do OOF()
+    }
+}

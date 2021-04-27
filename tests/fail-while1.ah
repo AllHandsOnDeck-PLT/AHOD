@@ -1,0 +1,7 @@
+main:
+{
+    while 42:
+    {
+    do PRINT("true")
+    }
+}

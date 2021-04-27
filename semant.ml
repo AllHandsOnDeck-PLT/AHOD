@@ -176,15 +176,21 @@ let check (globals, action_decls, main_decl) =
        in if t' != (check_series_type l) then raise (Failure err) else (t', e') 
      in
 
+    let check_bool_expr e = 
+      let (t', e') = check_expr e
+        and err = "expected Boolean expression in " ^ string_of_expr e
+        in if t' != Bool then raise (Failure err) else (t', e') 
+    in
+
     let rec check_stmt = function (*currently only supports one input -- support for map *)
       Expr e -> SExpr (check_expr e) 
       | SeriesPush (var, e) -> 
         let _ = check_series_type var in
         SSeriesPush(var, check_match_series_type_expr var e) 
-      | If(p, b1, b2) -> SIf(check_expr p, check_stmt b1, check_stmt b2)
-      | While(p, s) -> SWhile(check_expr p, check_stmt s)
+      | If(p, b1, b2) -> SIf(check_bool_expr p, check_stmt b1, check_stmt b2)
+      | While(p, s) -> SWhile(check_bool_expr p, check_stmt s)
       | For(e1, e2, e3, st) ->
-        SFor(check_expr e1, check_expr e2, check_expr e3, check_stmt st)
+        SFor(check_expr e1, check_bool_expr e2, check_expr e3, check_stmt st)
       | Return e -> let (t, e') = check_expr e in
         if t = main.mtyp then SReturn (t, e') 
         else raise (
@@ -325,20 +331,26 @@ let check (globals, action_decls, main_decl) =
      in if t' != (check_series_type l) then raise (Failure err) else (t', e') 
    in
 
-  let rec check_stmt = function (*currently only suuports one input -- support for map *)
+   let check_bool_expr e = 
+    let (t', e') = check_expr e
+      and err = "expected Boolean expression in " ^ string_of_expr e
+      in if t' != Bool then raise (Failure err) else (t', e') 
+  in
+
+  let rec check_stmt = function (*currently only supports one input -- support for map *)
     Expr e -> SExpr (check_expr e) 
     | SeriesPush (var, e) -> 
       let _ = check_series_type var in
       SSeriesPush(var, check_match_series_type_expr var e) 
-    | If(p, b1, b2) -> SIf(check_expr p, check_stmt b1, check_stmt b2)
-    | While(p, s) -> SWhile(check_expr p, check_stmt s)
+    | If(p, b1, b2) -> SIf(check_bool_expr p, check_stmt b1, check_stmt b2)
+    | While(p, s) -> SWhile(check_bool_expr p, check_stmt s)
+    | For(e1, e2, e3, st) ->
+      SFor(check_expr e1, check_bool_expr e2, check_expr e3, check_stmt st)
     | Return e -> let (t, e') = check_expr e in
         if t = act.atyp then SReturn (t, e') 
         else raise (
 	        Failure ("return gives " ^ string_of_typ t ^ " expected " ^
 		    string_of_typ act.atyp ^ " in " ^ string_of_expr e))
-    | For(e1, e2, e3, st) ->
-      SFor(check_expr e1, check_expr e2, check_expr e3, check_stmt st)
     | Block sl -> 
       let rec check_stmt_list = function
         [Return _ as s] -> [check_stmt s]

@@ -1,0 +1,9 @@
+when do int B(int x):
+{
+    return 3
+    x = 1
+}
+main:
+{
+    do B(4) 
+}

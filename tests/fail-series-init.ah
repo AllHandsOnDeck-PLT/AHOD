@@ -1,0 +1,5 @@
+main: 
+{
+    series<int> a 
+    a = []
+}

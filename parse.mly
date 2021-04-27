@@ -88,7 +88,7 @@ stmt_list:
 stmt:
     | stmt_block                                { $1 }
     | expr cend_opt NEWLINE                  { Expr $1} 
-    | RETURN expr_opt NEWLINE               { Return $2} /*doesn't have comment opt causes shift reduce */
+    | RETURN expr_opt NEWLINE               { Return $2}
     | if_stmt                               { $1 }
     | FOR LPAREN expr SEMI expr SEMI expr RPAREN COLON cend_opt stmt_block  { For($3, $5, $7, $11)   }
     /* | FOR ID IN expr COLON stmt_block       { ForLit($2, $4, $6) }  */

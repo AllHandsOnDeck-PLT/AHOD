@@ -1,5 +1,5 @@
-Player player
+Card card
 main:
 {
-  player = Player(1, "bob") 
+  card = Card(1, "name") 
 }

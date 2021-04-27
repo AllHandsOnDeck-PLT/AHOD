@@ -1,0 +1,10 @@
+when do void B():
+{
+}
+when do void B():
+{
+}
+main:
+{
+    do B() 
+}
