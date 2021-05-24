@@ -179,6 +179,6 @@ main:
 ⛵️ [**Language Reference Manual**](http://www.cs.columbia.edu/~sedwards/classes/2021/4115-spring/lrms/AHOD.pdf) \
 🗺 [**Proposal**](http://www.cs.columbia.edu/~sedwards/classes/2021/4115-spring/proposals/AHOD.pdf)
 
-# Acknowledgments
+# Acknowledgements
 
 This language was developed as a Programming Languages & Translators project in Spring 2021 at Columbia University by Caitlyn Chen, Tiffeny Chen, Jang Hun Choi, Mara Dimofte, and Christi Kim.
