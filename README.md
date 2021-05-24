@@ -172,7 +172,7 @@ main:
 
 # Architecture
 
-<img src="compiler_architecture.png" width=1000>
+<img src="architecture_diagram.png" width=1000>
 
 # Documentation
 ⚓️  [**Final Report**](http://www.cs.columbia.edu/~sedwards/classes/2021/4115-spring/reports/AHOD.pdf) \
